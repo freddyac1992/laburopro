@@ -2,19 +2,30 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
 export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url)
-  const code = searchParams.get('code')
-  // If next is in searchParams, use it as redirect destination
-  const next = searchParams.get('next') ?? '/dashboard'
+  const requestUrl = new URL(request.url)
+  const code = requestUrl.searchParams.get('code')
+  const next = requestUrl.searchParams.get('next') ?? '/dashboard'
+  const origin = requestUrl.origin
 
   if (code) {
     const supabase = await createClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`)
+      // Get user to check role
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single()
+        
+        const redirectPath = profile?.role === 'admin' ? '/admin' : next
+        return NextResponse.redirect(`${origin}${redirectPath}`)
+      }
     }
   }
 
-  // Return the user to an error page with some context
+  // Redirect to login with error
   return NextResponse.redirect(`${origin}/login?error=Could not authenticate with Google`)
 }
