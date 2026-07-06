@@ -27,18 +27,22 @@ type FilterTab = 'all' | 'pending' | 'approved' | 'verified'
 export default function AdminProviderActions({ initialProviders }: Props) {
   const [providers, setProviders] = useState<Provider[]>(initialProviders)
   const [saving, setSaving] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState<FilterTab>('all')
 
   const supabase = createClient()
 
   async function updateProvider(id: string, updates: Partial<{ is_approved: boolean; is_verified: boolean; is_active: boolean }>) {
     setSaving(id)
-    const { error } = await (supabase
+    setError(null)
+    const { error: updateError } = await (supabase
       .from('provider_profiles') as any)
       .update({ ...updates, updated_at: new Date().toISOString() })
       .eq('id', id)
 
-    if (!error) {
+    if (updateError) {
+      setError(`No se pudo actualizar el proveedor: ${updateError.message}`)
+    } else {
       setProviders((prev) =>
         prev.map((p) => (p.id === id ? { ...p, ...updates } : p))
       )
@@ -62,6 +66,12 @@ export default function AdminProviderActions({ initialProviders }: Props) {
 
   return (
     <div>
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 text-sm mb-4">
+          {error}
+        </div>
+      )}
+
       {/* Filter tabs */}
       <div className="flex gap-2 mb-6 border-b border-gray-200">
         {tabs.map((tab) => (

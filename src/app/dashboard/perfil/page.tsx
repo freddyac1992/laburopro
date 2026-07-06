@@ -66,7 +66,7 @@ export default function PerfilPage() {
       .from('provider_profiles')
       .select('*')
       .eq('user_id', user.id)
-      .single()) as any
+      .maybeSingle()) as any
 
     if (existing) {
       setProfileId(existing.id)

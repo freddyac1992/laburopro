@@ -1,16 +1,24 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { Suspense, useEffect, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { SITE_NAME } from '@/lib/constants'
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  // Errors passed back from the OAuth callback arrive as /login?error=...
+  const [error, setError] = useState<string | null>(searchParams.get('error'))
   const [form, setForm] = useState({ email: '', password: '' })
+
+  useEffect(() => {
+    if (searchParams.get('error')) {
+      window.history.replaceState(null, '', '/login')
+    }
+  }, [searchParams])
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
@@ -24,10 +32,15 @@ export default function LoginPage() {
       const supabase = createClient()
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
+        },
       })
       if (error) throw error
-    } catch (err: any) {
-      setError(err.message || 'Error al iniciar sesión con Google')
+      // No apagamos `loading`: el navegador está por redirigir a Google.
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : null
+      setError(msg || 'Error al iniciar sesión con Google')
       setLoading(false)
     }
   }
@@ -188,5 +201,14 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  // useSearchParams requires a Suspense boundary for static prerendering
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   )
 }

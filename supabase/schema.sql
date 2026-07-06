@@ -31,7 +31,8 @@ BEGIN
     NEW.id,
     NEW.email,
     COALESCE(NEW.raw_user_meta_data->>'full_name', ''),
-    COALESCE(NEW.raw_user_meta_data->>'role', 'provider')
+    -- Never trust client metadata for the role; admins are promoted manually
+    'provider'
   )
   ON CONFLICT (id) DO NOTHING;
   RETURN NEW;
@@ -140,7 +141,7 @@ ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
 -- Helper: check if user is admin
 CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS boolean
-LANGUAGE sql STABLE SECURITY DEFINER
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public
 AS $$
   SELECT EXISTS (
     SELECT 1 FROM public.profiles
@@ -231,3 +232,57 @@ CREATE TRIGGER set_profiles_updated_at BEFORE UPDATE ON public.profiles
 
 CREATE TRIGGER set_provider_profiles_updated_at BEFORE UPDATE ON public.provider_profiles
   FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
+
+-- ============================================================
+-- Privilege protection triggers
+-- ============================================================
+
+-- Block role changes by non-admins (RLS UPDATE policy alone would
+-- let a user set their own role to 'admin')
+CREATE OR REPLACE FUNCTION public.protect_profile_role()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER SET search_path = public
+AS $$
+BEGIN
+  IF NEW.role IS DISTINCT FROM OLD.role AND NOT public.is_admin() THEN
+    RAISE EXCEPTION 'Not authorized to change role';
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS protect_profile_role ON public.profiles;
+CREATE TRIGGER protect_profile_role
+  BEFORE UPDATE ON public.profiles
+  FOR EACH ROW EXECUTE FUNCTION public.protect_profile_role();
+
+-- Only admins can set moderation/reputation columns on provider profiles;
+-- for non-admins they silently keep previous values (or safe defaults on INSERT)
+CREATE OR REPLACE FUNCTION public.protect_provider_flags()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER SET search_path = public
+AS $$
+BEGIN
+  IF NOT public.is_admin() THEN
+    IF TG_OP = 'INSERT' THEN
+      NEW.is_approved   := false;
+      NEW.is_verified   := false;
+      NEW.rating        := 0;
+      NEW.review_count  := 0;
+    ELSE
+      NEW.is_approved   := OLD.is_approved;
+      NEW.is_verified   := OLD.is_verified;
+      NEW.rating        := OLD.rating;
+      NEW.review_count  := OLD.review_count;
+    END IF;
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS protect_provider_flags ON public.provider_profiles;
+CREATE TRIGGER protect_provider_flags
+  BEFORE INSERT OR UPDATE ON public.provider_profiles
+  FOR EACH ROW EXECUTE FUNCTION public.protect_provider_flags();

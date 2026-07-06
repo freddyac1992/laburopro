@@ -31,10 +31,15 @@ export default function RegistroPage() {
       const supabase = createClient()
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
+        },
       })
       if (error) throw error
-    } catch (err: any) {
-      setError(err.message || 'Error al registrarse con Google')
+      // No apagamos `loading`: el navegador está por redirigir a Google.
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : null
+      setError(msg || 'Error al registrarse con Google')
       setLoading(false)
     }
   }
@@ -64,14 +69,8 @@ export default function RegistroPage() {
 
       if (authError) throw authError
 
+      // The profiles row is created by the on_auth_user_created DB trigger
       if (data.user) {
-        // Insert profile
-        await (supabase.from('profiles') as any).upsert({
-          id: data.user.id,
-          email: form.email,
-          full_name: form.fullName,
-          role: 'provider',
-        })
         setSuccess(true)
       }
     } catch (err: unknown) {

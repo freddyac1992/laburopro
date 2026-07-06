@@ -20,7 +20,7 @@ export default async function DashboardPage() {
     .from('provider_profiles')
     .select('id, display_name, slug, is_approved, is_verified, is_active')
     .eq('user_id', user.id)
-    .single()) as any
+    .maybeSingle()) as any
 
   return (
     <DashboardShell title={`Hola, ${profile?.full_name ?? 'Proveedor'} 👋`}>
