@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import type { Role } from '@/types/database'
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
@@ -14,12 +15,12 @@ export async function GET(request: Request) {
       // Get user to check role
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
-        const { data: profile } = await supabase
+        const { data: profile } = (await supabase
           .from('profiles')
           .select('role')
           .eq('id', user.id)
-          .single()
-        
+          .single()) as { data: { role: Role } | null }
+
         const redirectPath = profile?.role === 'admin' ? '/admin' : next
         return NextResponse.redirect(`${origin}${redirectPath}`)
       }
