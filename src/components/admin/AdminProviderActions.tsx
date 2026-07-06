@@ -35,8 +35,8 @@ export default function AdminProviderActions({ initialProviders }: Props) {
   async function updateProvider(id: string, updates: Partial<{ is_approved: boolean; is_verified: boolean; is_active: boolean }>) {
     setSaving(id)
     setError(null)
-    const { error: updateError } = await (supabase
-      .from('provider_profiles') as any)
+    const { error: updateError } = await supabase
+      .from('provider_profiles')
       .update({ ...updates, updated_at: new Date().toISOString() })
       .eq('id', id)
 

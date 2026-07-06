@@ -67,7 +67,7 @@ function LoginForm() {
           .from('profiles')
           .select('role')
           .eq('id', data.user.id)
-          .single()) as any
+          .single())
 
         if (profile?.role === 'admin') {
           router.push('/admin')

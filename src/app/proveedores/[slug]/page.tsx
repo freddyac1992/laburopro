@@ -6,27 +6,39 @@ import VerificationBadge from '@/components/ui/VerificationBadge'
 import { SITE_NAME, SITE_URL } from '@/lib/constants'
 import { createClient } from '@/lib/supabase/server'
 import { getInitials } from '@/lib/utils'
+import type { ProviderProfile } from '@/types/database'
 
 interface PageProps {
   params: Promise<{ slug: string }>
+}
+
+type ProviderMetadata = ProviderProfile & {
+  category: { name: string } | null
+  city: { name: string } | null
+}
+
+type PublicProviderProfile = ProviderProfile & {
+  category: { name: string; slug: string; icon: string | null } | null
+  city: { name: string; slug: string } | null
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
   try {
     const supabase = await createClient()
-    const { data: provider } = (await supabase
+    const { data } = await supabase
       .from('provider_profiles')
       .select('*, category:categories(name), city:cities(name)')
       .eq('slug', slug)
       .eq('is_approved', true)
       .eq('is_active', true)
-      .single()) as any
+      .single()
+    const provider = data as unknown as ProviderMetadata | null
 
     if (!provider) return {}
 
-    const catName = (provider.category as { name: string } | null)?.name
-    const cityName = (provider.city as { name: string } | null)?.name
+    const catName = provider.category?.name
+    const cityName = provider.city?.name
     const title = `${provider.display_name} — ${catName ?? 'Proveedor'} en ${cityName ?? 'Bolivia'} | ${SITE_NAME}`
     const description = provider.description ?? `Perfil de ${provider.display_name} en LaburoPro. ${catName} en ${cityName}.`
 
@@ -47,14 +59,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 async function getProvider(slug: string) {
   try {
     const supabase = await createClient()
-    const { data } = (await supabase
+    const { data } = await supabase
       .from('provider_profiles')
       .select('*, category:categories(name, slug, icon), city:cities(name, slug)')
       .eq('slug', slug)
       .eq('is_approved', true)
       .eq('is_active', true)
-      .single()) as any
-    return data
+      .single()
+    return data as unknown as PublicProviderProfile | null
   } catch {
     return null
   }
@@ -65,8 +77,8 @@ export default async function ProviderProfilePage({ params }: PageProps) {
   const provider = await getProvider(slug)
   if (!provider) notFound()
 
-  const category = provider.category as { name: string; slug: string; icon: string } | null
-  const city = provider.city as { name: string; slug: string } | null
+  const category = provider.category
+  const city = provider.city
   const initials = getInitials(provider.display_name)
 
   return (

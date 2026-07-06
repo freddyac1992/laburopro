@@ -35,6 +35,11 @@ yarn-error.log*
 
 # vercel
 .vercel
+.vercel-cli
+
+# local deploy/tooling artifacts
+.deploy-tmp
+.claude
 
 # typescript
 *.tsbuildinfo

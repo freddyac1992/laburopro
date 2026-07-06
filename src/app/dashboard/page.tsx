@@ -12,7 +12,7 @@ export default async function DashboardPage() {
     .from('profiles')
     .select('full_name, role')
     .eq('id', user.id)
-    .single()) as any
+    .single())
 
   if (profile?.role === 'admin') redirect('/admin')
 
@@ -20,7 +20,7 @@ export default async function DashboardPage() {
     .from('provider_profiles')
     .select('id, display_name, slug, is_approved, is_verified, is_active')
     .eq('user_id', user.id)
-    .maybeSingle()) as any
+    .maybeSingle())
 
   return (
     <DashboardShell title={`Hola, ${profile?.full_name ?? 'Proveedor'} 👋`}>

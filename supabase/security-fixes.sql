@@ -73,11 +73,13 @@ BEGIN
     IF TG_OP = 'INSERT' THEN
       NEW.is_approved   := false;
       NEW.is_verified   := false;
+      NEW.is_active     := true;
       NEW.rating        := 0;
       NEW.review_count  := 0;
     ELSE
       NEW.is_approved   := OLD.is_approved;
       NEW.is_verified   := OLD.is_verified;
+      NEW.is_active     := OLD.is_active;
       NEW.rating        := OLD.rating;
       NEW.review_count  := OLD.review_count;
     END IF;

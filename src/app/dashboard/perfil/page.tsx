@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import DashboardShell from '@/components/dashboard/DashboardShell'
 import { createClient } from '@/lib/supabase/client'
 import { CATEGORIES, CITIES } from '@/lib/constants'
 import { slugify } from '@/lib/utils'
+import type { ProviderProfile } from '@/types/database'
 
 interface FormState {
   display_name: string
@@ -44,52 +45,64 @@ export default function PerfilPage() {
     availability: '',
   })
 
-  const loadData = useCallback(async () => {
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { router.push('/login'); return }
-    setUserId(user.id)
+  useEffect(() => {
+    let cancelled = false
 
-    // Load categories and cities from DB (fallback to constants)
-    const [catsResult, citiesResult] = await Promise.all([
-      supabase.from('categories').select('id, name, slug').order('name'),
-      supabase.from('cities').select('id, name, slug').order('name'),
-    ])
+    async function loadData() {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        router.push('/login')
+        return
+      }
+      if (cancelled) return
+      setUserId(user.id)
 
-    const cats = (catsResult.data ?? []) as { id: string; name: string; slug: string }[]
-    const cities = (citiesResult.data ?? []) as { id: string; name: string; slug: string }[]
-    setDbCategories(cats)
-    setDbCities(cities)
+      // Load categories and cities from DB (fallback to constants)
+      const [catsResult, citiesResult] = await Promise.all([
+        supabase.from('categories').select('id, name, slug').order('name'),
+        supabase.from('cities').select('id, name, slug').order('name'),
+      ])
+      if (cancelled) return
 
-    // Load existing provider profile
-    const { data: existing } = (await supabase
-      .from('provider_profiles')
-      .select('*')
-      .eq('user_id', user.id)
-      .maybeSingle()) as any
+      const cats = catsResult.data ?? []
+      const cities = citiesResult.data ?? []
+      setDbCategories(cats)
+      setDbCities(cities)
 
-    if (existing) {
-      setProfileId(existing.id)
-      setForm({
-        display_name: existing.display_name ?? '',
-        category_id: existing.category_id ?? '',
-        city_id: existing.city_id ?? '',
-        zone: existing.zone ?? '',
-        description: existing.description ?? '',
-        services: existing.services ? (existing.services as string[]).join(', ') : '',
-        years_experience: existing.years_experience?.toString() ?? '',
-        price_reference: existing.price_reference ?? '',
-        whatsapp: existing.whatsapp ?? '',
-        availability: existing.availability ?? '',
-      })
+      // Load existing provider profile
+      const { data: existing } = await supabase
+        .from('provider_profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle()
+
+      if (cancelled) return
+      const providerProfile = existing as ProviderProfile | null
+      if (providerProfile) {
+        setProfileId(providerProfile.id)
+        setForm({
+          display_name: providerProfile.display_name ?? '',
+          category_id: providerProfile.category_id ?? '',
+          city_id: providerProfile.city_id ?? '',
+          zone: providerProfile.zone ?? '',
+          description: providerProfile.description ?? '',
+          services: providerProfile.services ? providerProfile.services.join(', ') : '',
+          years_experience: providerProfile.years_experience?.toString() ?? '',
+          price_reference: providerProfile.price_reference ?? '',
+          whatsapp: providerProfile.whatsapp ?? '',
+          availability: providerProfile.availability ?? '',
+        })
+      }
+
+      setLoading(false)
     }
 
-    setLoading(false)
+    void loadData()
+    return () => {
+      cancelled = true
+    }
   }, [router])
-
-  useEffect(() => {
-    loadData()
-  }, [loadData])
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
@@ -104,6 +117,7 @@ export default function PerfilPage() {
 
     if (!form.display_name.trim()) return setError('El nombre es obligatorio.')
     if (!form.whatsapp.trim()) return setError('El número de WhatsApp es obligatorio.')
+    if (!userId) return setError('No se pudo identificar al usuario. Vuelve a iniciar sesión.')
 
     setSaving(true)
     try {
@@ -115,7 +129,6 @@ export default function PerfilPage() {
         .filter(Boolean)
 
       const payload = {
-        user_id: userId!,
         display_name: form.display_name.trim(),
         category_id: form.category_id || null,
         city_id: form.city_id || null,
@@ -126,19 +139,18 @@ export default function PerfilPage() {
         price_reference: form.price_reference.trim() || null,
         whatsapp: form.whatsapp.trim(),
         availability: form.availability.trim() || null,
-        updated_at: new Date().toISOString(),
       }
 
       if (profileId) {
-        const { error: updateError } = await (supabase
-          .from('provider_profiles') as any)
+        const { error: updateError } = await supabase
+          .from('provider_profiles')
           .update(payload)
           .eq('id', profileId)
         if (updateError) throw updateError
       } else {
-        const { data: newProfile, error: insertError } = await (supabase
-          .from('provider_profiles') as any)
-          .insert({ ...payload, slug })
+        const { data: newProfile, error: insertError } = await supabase
+          .from('provider_profiles')
+          .insert({ ...payload, user_id: userId, slug })
           .select('id')
           .single()
         if (insertError) throw insertError

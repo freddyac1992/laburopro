@@ -6,9 +6,15 @@ import CitySelector from '@/components/ui/CitySelector'
 import EmptyState from '@/components/ui/EmptyState'
 import { CATEGORIES, CITIES, SITE_NAME, SITE_URL } from '@/lib/constants'
 import { createClient } from '@/lib/supabase/server'
+import type { ProviderProfile } from '@/types/database'
 
 interface PageProps {
   params: Promise<{ categoria: string; ciudad: string }>
+}
+
+type ProviderListItem = ProviderProfile & {
+  category: { name: string; slug: string } | null
+  city: { name: string; slug: string } | null
 }
 
 export async function generateStaticParams() {
@@ -44,21 +50,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 async function getProviders(categorySlug: string, citySlug: string) {
   try {
     const supabase = await createClient()
-    const { data } = (await supabase
+    const { data } = await supabase
       .from('provider_profiles')
-      .select('*, category:categories(name, slug), city:cities(name, slug)')
+      .select('*, category:categories!inner(name, slug), city:cities!inner(name, slug)')
       .eq('is_approved', true)
       .eq('is_active', true)
+      .eq('category.slug', categorySlug)
+      .eq('city.slug', citySlug)
       .order('is_verified', { ascending: false })
-      .order('rating', { ascending: false })) as any
+      .order('rating', { ascending: false })
 
-    return (data ?? []).filter(
-      (p: any) =>
-        p.category &&
-        (p.category as { slug: string }).slug === categorySlug &&
-        p.city &&
-        (p.city as { slug: string }).slug === citySlug
-    )
+    return (data ?? []) as unknown as ProviderListItem[]
   } catch {
     return []
   }
@@ -132,9 +134,9 @@ export default async function CategoriayCiudadPage({ params }: PageProps) {
             {providers.length} proveedor{providers.length !== 1 ? 'es' : ''} en {city.name}
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {providers.map((p: any) => {
-              const catData = p.category as { name: string } | undefined
-              const cityData = p.city as { name: string } | undefined
+            {providers.map((p) => {
+              const catData = p.category
+              const cityData = p.city
               return (
                 <ProviderCard
                   key={p.id}

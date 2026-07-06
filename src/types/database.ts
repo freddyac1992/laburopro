@@ -1,6 +1,6 @@
 export type Role = 'provider' | 'admin'
 
-export interface Profile {
+export type Profile = {
   id: string
   email: string | null
   full_name: string | null
@@ -9,7 +9,7 @@ export interface Profile {
   updated_at: string
 }
 
-export interface Category {
+export type Category = {
   id: string
   name: string
   slug: string
@@ -18,7 +18,7 @@ export interface Category {
   created_at: string
 }
 
-export interface City {
+export type City = {
   id: string
   name: string
   slug: string
@@ -26,7 +26,7 @@ export interface City {
   created_at: string
 }
 
-export interface ProviderProfile {
+export type ProviderProfile = {
   id: string
   user_id: string
   category_id: string | null
@@ -52,7 +52,7 @@ export interface ProviderProfile {
   city?: City
 }
 
-export interface Lead {
+export type Lead = {
   id: string
   provider_id: string | null
   customer_name: string | null
@@ -62,7 +62,7 @@ export interface Lead {
   created_at: string
 }
 
-export interface Review {
+export type Review = {
   id: string
   provider_id: string | null
   rating: number
@@ -79,32 +79,42 @@ export interface Database {
         Row: Profile
         Insert: Omit<Profile, 'created_at' | 'updated_at'>
         Update: Partial<Omit<Profile, 'id' | 'created_at'>>
+        Relationships: []
       }
       categories: {
         Row: Category
         Insert: Omit<Category, 'id' | 'created_at'>
         Update: Partial<Omit<Category, 'id' | 'created_at'>>
+        Relationships: []
       }
       cities: {
         Row: City
         Insert: Omit<City, 'id' | 'created_at'>
         Update: Partial<Omit<City, 'id' | 'created_at'>>
+        Relationships: []
       }
       provider_profiles: {
         Row: ProviderProfile
         Insert: Omit<ProviderProfile, 'id' | 'created_at' | 'updated_at' | 'rating' | 'review_count' | 'is_approved' | 'is_verified' | 'is_active' | 'category' | 'city'>
         Update: Partial<Omit<ProviderProfile, 'id' | 'user_id' | 'created_at' | 'category' | 'city'>>
+        Relationships: []
       }
       leads: {
         Row: Lead
         Insert: Omit<Lead, 'id' | 'created_at'>
         Update: Partial<Omit<Lead, 'id' | 'created_at'>>
+        Relationships: []
       }
       reviews: {
         Row: Review
         Insert: Omit<Review, 'id' | 'created_at' | 'is_approved'>
         Update: Partial<Omit<Review, 'id' | 'created_at'>>
+        Relationships: []
       }
     }
+    Views: Record<string, never>
+    Functions: Record<string, never>
+    Enums: Record<string, never>
+    CompositeTypes: Record<string, never>
   }
 }
