@@ -201,6 +201,7 @@ export default async function ProviderProfilePage({ params }: PageProps) {
               <WhatsAppButton
                 phone={provider.whatsapp}
                 providerName={provider.display_name}
+                providerId={provider.id}
                 size="md"
                 pulse
                 className="w-full"

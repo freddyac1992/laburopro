@@ -22,6 +22,13 @@ export default async function DashboardPage() {
     .eq('user_id', user.id)
     .maybeSingle())
 
+  const { count: leadCount } = providerProfile
+    ? await supabase
+        .from('leads')
+        .select('*', { count: 'exact', head: true })
+        .eq('provider_id', providerProfile.id)
+    : { count: 0 }
+
   return (
     <DashboardShell title={`Hola, ${profile?.full_name ?? 'Proveedor'} 👋`}>
       <div className="space-y-6">
@@ -45,6 +52,10 @@ export default async function DashboardPage() {
                 <span className={`font-semibold text-sm ${providerProfile.is_verified ? 'text-green-600' : 'text-gray-400'}`}>
                   {providerProfile.is_verified ? '✅ Verificado' : '— No verificado'}
                 </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">Contactos recibidos</span>
+                <span className="font-semibold text-sm text-blue-700">{leadCount ?? 0}</span>
               </div>
               {!providerProfile.is_approved && (
                 <div className="mt-3 bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
@@ -98,6 +109,16 @@ export default async function DashboardPage() {
             <div className="text-3xl mb-3">⭐</div>
             <h3 className="font-semibold text-gray-900 mb-1">Reseñas</h3>
             <p className="text-gray-500 text-sm">Próximamente: ve y responde las reseñas de clientes.</p>
+          </div>
+
+          <div className="bg-white rounded-2xl border border-gray-100 p-5">
+            <div className="text-3xl mb-3">📲</div>
+            <h3 className="font-semibold text-gray-900 mb-1">Contactos</h3>
+            <p className="text-gray-500 text-sm">
+              {providerProfile
+                ? `${leadCount ?? 0} persona${leadCount === 1 ? '' : 's'} hicieron click para contactarte por WhatsApp.`
+                : 'Crea tu perfil para empezar a recibir contactos.'}
+            </p>
           </div>
         </div>
       </div>

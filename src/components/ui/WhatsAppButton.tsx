@@ -1,8 +1,11 @@
+'use client'
+
 import { buildWhatsAppUrl } from '@/lib/utils'
 
 interface WhatsAppButtonProps {
   phone: string
   providerName: string
+  providerId?: string
   message?: string
   size?: 'sm' | 'md' | 'lg'
   pulse?: boolean
@@ -12,6 +15,7 @@ interface WhatsAppButtonProps {
 export default function WhatsAppButton({
   phone,
   providerName,
+  providerId,
   message,
   size = 'md',
   pulse = false,
@@ -32,12 +36,37 @@ export default function WhatsAppButton({
     lg: 'w-6 h-6',
   }
 
+  const trackLead = () => {
+    if (!providerId) return
+
+    const payload = JSON.stringify({
+      providerId,
+      message: defaultMessage,
+      source: 'whatsapp_profile',
+    })
+
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon('/api/leads', new Blob([payload], { type: 'application/json' }))
+      return
+    }
+
+    void fetch('/api/leads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: payload,
+      keepalive: true,
+    }).catch(() => {
+      // Contact tracking should never block the WhatsApp handoff.
+    })
+  }
+
   return (
     <a
       href={url}
       target="_blank"
       rel="noopener noreferrer"
       id={`whatsapp-btn-${providerName.toLowerCase().replace(/\s+/g, '-')}`}
+      onClick={trackLead}
       className={`inline-flex items-center justify-center font-semibold text-white rounded-xl ${sizes[size]} ${pulse ? 'whatsapp-pulse' : ''} ${className}`}
       style={{ backgroundColor: '#25d366' }}
       aria-label={`Contactar a ${providerName} por WhatsApp`}
