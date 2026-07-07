@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import DashboardShell from '@/components/dashboard/DashboardShell'
 import { createClient } from '@/lib/supabase/client'
 import { CATEGORIES, CITIES } from '@/lib/constants'
-import { slugify } from '@/lib/utils'
 import type { ProviderProfile } from '@/types/database'
 
 interface FormState {
@@ -26,7 +25,6 @@ export default function PerfilPage() {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [profileId, setProfileId] = useState<string | null>(null)
-  const [userId, setUserId] = useState<string | null>(null)
   const [dbCategories, setDbCategories] = useState<{ id: string; name: string; slug: string }[]>([])
   const [dbCities, setDbCities] = useState<{ id: string; name: string; slug: string }[]>([])
 
@@ -58,7 +56,6 @@ export default function PerfilPage() {
         return
       }
       if (cancelled) return
-      setUserId(user.id)
 
       // Load categories and cities from DB (fallback to constants)
       const [catsResult, citiesResult] = await Promise.all([
@@ -119,12 +116,9 @@ export default function PerfilPage() {
 
     if (!form.display_name.trim()) return setError('El nombre es obligatorio.')
     if (!form.whatsapp.trim()) return setError('El número de WhatsApp es obligatorio.')
-    if (!userId) return setError('No se pudo identificar al usuario. Vuelve a iniciar sesión.')
 
     setSaving(true)
     try {
-      const supabase = createClient()
-      const slug = slugify(form.display_name) + '-' + Math.random().toString(36).slice(2, 6)
       const servicesArray = form.services
         .split(',')
         .map((s) => s.trim())
@@ -143,22 +137,18 @@ export default function PerfilPage() {
         availability: form.availability.trim() || null,
       }
 
-      if (profileId) {
-        const { error: updateError } = await supabase
-          .from('provider_profiles')
-          .update(payload)
-          .eq('id', profileId)
-        if (updateError) throw updateError
-      } else {
-        const { data: newProfile, error: insertError } = await supabase
-          .from('provider_profiles')
-          .insert({ ...payload, user_id: userId, slug })
-          .select('id')
-          .single()
-        if (insertError) throw insertError
-        if (newProfile) setProfileId(newProfile.id)
+      const response = await fetch('/api/provider-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      const result = (await response.json()) as { id?: string; message?: string }
+
+      if (!response.ok) {
+        throw new Error(result.message ?? 'Error al guardar')
       }
 
+      if (result.id) setProfileId(result.id)
       setSuccess(true)
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (err: unknown) {
