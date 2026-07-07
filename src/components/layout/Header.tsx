@@ -1,11 +1,129 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { NAV_LINKS, SITE_NAME } from '@/lib/constants'
+import { createClient } from '@/lib/supabase/client'
+import type { Role } from '@/types/database'
 
 export default function Header() {
+  const router = useRouter()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [checkingSession, setCheckingSession] = useState(true)
+  const [dashboardHref, setDashboardHref] = useState('/dashboard')
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+  useEffect(() => {
+    const supabase = createClient()
+
+    async function loadSession() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
+      setIsLoggedIn(Boolean(user))
+
+      if (user) {
+        const { data: profile } = (await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .maybeSingle()) as { data: { role: Role } | null }
+
+        setDashboardHref(profile?.role === 'admin' ? '/admin' : '/dashboard')
+      }
+
+      setCheckingSession(false)
+    }
+
+    void loadSession()
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(Boolean(session?.user))
+      setDashboardHref('/dashboard')
+      setCheckingSession(false)
+      router.refresh()
+    })
+
+    return () => subscription.unsubscribe()
+  }, [router])
+
+  const closeMenu = () => setMenuOpen(false)
+
+  const authLinks = isLoggedIn ? (
+    <>
+      <Link
+        href={dashboardHref}
+        id="header-dashboard-btn"
+        className="text-sm font-semibold bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-800"
+      >
+        Mi panel
+      </Link>
+      <Link
+        href="/api/auth/logout"
+        id="header-logout-btn"
+        className="text-sm font-medium text-gray-700 hover:text-red-600 px-4 py-2 rounded-lg hover:bg-red-50"
+      >
+        Cerrar sesión
+      </Link>
+    </>
+  ) : (
+    <>
+      <Link
+        href="/login"
+        id="header-login-btn"
+        className="text-sm font-medium text-gray-700 hover:text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-50"
+      >
+        Ingresar
+      </Link>
+      <Link
+        href="/registro"
+        id="header-register-btn"
+        className="text-sm font-semibold bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-800"
+      >
+        Publicar servicio
+      </Link>
+    </>
+  )
+
+  const mobileAuthLinks = isLoggedIn ? (
+    <>
+      <Link
+        href={dashboardHref}
+        className="block px-4 py-2 bg-blue-700 text-white rounded-lg font-semibold text-center hover:bg-blue-800"
+        onClick={closeMenu}
+      >
+        Mi panel
+      </Link>
+      <Link
+        href="/api/auth/logout"
+        className="block px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg font-medium"
+        onClick={closeMenu}
+      >
+        Cerrar sesión
+      </Link>
+    </>
+  ) : (
+    <>
+      <Link
+        href="/login"
+        className="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg font-medium"
+        onClick={closeMenu}
+      >
+        Ingresar
+      </Link>
+      <Link
+        href="/registro"
+        className="block px-4 py-2 bg-blue-700 text-white rounded-lg font-semibold text-center hover:bg-blue-800"
+        onClick={closeMenu}
+      >
+        Publicar servicio
+      </Link>
+    </>
+  )
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
@@ -36,20 +154,7 @@ export default function Header() {
 
           {/* Desktop auth buttons */}
           <div className="hidden md:flex items-center gap-3">
-            <Link
-              href="/login"
-              id="header-login-btn"
-              className="text-sm font-medium text-gray-700 hover:text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-50"
-            >
-              Ingresar
-            </Link>
-            <Link
-              href="/registro"
-              id="header-register-btn"
-              className="text-sm font-semibold bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-800"
-            >
-              Publicar servicio
-            </Link>
+            {!checkingSession && authLinks}
           </div>
 
           {/* Mobile menu button */}
@@ -79,26 +184,13 @@ export default function Header() {
                 key={link.href}
                 href={link.href}
                 className="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg font-medium"
-                onClick={() => setMenuOpen(false)}
+                onClick={closeMenu}
               >
                 {link.label}
               </Link>
             ))}
             <div className="pt-2 border-t border-gray-100 space-y-2">
-              <Link
-                href="/login"
-                className="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg font-medium"
-                onClick={() => setMenuOpen(false)}
-              >
-                Ingresar
-              </Link>
-              <Link
-                href="/registro"
-                className="block px-4 py-2 bg-blue-700 text-white rounded-lg font-semibold text-center hover:bg-blue-800"
-                onClick={() => setMenuOpen(false)}
-              >
-                Publicar servicio
-              </Link>
+              {!checkingSession && mobileAuthLinks}
             </div>
           </div>
         )}

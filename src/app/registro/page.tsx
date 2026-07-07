@@ -69,10 +69,15 @@ export default function RegistroPage() {
 
       if (authError) throw authError
 
-      // The profiles row is created by the on_auth_user_created DB trigger
-      if (data.user) {
-        setSuccess(true)
+      if (data.session) {
+        router.push('/dashboard')
+        router.refresh()
+        return
       }
+
+      // The profiles row is created by the on_auth_user_created DB trigger.
+      // When email confirmation is enabled, Supabase returns a user without a session.
+      if (data.user) setSuccess(true)
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Error al registrarse'
       setError(message)
