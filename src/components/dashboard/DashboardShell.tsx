@@ -57,6 +57,13 @@ export default function DashboardShell({ children, title }: DashboardShellProps)
             {item.icon} {item.label}
           </Link>
         ))}
+        <Link
+          href="/api/auth/logout"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-gray-700 hover:bg-red-50 hover:text-red-600 font-medium text-sm whitespace-nowrap"
+          id="dashboard-mobile-logout-btn"
+        >
+          🚪 Cerrar sesión
+        </Link>
       </div>
 
       {/* Main content */}

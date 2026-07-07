@@ -43,11 +43,30 @@ export default function AdminShell({ children, title }: AdminShellProps) {
           >
             ← Volver al sitio
           </Link>
+          <Link
+            href="/api/auth/logout"
+            className="mt-1 flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-red-950 hover:text-red-100 font-medium text-sm transition-colors"
+            id="admin-logout-btn"
+          >
+            🚪 Cerrar sesión
+          </Link>
         </div>
       </aside>
 
       {/* Main content */}
       <div className="flex-1 flex flex-col">
+        <div className="md:hidden bg-gray-900 text-white px-4 py-3 flex items-center justify-between">
+          <Link href="/" className="font-bold">
+            {SITE_NAME}
+          </Link>
+          <Link
+            href="/api/auth/logout"
+            className="text-sm text-gray-200 hover:text-white"
+            id="admin-mobile-logout-btn"
+          >
+            Cerrar sesión
+          </Link>
+        </div>
         <div className="max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 md:py-10">
           {title && (
             <h1 className="text-2xl font-bold text-gray-900 mb-6">{title}</h1>
