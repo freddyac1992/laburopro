@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import DashboardShell from '@/components/dashboard/DashboardShell'
 import { createClient } from '@/lib/supabase/client'
 import { CATEGORIES, CITIES } from '@/lib/constants'
@@ -22,7 +21,6 @@ interface FormState {
 }
 
 export default function PerfilPage() {
-  const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -50,9 +48,13 @@ export default function PerfilPage() {
 
     async function loadData() {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+      const user = session?.user
       if (!user) {
-        router.push('/login')
+        setError('No se pudo cargar tu sesión. Actualiza la página o vuelve a iniciar sesión.')
+        setLoading(false)
         return
       }
       if (cancelled) return
@@ -102,7 +104,7 @@ export default function PerfilPage() {
     return () => {
       cancelled = true
     }
-  }, [router])
+  }, [])
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
