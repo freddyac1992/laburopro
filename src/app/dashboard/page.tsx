@@ -12,7 +12,7 @@ export default async function DashboardPage() {
     .from('profiles')
     .select('full_name, role')
     .eq('id', user.id)
-    .single())
+    .maybeSingle())
 
   if (profile?.role === 'admin') redirect('/admin')
 

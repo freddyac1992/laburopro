@@ -19,6 +19,26 @@ function optionalString(value: unknown) {
   return typeof value === 'string' && value.trim() ? value.trim() : null
 }
 
+function looksLikeUuid(value: string) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
+}
+
+async function resolveReferenceId(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  table: 'categories' | 'cities',
+  value: string | null
+) {
+  if (!value) return null
+
+  const { data } = await supabase
+    .from(table)
+    .select('id')
+    .eq(looksLikeUuid(value) ? 'id' : 'slug', value)
+    .maybeSingle()
+
+  return data?.id ?? null
+}
+
 export async function POST(request: Request) {
   let body: ProviderProfileRequestBody
 
@@ -48,6 +68,32 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'Tu sesión expiró. Vuelve a iniciar sesión.' }, { status: 401 })
   }
 
+  const { data: profile, error: profileLookupError } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('id', user.id)
+    .maybeSingle()
+
+  if (profileLookupError) {
+    return NextResponse.json({ message: profileLookupError.message }, { status: 500 })
+  }
+
+  if (!profile) {
+    const { error: profileInsertError } = await supabase.from('profiles').insert({
+      id: user.id,
+      email: user.email ?? null,
+      full_name:
+        typeof user.user_metadata?.full_name === 'string'
+          ? user.user_metadata.full_name
+          : null,
+      role: 'provider',
+    })
+
+    if (profileInsertError) {
+      return NextResponse.json({ message: profileInsertError.message }, { status: 500 })
+    }
+  }
+
   const services = Array.isArray(body.services)
     ? body.services.filter((service): service is string => typeof service === 'string' && Boolean(service.trim()))
     : null
@@ -57,10 +103,15 @@ export async function POST(request: Request) {
       ? body.years_experience
       : null
 
+  const [categoryId, cityId] = await Promise.all([
+    resolveReferenceId(supabase, 'categories', optionalString(body.category_id)),
+    resolveReferenceId(supabase, 'cities', optionalString(body.city_id)),
+  ])
+
   const payload = {
     display_name: displayName,
-    category_id: optionalString(body.category_id),
-    city_id: optionalString(body.city_id),
+    category_id: categoryId,
+    city_id: cityId,
     zone: optionalString(body.zone),
     description: optionalString(body.description),
     services: services && services.length > 0 ? services.map((service) => service.trim()) : null,

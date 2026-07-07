@@ -31,6 +31,16 @@ export async function POST(request: Request) {
       : 'whatsapp'
 
   const supabase = await createClient()
+  const { data: provider } = await supabase
+    .from('provider_profiles')
+    .select('id')
+    .eq('id', providerId)
+    .maybeSingle()
+
+  if (!provider) {
+    return NextResponse.json({ message: 'Proveedor no encontrado.' }, { status: 404 })
+  }
+
   const { error } = await supabase.from('leads').insert({
     provider_id: providerId,
     customer_name: null,

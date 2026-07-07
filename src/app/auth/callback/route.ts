@@ -44,7 +44,7 @@ export async function GET(request: Request) {
     .from('profiles')
     .select('role')
     .eq('id', user.id)
-    .single()) as { data: { role: Role } | null }
+    .maybeSingle()) as { data: { role: Role } | null }
 
   const redirectPath = profile?.role === 'admin' ? '/admin' : next
   return NextResponse.redirect(`${origin}${redirectPath}`)
