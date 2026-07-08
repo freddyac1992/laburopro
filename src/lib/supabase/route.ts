@@ -22,6 +22,9 @@ export function createRouteClient(request: NextRequest) {
           return request.cookies.getAll()
         },
         setAll(newCookies, headers) {
+          newCookies.forEach(({ name, value }) => {
+            request.cookies.set(name, value)
+          })
           cookiesToSet.push(...newCookies)
           Object.assign(headersToSet, headers)
         },

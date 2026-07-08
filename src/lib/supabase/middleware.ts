@@ -33,17 +33,25 @@ export async function updateSession(request: NextRequest) {
 
   const url = request.nextUrl.clone()
 
+  const redirectWithAuthCookies = (redirectUrl: URL) => {
+    const response = NextResponse.redirect(redirectUrl)
+    supabaseResponse.cookies.getAll().forEach((cookie) => {
+      response.cookies.set(cookie)
+    })
+    return response
+  }
+
   // Protect dashboard routes
   if (!user && url.pathname.startsWith('/dashboard')) {
     url.pathname = '/login'
-    return NextResponse.redirect(url)
+    return redirectWithAuthCookies(url)
   }
 
   // Protect admin routes
   if (url.pathname.startsWith('/admin')) {
     if (!user) {
       url.pathname = '/login'
-      return NextResponse.redirect(url)
+      return redirectWithAuthCookies(url)
     }
     // Role check is done inside admin pages using server client
   }
