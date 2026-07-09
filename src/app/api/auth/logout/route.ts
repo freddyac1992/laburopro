@@ -1,7 +1,14 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createRouteClient } from '@/lib/supabase/route'
 
-export async function GET(request: NextRequest) {
+export function GET() {
+  return NextResponse.json(
+    { message: 'Usa POST para cerrar sesión.' },
+    { status: 405, headers: { Allow: 'POST' } }
+  )
+}
+
+export async function POST(request: NextRequest) {
   const requestUrl = new URL(request.url)
   const forwardedHost = request.headers.get('x-forwarded-host')
   const forwardedProto = request.headers.get('x-forwarded-proto')

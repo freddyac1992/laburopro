@@ -28,8 +28,8 @@ async function expectStatus(path, status, init) {
   return response
 }
 
-async function expectRedirect(path, target) {
-  const response = await expectStatus(path, 307)
+async function expectRedirect(path, target, init) {
+  const response = await expectStatus(path, 307, init)
   const location = response.headers.get('location') ?? ''
   assert(
     location.includes(target),
@@ -57,7 +57,8 @@ await expectRedirect('/dashboard/perfil', '/login')
 await expectRedirect('/admin', '/login')
 await expectRedirect('/admin/proveedores', '/login')
 await expectRedirect('/auth/callback', '/login?error=')
-await expectRedirect('/api/auth/logout', '/login')
+await expectStatus('/api/auth/logout', 405)
+await expectRedirect('/api/auth/logout', '/login', { method: 'POST' })
 
 await expectStatus('/api/provider-profile', 401, {
   method: 'POST',

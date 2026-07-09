@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import LogoutButton from '@/components/auth/LogoutButton'
 import { SITE_NAME } from '@/lib/constants'
 
 const navItems = [
@@ -43,13 +44,12 @@ export default function AdminShell({ children, title }: AdminShellProps) {
           >
             ← Volver al sitio
           </Link>
-          <Link
-            href="/api/auth/logout"
+          <LogoutButton
             className="mt-1 flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-red-950 hover:text-red-100 font-medium text-sm transition-colors"
             id="admin-logout-btn"
           >
             🚪 Cerrar sesión
-          </Link>
+          </LogoutButton>
         </div>
       </aside>
 
@@ -59,13 +59,12 @@ export default function AdminShell({ children, title }: AdminShellProps) {
           <Link href="/" className="font-bold">
             {SITE_NAME}
           </Link>
-          <Link
-            href="/api/auth/logout"
+          <LogoutButton
             className="text-sm text-gray-200 hover:text-white"
             id="admin-mobile-logout-btn"
           >
             Cerrar sesión
-          </Link>
+          </LogoutButton>
         </div>
         <div className="max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 md:py-10">
           {title && (

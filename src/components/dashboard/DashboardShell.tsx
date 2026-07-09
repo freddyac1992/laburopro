@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import LogoutButton from '@/components/auth/LogoutButton'
 import { SITE_NAME } from '@/lib/constants'
 
 const navItems = [
@@ -36,13 +37,12 @@ export default function DashboardShell({ children, title }: DashboardShellProps)
           ))}
         </nav>
         <div className="px-4 pb-4">
-          <Link
-            href="/api/auth/logout"
+          <LogoutButton
             className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-500 hover:bg-red-50 hover:text-red-600 font-medium text-sm transition-colors w-full"
             id="dashboard-logout-btn"
           >
             <span>🚪</span> Cerrar sesión
-          </Link>
+          </LogoutButton>
         </div>
       </aside>
 
@@ -57,13 +57,12 @@ export default function DashboardShell({ children, title }: DashboardShellProps)
             {item.icon} {item.label}
           </Link>
         ))}
-        <Link
-          href="/api/auth/logout"
+        <LogoutButton
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-gray-700 hover:bg-red-50 hover:text-red-600 font-medium text-sm whitespace-nowrap"
           id="dashboard-mobile-logout-btn"
         >
           🚪 Cerrar sesión
-        </Link>
+        </LogoutButton>
       </div>
 
       {/* Main content */}

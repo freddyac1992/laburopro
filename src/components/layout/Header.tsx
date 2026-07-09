@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import LogoutButton from '@/components/auth/LogoutButton'
 import { NAV_LINKS, SITE_NAME } from '@/lib/constants'
 import { createClient } from '@/lib/supabase/client'
 import type { Role } from '@/types/database'
@@ -62,13 +63,12 @@ export default function Header() {
       >
         Mi panel
       </Link>
-      <Link
-        href="/api/auth/logout"
+      <LogoutButton
         id="header-logout-btn"
         className="text-sm font-medium text-gray-700 hover:text-red-600 px-4 py-2 rounded-lg hover:bg-red-50"
       >
         Cerrar sesión
-      </Link>
+      </LogoutButton>
     </>
   ) : (
     <>
@@ -98,13 +98,12 @@ export default function Header() {
       >
         Mi panel
       </Link>
-      <Link
-        href="/api/auth/logout"
+      <LogoutButton
         className="block px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg font-medium"
         onClick={closeMenu}
       >
         Cerrar sesión
-      </Link>
+      </LogoutButton>
     </>
   ) : (
     <>
