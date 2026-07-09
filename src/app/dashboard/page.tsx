@@ -111,7 +111,11 @@ export default async function DashboardPage() {
             <p className="text-gray-500 text-sm">Próximamente: ve y responde las reseñas de clientes.</p>
           </div>
 
-          <div className="bg-white rounded-2xl border border-gray-100 p-5">
+          <Link
+            href="/dashboard/contactos"
+            id="dashboard-contacts-card"
+            className="bg-white rounded-2xl border border-gray-100 p-5 hover:border-blue-200 hover:shadow-md transition-all"
+          >
             <div className="text-3xl mb-3">📲</div>
             <h3 className="font-semibold text-gray-900 mb-1">Contactos</h3>
             <p className="text-gray-500 text-sm">
@@ -119,7 +123,7 @@ export default async function DashboardPage() {
                 ? `${leadCount ?? 0} persona${leadCount === 1 ? '' : 's'} hicieron click para contactarte por WhatsApp.`
                 : 'Crea tu perfil para empezar a recibir contactos.'}
             </p>
-          </div>
+          </Link>
         </div>
       </div>
     </DashboardShell>

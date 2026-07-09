@@ -5,6 +5,7 @@ import { SITE_NAME } from '@/lib/constants'
 const navItems = [
   { label: 'Panel principal', href: '/dashboard', icon: '🏠' },
   { label: 'Mi perfil', href: '/dashboard/perfil', icon: '👤' },
+  { label: 'Contactos', href: '/dashboard/contactos', icon: '📲' },
 ]
 
 interface DashboardShellProps {

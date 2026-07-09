@@ -109,8 +109,15 @@ CREATE TABLE IF NOT EXISTS public.leads (
   customer_phone text,
   message       text,
   source        text DEFAULT 'whatsapp',
+  page_url      text,
+  referrer      text,
+  user_agent    text,
+  metadata      jsonb NOT NULL DEFAULT '{}'::jsonb,
   created_at    timestamptz DEFAULT now()
 );
+
+CREATE INDEX IF NOT EXISTS idx_leads_created_at ON public.leads(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_leads_provider_created ON public.leads(provider_id, created_at DESC);
 
 -- ============================================================
 -- 6. REVIEWS

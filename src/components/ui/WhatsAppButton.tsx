@@ -12,6 +12,18 @@ interface WhatsAppButtonProps {
   className?: string
 }
 
+function getTrackingContext() {
+  if (typeof window === 'undefined') {
+    return {}
+  }
+
+  return {
+    pageUrl: window.location.href,
+    referrer: document.referrer || null,
+    userAgent: navigator.userAgent || null,
+  }
+}
+
 export default function WhatsAppButton({
   phone,
   providerName,
@@ -43,6 +55,7 @@ export default function WhatsAppButton({
       providerId,
       message: defaultMessage,
       source: 'whatsapp_profile',
+      ...getTrackingContext(),
     })
 
     if (navigator.sendBeacon) {

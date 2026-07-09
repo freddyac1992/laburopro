@@ -59,8 +59,15 @@ export type Lead = {
   customer_phone: string | null
   message: string | null
   source: string
+  page_url: string | null
+  referrer: string | null
+  user_agent: string | null
+  metadata: Record<string, unknown>
   created_at: string
 }
+
+export type LeadInsert = Omit<Lead, 'id' | 'created_at' | 'page_url' | 'referrer' | 'user_agent' | 'metadata'> &
+  Partial<Pick<Lead, 'page_url' | 'referrer' | 'user_agent' | 'metadata'>>
 
 export type Review = {
   id: string
@@ -101,7 +108,7 @@ export interface Database {
       }
       leads: {
         Row: Lead
-        Insert: Omit<Lead, 'id' | 'created_at'>
+        Insert: LeadInsert
         Update: Partial<Omit<Lead, 'id' | 'created_at'>>
         Relationships: []
       }

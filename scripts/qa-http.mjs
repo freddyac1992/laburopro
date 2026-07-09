@@ -54,8 +54,10 @@ for (const path of publicPages) {
 
 await expectRedirect('/dashboard', '/login')
 await expectRedirect('/dashboard/perfil', '/login')
+await expectRedirect('/dashboard/contactos', '/login')
 await expectRedirect('/admin', '/login')
 await expectRedirect('/admin/proveedores', '/login')
+await expectRedirect('/admin/contactos', '/login')
 await expectRedirect('/auth/callback', '/login?error=')
 await expectStatus('/api/auth/logout', 405)
 await expectRedirect('/api/auth/logout', '/login', { method: 'POST' })

@@ -5,6 +5,15 @@ type LeadRequestBody = {
   providerId?: unknown
   message?: unknown
   source?: unknown
+  pageUrl?: unknown
+  referrer?: unknown
+  userAgent?: unknown
+}
+
+function cleanText(value: unknown, maxLength: number) {
+  return typeof value === 'string' && value.trim()
+    ? value.trim().slice(0, maxLength)
+    : null
 }
 
 export async function POST(request: Request) {
@@ -21,14 +30,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'Falta el proveedor.' }, { status: 400 })
   }
 
-  const message =
-    typeof body.message === 'string' && body.message.trim()
-      ? body.message.trim().slice(0, 500)
-      : null
-  const source =
-    typeof body.source === 'string' && body.source.trim()
-      ? body.source.trim().slice(0, 50)
-      : 'whatsapp'
+  const message = cleanText(body.message, 500)
+  const source = cleanText(body.source, 50) ?? 'whatsapp'
+  const pageUrl = cleanText(body.pageUrl, 1000)
+  const referrer = cleanText(body.referrer, 1000) ?? cleanText(request.headers.get('referer'), 1000)
+  const userAgent = cleanText(body.userAgent, 500) ?? cleanText(request.headers.get('user-agent'), 500)
 
   const supabase = await createClient()
   const { data: provider } = await supabase
@@ -41,13 +47,35 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'Proveedor no encontrado.' }, { status: 404 })
   }
 
-  const { error } = await supabase.from('leads').insert({
+  const enrichedLead = {
     provider_id: providerId,
     customer_name: null,
     customer_phone: null,
     message,
     source,
-  })
+    page_url: pageUrl,
+    referrer,
+    user_agent: userAgent,
+    metadata: {
+      tracked_at: new Date().toISOString(),
+    },
+  }
+
+  const { error } = await supabase.from('leads').insert(enrichedLead)
+
+  if (error && error.code === 'PGRST204') {
+    const { error: fallbackError } = await supabase.from('leads').insert({
+      provider_id: providerId,
+      customer_name: null,
+      customer_phone: null,
+      message,
+      source,
+    })
+
+    if (!fallbackError) {
+      return NextResponse.json({ ok: true, degraded: true })
+    }
+  }
 
   if (error) {
     return NextResponse.json({ message: 'No se pudo registrar el contacto.' }, { status: 500 })

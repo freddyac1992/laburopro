@@ -5,6 +5,7 @@ import { SITE_NAME } from '@/lib/constants'
 const navItems = [
   { label: 'Resumen', href: '/admin', icon: '📊' },
   { label: 'Proveedores', href: '/admin/proveedores', icon: '👥' },
+  { label: 'Contactos', href: '/admin/contactos', icon: '📲' },
 ]
 
 interface AdminShellProps {
