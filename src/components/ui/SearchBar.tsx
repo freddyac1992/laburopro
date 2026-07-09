@@ -6,17 +6,29 @@ import { CATEGORIES, CITIES } from '@/lib/constants'
 
 export default function SearchBar() {
   const router = useRouter()
+  const [query, setQuery] = useState('')
   const [category, setCategory] = useState('')
   const [city, setCity] = useState('')
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault()
+    const params = new URLSearchParams()
+    if (query.trim()) {
+      params.set('q', query.trim())
+    }
+
+    const suffix = params.toString() ? `?${params.toString()}` : ''
+
     if (category && city) {
-      router.push(`/servicios/${category}/${city}`)
+      router.push(`/servicios/${category}/${city}${suffix}`)
     } else if (category) {
-      router.push(`/servicios/${category}`)
+      router.push(`/servicios/${category}${suffix}`)
     } else {
-      router.push('/servicios')
+      if (city) {
+        params.set('city', city)
+      }
+      const globalSuffix = params.toString() ? `?${params.toString()}` : ''
+      router.push(`/servicios${globalSuffix}`)
     }
   }
 
@@ -26,6 +38,16 @@ export default function SearchBar() {
       className="flex flex-col sm:flex-row gap-3 w-full max-w-2xl"
       id="search-form"
     >
+      <input
+        id="search-query"
+        type="search"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="¿Qué necesitas?"
+        className="form-input flex-1 bg-white text-gray-900"
+        aria-label="Buscar servicio o detalle"
+      />
+
       <select
         id="search-category"
         value={category}

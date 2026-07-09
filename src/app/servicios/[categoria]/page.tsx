@@ -4,17 +4,13 @@ import Link from 'next/link'
 import ProviderCard from '@/components/ui/ProviderCard'
 import CitySelector from '@/components/ui/CitySelector'
 import EmptyState from '@/components/ui/EmptyState'
+import ProviderFilters from '@/components/ui/ProviderFilters'
 import { CATEGORIES, CITIES, SITE_NAME, SITE_URL } from '@/lib/constants'
-import { createClient } from '@/lib/supabase/server'
-import type { ProviderProfile } from '@/types/database'
+import { hasActiveProviderFilters, parseProviderFilters, searchProviders } from '@/lib/provider-search'
 
 interface PageProps {
   params: Promise<{ categoria: string }>
-}
-
-type ProviderListItem = ProviderProfile & {
-  category: { name: string; slug: string } | null
-  city: { name: string; slug: string } | null
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
 export async function generateStaticParams() {
@@ -40,31 +36,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 }
 
-async function getProviders(categorySlug: string) {
-  try {
-    const supabase = await createClient()
-    const { data } = await supabase
-      .from('provider_profiles')
-      .select('*, category:categories!inner(name, slug), city:cities(name, slug)')
-      .eq('is_approved', true)
-      .eq('is_active', true)
-      .eq('category.slug', categorySlug)
-      .order('is_verified', { ascending: false })
-      .order('rating', { ascending: false })
-      .limit(24)
-
-    return (data ?? []) as unknown as ProviderListItem[]
-  } catch {
-    return []
-  }
-}
-
-export default async function CategoriaPage({ params }: PageProps) {
+export default async function CategoriaPage({ params, searchParams }: PageProps) {
   const { categoria } = await params
+  const filters = parseProviderFilters(await searchParams)
   const cat = CATEGORIES.find((c) => c.slug === categoria)
   if (!cat) notFound()
 
-  const providers = await getProviders(categoria)
+  const providers = await searchProviders({ categorySlug: categoria, filters })
+  const hasFilters = hasActiveProviderFilters(filters)
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -100,19 +79,34 @@ export default async function CategoriaPage({ params }: PageProps) {
         </p>
       </div>
 
+      <ProviderFilters
+        filters={filters}
+        clearHref={`/servicios/${categoria}`}
+        resultCount={providers.length}
+      />
+
       {/* Providers grid */}
       {providers.length === 0 ? (
         <EmptyState
-          title={`No hay proveedores disponibles en ${cat.name} aún`}
-          description="Estamos creciendo. Sé el primero en publicar tu servicio en esta categoría."
+          title={hasFilters ? 'No encontramos proveedores con esos filtros' : `No hay proveedores disponibles en ${cat.name} aún`}
+          description={hasFilters ? 'Prueba quitando filtros o usando una búsqueda más general.' : 'Estamos creciendo. Sé el primero en publicar tu servicio en esta categoría.'}
           icon={cat.icon}
           action={
-            <Link
-              href="/registro"
-              className="inline-block px-6 py-3 bg-blue-700 text-white font-semibold rounded-xl hover:bg-blue-800"
-            >
-              Publicar mi servicio
-            </Link>
+            hasFilters ? (
+              <Link
+                href={`/servicios/${categoria}`}
+                className="inline-block px-6 py-3 bg-blue-700 text-white font-semibold rounded-xl hover:bg-blue-800"
+              >
+                Limpiar filtros
+              </Link>
+            ) : (
+              <Link
+                href="/registro"
+                className="inline-block px-6 py-3 bg-blue-700 text-white font-semibold rounded-xl hover:bg-blue-800"
+              >
+                Publicar mi servicio
+              </Link>
+            )
           }
         />
       ) : (

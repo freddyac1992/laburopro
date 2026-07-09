@@ -40,8 +40,11 @@ async function expectRedirect(path, target, init) {
 const publicPages = [
   '/',
   '/servicios',
+  '/servicios?q=plomero',
   '/servicios/plomeros',
+  '/servicios/plomeros?q=zona',
   '/servicios/plomeros/el-alto',
+  '/servicios/plomeros/el-alto?verified=1&sort=experience',
   '/login',
   '/registro',
   '/privacidad',

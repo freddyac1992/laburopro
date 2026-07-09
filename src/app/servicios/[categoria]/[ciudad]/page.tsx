@@ -4,17 +4,13 @@ import Link from 'next/link'
 import ProviderCard from '@/components/ui/ProviderCard'
 import CitySelector from '@/components/ui/CitySelector'
 import EmptyState from '@/components/ui/EmptyState'
+import ProviderFilters from '@/components/ui/ProviderFilters'
 import { CATEGORIES, CITIES, SITE_NAME, SITE_URL } from '@/lib/constants'
-import { createClient } from '@/lib/supabase/server'
-import type { ProviderProfile } from '@/types/database'
+import { hasActiveProviderFilters, parseProviderFilters, searchProviders } from '@/lib/provider-search'
 
 interface PageProps {
   params: Promise<{ categoria: string; ciudad: string }>
-}
-
-type ProviderListItem = ProviderProfile & {
-  category: { name: string; slug: string } | null
-  city: { name: string; slug: string } | null
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
 export async function generateStaticParams() {
@@ -47,32 +43,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 }
 
-async function getProviders(categorySlug: string, citySlug: string) {
-  try {
-    const supabase = await createClient()
-    const { data } = await supabase
-      .from('provider_profiles')
-      .select('*, category:categories!inner(name, slug), city:cities!inner(name, slug)')
-      .eq('is_approved', true)
-      .eq('is_active', true)
-      .eq('category.slug', categorySlug)
-      .eq('city.slug', citySlug)
-      .order('is_verified', { ascending: false })
-      .order('rating', { ascending: false })
-
-    return (data ?? []) as unknown as ProviderListItem[]
-  } catch {
-    return []
-  }
-}
-
-export default async function CategoriayCiudadPage({ params }: PageProps) {
+export default async function CategoriayCiudadPage({ params, searchParams }: PageProps) {
   const { categoria, ciudad } = await params
+  const filters = parseProviderFilters(await searchParams)
   const cat = CATEGORIES.find((c) => c.slug === categoria)
   const city = CITIES.find((c) => c.slug === ciudad)
   if (!cat || !city) notFound()
 
-  const providers = await getProviders(categoria, ciudad)
+  const providers = await searchProviders({ categorySlug: categoria, citySlug: ciudad, filters })
+  const hasFilters = hasActiveProviderFilters(filters)
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -105,20 +84,36 @@ export default async function CategoriayCiudadPage({ params }: PageProps) {
         </div>
       </div>
 
+      <ProviderFilters
+        filters={filters}
+        clearHref={`/servicios/${categoria}/${ciudad}`}
+        resultCount={providers.length}
+        locationLabel={city.name}
+      />
+
       {/* Providers grid */}
       {providers.length === 0 ? (
         <EmptyState
-          title={`No hay ${cat.name.toLowerCase()} en ${city.name} aún`}
-          description={`Estamos creciendo en ${city.name}. ¿Eres ${cat.name.toLowerCase()}? Publica tu perfil gratis.`}
+          title={hasFilters ? 'No encontramos proveedores con esos filtros' : `No hay ${cat.name.toLowerCase()} en ${city.name} aún`}
+          description={hasFilters ? 'Prueba quitando filtros o buscando en toda Bolivia.' : `Estamos creciendo en ${city.name}. ¿Eres ${cat.name.toLowerCase()}? Publica tu perfil gratis.`}
           icon={cat.icon}
           action={
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link
-                href="/registro"
-                className="px-6 py-3 bg-blue-700 text-white font-semibold rounded-xl hover:bg-blue-800"
-              >
-                Publicar mi servicio
-              </Link>
+              {hasFilters ? (
+                <Link
+                  href={`/servicios/${categoria}/${ciudad}`}
+                  className="px-6 py-3 bg-blue-700 text-white font-semibold rounded-xl hover:bg-blue-800"
+                >
+                  Limpiar filtros
+                </Link>
+              ) : (
+                <Link
+                  href="/registro"
+                  className="px-6 py-3 bg-blue-700 text-white font-semibold rounded-xl hover:bg-blue-800"
+                >
+                  Publicar mi servicio
+                </Link>
+              )}
               <Link
                 href={`/servicios/${categoria}`}
                 className="px-6 py-3 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:border-blue-400"
