@@ -105,10 +105,10 @@ export default async function DashboardPage() {
             <p className="text-gray-500 text-sm">Completa o actualiza tu información de proveedor.</p>
           </Link>
 
-          <div className="bg-white rounded-2xl border border-gray-100 p-5 opacity-60">
+          <div className="bg-white rounded-2xl border border-gray-100 p-5">
             <div className="text-3xl mb-3">⭐</div>
             <h3 className="font-semibold text-gray-900 mb-1">Reseñas</h3>
-            <p className="text-gray-500 text-sm">Próximamente: ve y responde las reseñas de clientes.</p>
+            <p className="text-gray-500 text-sm">Los clientes ya pueden dejar reseñas públicas moderadas en tu perfil.</p>
           </div>
 
           <Link

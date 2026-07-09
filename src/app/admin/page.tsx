@@ -79,6 +79,16 @@ export default async function AdminPage() {
           <h3 className="font-semibold text-gray-900 mb-1">Ver contactos</h3>
           <p className="text-gray-500 text-sm">Medir qué proveedores reciben intención real de clientes por WhatsApp.</p>
         </Link>
+
+        <Link
+          href="/admin/resenas"
+          id="admin-reviews-link"
+          className="bg-white rounded-2xl border border-gray-100 p-6 hover:border-blue-200 hover:shadow-md transition-all"
+        >
+          <div className="text-3xl mb-3">⭐</div>
+          <h3 className="font-semibold text-gray-900 mb-1">Moderar reseñas</h3>
+          <p className="text-gray-500 text-sm">Aprobar experiencias reales y mantener la reputación confiable.</p>
+        </Link>
       </div>
     </AdminShell>
   )
