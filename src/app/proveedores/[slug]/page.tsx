@@ -4,6 +4,7 @@ import Link from 'next/link'
 import WhatsAppButton from '@/components/ui/WhatsAppButton'
 import VerificationBadge from '@/components/ui/VerificationBadge'
 import ReviewForm from '@/components/ui/ReviewForm'
+import ProviderReportForm from '@/components/ui/ProviderReportForm'
 import { SITE_NAME, SITE_URL } from '@/lib/constants'
 import { createClient } from '@/lib/supabase/server'
 import { getInitials } from '@/lib/utils'
@@ -255,6 +256,7 @@ export default async function ProviderProfilePage({ params }: PageProps) {
           </div>
 
           <ReviewForm providerId={provider.id} providerName={provider.display_name} />
+          <ProviderReportForm providerId={provider.id} providerName={provider.display_name} />
 
           {/* Safety disclaimer */}
           <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5">

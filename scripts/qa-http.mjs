@@ -62,6 +62,7 @@ await expectRedirect('/admin', '/login')
 await expectRedirect('/admin/proveedores', '/login')
 await expectRedirect('/admin/contactos', '/login')
 await expectRedirect('/admin/resenas', '/login')
+await expectRedirect('/admin/reportes', '/login')
 await expectRedirect('/auth/callback', '/login?error=')
 await expectStatus('/api/auth/logout', 405)
 await expectRedirect('/api/auth/logout', '/login', { method: 'POST' })
@@ -87,6 +88,11 @@ await expectStatus('/api/leads', 404, {
 })
 
 await expectStatus('/api/reviews', 400, {
+  method: 'POST',
+  body: JSON.stringify({}),
+})
+
+await expectStatus('/api/provider-reports', 400, {
   method: 'POST',
   body: JSON.stringify({}),
 })

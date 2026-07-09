@@ -7,6 +7,7 @@ const navItems = [
   { label: 'Proveedores', href: '/admin/proveedores', icon: '👥' },
   { label: 'Contactos', href: '/admin/contactos', icon: '📲' },
   { label: 'Reseñas', href: '/admin/resenas', icon: '⭐' },
+  { label: 'Reportes', href: '/admin/reportes', icon: '🛡️' },
 ]
 
 interface AdminShellProps {

@@ -79,6 +79,20 @@ export type Review = {
   created_at: string
 }
 
+export type ProviderReportStatus = 'pending' | 'reviewed' | 'resolved'
+
+export type ProviderReport = {
+  id: string
+  provider_id: string | null
+  reason: string
+  details: string | null
+  reporter_name: string | null
+  reporter_contact: string | null
+  status: ProviderReportStatus
+  created_at: string
+  updated_at: string
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -116,6 +130,12 @@ export interface Database {
         Row: Review
         Insert: Omit<Review, 'id' | 'created_at' | 'is_approved'>
         Update: Partial<Omit<Review, 'id' | 'created_at'>>
+        Relationships: []
+      }
+      provider_reports: {
+        Row: ProviderReport
+        Insert: Omit<ProviderReport, 'id' | 'created_at' | 'updated_at' | 'status'>
+        Update: Partial<Omit<ProviderReport, 'id' | 'created_at'>>
         Relationships: []
       }
     }
