@@ -72,6 +72,7 @@ export default async function AdminPage() {
     { count: pendingProviders },
     { count: verifiedProviders },
     { count: leadsLastSevenDays },
+    { count: profileViewsLastSevenDays },
     { count: pendingReviews },
     { count: pendingReports },
     { data: recentLeads },
@@ -82,6 +83,7 @@ export default async function AdminPage() {
     supabase.from('provider_profiles').select('*', { count: 'exact', head: true }).eq('is_approved', false).eq('is_active', true),
     supabase.from('provider_profiles').select('*', { count: 'exact', head: true }).eq('is_verified', true),
     supabase.from('leads').select('*', { count: 'exact', head: true }).gte('created_at', since(7)),
+    supabase.from('profile_views').select('*', { count: 'exact', head: true }).gte('created_at', since(7)),
     supabase.from('reviews').select('*', { count: 'exact', head: true }).eq('is_approved', false),
     supabase.from('provider_reports').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
     supabase
@@ -106,6 +108,7 @@ export default async function AdminPage() {
   const stats = [
     { label: 'Total proveedores', value: totalProviders ?? 0, icon: '👥', color: 'blue' },
     { label: 'Pendientes de aprobación', value: pendingProviders ?? 0, icon: '⏳', color: 'amber' },
+    { label: 'Vistas últimos 7 días', value: profileViewsLastSevenDays ?? 0, icon: '👁️', color: 'blue' },
     { label: 'Leads últimos 7 días', value: leadsLastSevenDays ?? 0, icon: '📲', color: 'green' },
     { label: 'Verificados', value: verifiedProviders ?? 0, icon: '🛡️', color: 'purple' },
   ]
@@ -139,7 +142,7 @@ export default async function AdminPage() {
       <p className="text-gray-500 -mt-4 mb-8">Bienvenido, {profile?.full_name ?? 'Admin'}</p>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         {stats.map((stat) => (
           <div key={stat.label} className="bg-white rounded-2xl border border-gray-100 p-5">
             <div className="text-2xl mb-2">{stat.icon}</div>

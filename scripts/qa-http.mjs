@@ -87,6 +87,18 @@ await expectStatus('/api/leads', 404, {
   }),
 })
 
+await expectStatus('/api/profile-views', 400, {
+  method: 'POST',
+  body: JSON.stringify({}),
+})
+
+await expectStatus('/api/profile-views', 404, {
+  method: 'POST',
+  body: JSON.stringify({
+    providerId: '00000000-0000-4000-8000-000000000000',
+  }),
+})
+
 await expectStatus('/api/reviews', 400, {
   method: 'POST',
   body: JSON.stringify({}),

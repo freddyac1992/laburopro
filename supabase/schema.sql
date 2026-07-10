@@ -120,6 +120,22 @@ CREATE INDEX IF NOT EXISTS idx_leads_created_at ON public.leads(created_at DESC)
 CREATE INDEX IF NOT EXISTS idx_leads_provider_created ON public.leads(provider_id, created_at DESC);
 
 -- ============================================================
+-- PROFILE VIEWS
+-- ============================================================
+CREATE TABLE IF NOT EXISTS public.profile_views (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  provider_id uuid NOT NULL REFERENCES public.provider_profiles(id) ON DELETE CASCADE,
+  visitor_id  text,
+  page_url    text,
+  referrer    text,
+  user_agent  text,
+  created_at  timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_profile_views_created_at ON public.profile_views(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_profile_views_provider_created ON public.profile_views(provider_id, created_at DESC);
+
+-- ============================================================
 -- 6. REVIEWS
 -- ============================================================
 CREATE TABLE IF NOT EXISTS public.reviews (
@@ -161,6 +177,7 @@ ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.cities ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.provider_profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.leads ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.profile_views ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.provider_reports ENABLE ROW LEVEL SECURITY;
 
@@ -230,6 +247,20 @@ CREATE POLICY "Providers can view own leads" ON public.leads
   );
 
 CREATE POLICY "Admins can view all leads" ON public.leads
+  FOR SELECT USING (public.is_admin());
+
+-- PROFILE VIEWS policies
+CREATE POLICY "Anyone can insert profile views" ON public.profile_views
+  FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Providers can view own profile views" ON public.profile_views
+  FOR SELECT USING (
+    provider_id IN (
+      SELECT id FROM public.provider_profiles WHERE user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Admins can view all profile views" ON public.profile_views
   FOR SELECT USING (public.is_admin());
 
 -- REVIEWS policies

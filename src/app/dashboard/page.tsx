@@ -23,22 +23,13 @@ type ProviderDashboardProfile = {
   city: { name: string | null } | null
 }
 
-type DashboardLead = {
-  id: string
-  created_at: string
-  source: string | null
+function since(days: number) {
+  return new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString()
 }
 
-function isWithinDays(value: string, days: number) {
-  const date = new Date(value).getTime()
-  const since = Date.now() - days * 24 * 60 * 60 * 1000
-  return date >= since
-}
-
-function isToday(value: string) {
-  const now = new Date()
-  const date = new Date(value)
-  return date.toLocaleDateString('en-CA', { timeZone: 'America/La_Paz' }) === now.toLocaleDateString('en-CA', { timeZone: 'America/La_Paz' })
+function startOfTodayInLaPaz() {
+  const localDate = new Date().toLocaleDateString('en-CA', { timeZone: 'America/La_Paz' })
+  return new Date(`${localDate}T00:00:00-04:00`).toISOString()
 }
 
 function getProfileChecklist(providerProfile: ProviderDashboardProfile) {
@@ -95,20 +86,30 @@ export default async function DashboardPage() {
     .eq('user_id', user.id)
     .maybeSingle()) as { data: ProviderDashboardProfile | null }
 
-  const { data: leads } = providerProfile
-    ? await supabase
-        .from('leads')
-        .select('id, created_at, source')
-        .eq('provider_id', providerProfile.id)
-        .order('created_at', { ascending: false })
-        .limit(100)
-    : { data: [] }
+  const analytics = providerProfile
+    ? await Promise.all([
+        supabase.from('leads').select('id', { count: 'exact', head: true }).eq('provider_id', providerProfile.id),
+        supabase.from('leads').select('id', { count: 'exact', head: true }).eq('provider_id', providerProfile.id).gte('created_at', startOfTodayInLaPaz()),
+        supabase.from('leads').select('id', { count: 'exact', head: true }).eq('provider_id', providerProfile.id).gte('created_at', since(7)),
+        supabase.from('leads').select('id', { count: 'exact', head: true }).eq('provider_id', providerProfile.id).gte('created_at', since(30)),
+        supabase.from('profile_views').select('id', { count: 'exact', head: true }).eq('provider_id', providerProfile.id),
+        supabase.from('profile_views').select('id', { count: 'exact', head: true }).eq('provider_id', providerProfile.id).gte('created_at', startOfTodayInLaPaz()),
+        supabase.from('profile_views').select('id', { count: 'exact', head: true }).eq('provider_id', providerProfile.id).gte('created_at', since(7)),
+        supabase.from('profile_views').select('id', { count: 'exact', head: true }).eq('provider_id', providerProfile.id).gte('created_at', since(30)),
+      ])
+    : []
 
-  const leadRows = (leads ?? []) as DashboardLead[]
-  const leadCount = leadRows.length
-  const leadsToday = leadRows.filter((lead) => isToday(lead.created_at)).length
-  const leadsLastSevenDays = leadRows.filter((lead) => isWithinDays(lead.created_at, 7)).length
-  const leadsLastThirtyDays = leadRows.filter((lead) => isWithinDays(lead.created_at, 30)).length
+  const leadCount = analytics[0]?.count ?? 0
+  const leadsToday = analytics[1]?.count ?? 0
+  const leadsLastSevenDays = analytics[2]?.count ?? 0
+  const leadsLastThirtyDays = analytics[3]?.count ?? 0
+  const profileViews = analytics[4]?.count ?? 0
+  const profileViewsToday = analytics[5]?.count ?? 0
+  const profileViewsLastSevenDays = analytics[6]?.count ?? 0
+  const profileViewsLastThirtyDays = analytics[7]?.count ?? 0
+  const conversionLastThirtyDays = profileViewsLastThirtyDays > 0
+    ? Math.round((leadsLastThirtyDays / profileViewsLastThirtyDays) * 100)
+    : 0
   const checklist = providerProfile ? getProfileChecklist(providerProfile) : []
   const completedChecklist = checklist.filter((item) => item.done).length
   const completionPercent = checklist.length > 0 ? Math.round((completedChecklist / checklist.length) * 100) : 0
@@ -177,6 +178,39 @@ export default async function DashboardPage() {
 
         {providerProfile && (
           <>
+            <div>
+              <div className="flex items-end justify-between gap-4 mb-3">
+                <div>
+                  <h2 className="font-semibold text-gray-900">Visitas al perfil</h2>
+                  <p className="text-sm text-gray-500">Personas que abrieron tu ficha pública.</p>
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-blue-700">{conversionLastThirtyDays}%</div>
+                  <div className="text-xs text-gray-500">conversión a contacto</div>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="bg-white rounded-2xl border border-gray-100 p-5">
+                  <div className="text-sm text-gray-500 mb-1">Visitas totales</div>
+                  <div className="text-3xl font-bold text-gray-900">{profileViews}</div>
+                </div>
+                <div className="bg-white rounded-2xl border border-gray-100 p-5">
+                  <div className="text-sm text-gray-500 mb-1">Hoy</div>
+                  <div className="text-3xl font-bold text-gray-900">{profileViewsToday}</div>
+                </div>
+                <div className="bg-white rounded-2xl border border-gray-100 p-5">
+                  <div className="text-sm text-gray-500 mb-1">Últimos 7 días</div>
+                  <div className="text-3xl font-bold text-gray-900">{profileViewsLastSevenDays}</div>
+                </div>
+                <div className="bg-white rounded-2xl border border-gray-100 p-5">
+                  <div className="text-sm text-gray-500 mb-1">Últimos 30 días</div>
+                  <div className="text-3xl font-bold text-gray-900">{profileViewsLastThirtyDays}</div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h2 className="font-semibold text-gray-900 mb-3">Contactos por WhatsApp</h2>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               <Link
                 href="/dashboard/contactos"
@@ -197,6 +231,7 @@ export default async function DashboardPage() {
                 <div className="text-sm text-gray-500 mb-1">Últimos 30 días</div>
                 <div className="text-3xl font-bold text-gray-900">{leadsLastThirtyDays}</div>
               </div>
+            </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

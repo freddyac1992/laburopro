@@ -5,6 +5,7 @@ import WhatsAppButton from '@/components/ui/WhatsAppButton'
 import VerificationBadge from '@/components/ui/VerificationBadge'
 import ReviewForm from '@/components/ui/ReviewForm'
 import ProviderReportForm from '@/components/ui/ProviderReportForm'
+import ProfileViewTracker from '@/components/analytics/ProfileViewTracker'
 import { SITE_NAME, SITE_URL } from '@/lib/constants'
 import { createClient } from '@/lib/supabase/server'
 import { getInitials } from '@/lib/utils'
@@ -136,6 +137,8 @@ export default async function ProviderProfilePage({ params, searchParams }: Page
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      {!isAdminPreview && <ProfileViewTracker providerId={provider.id} />}
+
       {isAdminPreview && (!provider.is_approved || !provider.is_active) && (
         <div className="mb-6 border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 rounded-lg">
           Vista previa de administrador: este perfil {provider.is_active ? 'todavía no está aprobado' : 'está inactivo'} y no es visible públicamente.

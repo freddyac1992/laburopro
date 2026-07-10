@@ -69,6 +69,16 @@ export type Lead = {
 export type LeadInsert = Omit<Lead, 'id' | 'created_at' | 'page_url' | 'referrer' | 'user_agent' | 'metadata'> &
   Partial<Pick<Lead, 'page_url' | 'referrer' | 'user_agent' | 'metadata'>>
 
+export type ProfileView = {
+  id: string
+  provider_id: string
+  visitor_id: string | null
+  page_url: string | null
+  referrer: string | null
+  user_agent: string | null
+  created_at: string
+}
+
 export type Review = {
   id: string
   provider_id: string | null
@@ -124,6 +134,12 @@ export interface Database {
         Row: Lead
         Insert: LeadInsert
         Update: Partial<Omit<Lead, 'id' | 'created_at'>>
+        Relationships: []
+      }
+      profile_views: {
+        Row: ProfileView
+        Insert: Omit<ProfileView, 'id' | 'created_at'>
+        Update: never
         Relationships: []
       }
       reviews: {
