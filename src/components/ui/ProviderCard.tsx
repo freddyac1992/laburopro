@@ -1,6 +1,8 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import VerificationBadge from './VerificationBadge'
 import { truncate, getInitials } from '@/lib/utils'
+import { getProviderImageUrl } from '@/lib/provider-images'
 
 interface ProviderCardProps {
   id: string
@@ -15,6 +17,8 @@ interface ProviderCardProps {
   reviewCount?: number
   isVerified?: boolean
   yearsExperience?: number | null
+  profilePhotoPath?: string | null
+  imageVersion?: string
 }
 
 export default function ProviderCard({
@@ -29,8 +33,11 @@ export default function ProviderCard({
   reviewCount = 0,
   isVerified = false,
   yearsExperience,
+  profilePhotoPath,
+  imageVersion,
 }: ProviderCardProps) {
   const initials = getInitials(displayName)
+  const profilePhotoUrl = getProviderImageUrl(profilePhotoPath, imageVersion)
 
   return (
     <Link
@@ -41,8 +48,16 @@ export default function ProviderCard({
       {/* Header */}
       <div className="flex items-start gap-4 p-5">
         {/* Avatar */}
-        <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-blue-700 flex items-center justify-center text-white font-bold text-lg">
-          {initials}
+        <div className="relative flex-shrink-0 w-14 h-14 overflow-hidden rounded-2xl bg-blue-700 flex items-center justify-center text-white font-bold text-lg">
+          {profilePhotoUrl ? (
+            <Image
+              src={profilePhotoUrl}
+              alt={`Foto de ${displayName}`}
+              fill
+              sizes="56px"
+              className="object-cover"
+            />
+          ) : initials}
         </div>
 
         {/* Info */}

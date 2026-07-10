@@ -40,6 +40,8 @@ export type ProviderProfile = {
   price_reference: string | null
   whatsapp: string | null
   availability: string | null
+  profile_photo_path: string | null
+  work_photo_path: string | null
   is_approved: boolean
   is_verified: boolean
   is_active: boolean

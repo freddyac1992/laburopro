@@ -1,10 +1,23 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import DashboardShell from '@/components/dashboard/DashboardShell'
 import { createClient } from '@/lib/supabase/client'
 import { CATEGORIES, CITIES } from '@/lib/constants'
+import {
+  compressProviderImage,
+  getProviderImageUrl,
+  PROVIDER_IMAGES_BUCKET,
+} from '@/lib/provider-images'
 import type { ProviderProfile } from '@/types/database'
+
+type PhotoKind = 'profile' | 'work'
+
+const photoConfig = {
+  profile: { filename: 'profile.webp', width: 800, height: 800 },
+  work: { filename: 'work.webp', width: 1600, height: 1200 },
+} as const
 
 interface FormState {
   display_name: string
@@ -25,6 +38,10 @@ export default function PerfilPage() {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [profileId, setProfileId] = useState<string | null>(null)
+  const [photoPaths, setPhotoPaths] = useState<Record<PhotoKind, string | null>>({ profile: null, work: null })
+  const [photoFiles, setPhotoFiles] = useState<Record<PhotoKind, File | null>>({ profile: null, work: null })
+  const [photoPreviews, setPhotoPreviews] = useState<Record<PhotoKind, string | null>>({ profile: null, work: null })
+  const [removedPhotos, setRemovedPhotos] = useState<Record<PhotoKind, boolean>>({ profile: false, work: false })
   const [dbCategories, setDbCategories] = useState<{ id: string; name: string; slug: string }[]>([])
   const [dbCities, setDbCities] = useState<{ id: string; name: string; slug: string }[]>([])
 
@@ -80,6 +97,14 @@ export default function PerfilPage() {
       const providerProfile = existing as ProviderProfile | null
       if (providerProfile) {
         setProfileId(providerProfile.id)
+        setPhotoPaths({
+          profile: providerProfile.profile_photo_path,
+          work: providerProfile.work_photo_path,
+        })
+        setPhotoPreviews({
+          profile: getProviderImageUrl(providerProfile.profile_photo_path, providerProfile.updated_at),
+          work: getProviderImageUrl(providerProfile.work_photo_path, providerProfile.updated_at),
+        })
         setForm({
           display_name: providerProfile.display_name ?? '',
           category_id: providerProfile.category_id ?? '',
@@ -109,6 +134,38 @@ export default function PerfilPage() {
     setSuccess(false)
   }
 
+  function handlePhotoChange(kind: PhotoKind, file: File | undefined) {
+    if (!file) return
+
+    const acceptedTypes = new Set(['image/jpeg', 'image/png', 'image/webp'])
+    if (!acceptedTypes.has(file.type)) {
+      setError('Las fotos deben ser JPG, PNG o WebP.')
+      return
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setError('La imagen original no puede superar 10 MB.')
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = () => {
+      setPhotoFiles((current) => ({ ...current, [kind]: file }))
+      setPhotoPreviews((current) => ({ ...current, [kind]: String(reader.result) }))
+      setRemovedPhotos((current) => ({ ...current, [kind]: false }))
+      setError(null)
+      setSuccess(false)
+    }
+    reader.readAsDataURL(file)
+  }
+
+  function removePhoto(kind: PhotoKind) {
+    setPhotoFiles((current) => ({ ...current, [kind]: null }))
+    setPhotoPaths((current) => ({ ...current, [kind]: null }))
+    setPhotoPreviews((current) => ({ ...current, [kind]: null }))
+    setRemovedPhotos((current) => ({ ...current, [kind]: true }))
+    setSuccess(false)
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
@@ -119,6 +176,46 @@ export default function PerfilPage() {
 
     setSaving(true)
     try {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('Tu sesión expiró. Vuelve a iniciar sesión.')
+      const userId = user.id
+
+      async function syncPhoto(kind: PhotoKind) {
+        const config = photoConfig[kind]
+        const path = `${userId}/${config.filename}`
+        const file = photoFiles[kind]
+
+        if (file) {
+          const compressed = await compressProviderImage(file, config)
+          const { error: uploadError } = await supabase.storage
+            .from(PROVIDER_IMAGES_BUCKET)
+            .upload(path, compressed, {
+              contentType: 'image/webp',
+              cacheControl: '3600',
+              upsert: true,
+            })
+
+          if (uploadError) throw new Error(`No se pudo subir la foto: ${uploadError.message}`)
+          return path
+        }
+
+        if (removedPhotos[kind]) {
+          const { error: removeError } = await supabase.storage
+            .from(PROVIDER_IMAGES_BUCKET)
+            .remove([path])
+          if (removeError) throw new Error(`No se pudo eliminar la foto: ${removeError.message}`)
+          return null
+        }
+
+        return photoPaths[kind]
+      }
+
+      const [profilePhotoPath, workPhotoPath] = await Promise.all([
+        syncPhoto('profile'),
+        syncPhoto('work'),
+      ])
+
       const servicesArray = form.services
         .split(',')
         .map((s) => s.trim())
@@ -135,6 +232,8 @@ export default function PerfilPage() {
         price_reference: form.price_reference.trim() || null,
         whatsapp: form.whatsapp.trim(),
         availability: form.availability.trim() || null,
+        profile_photo_path: profilePhotoPath,
+        work_photo_path: workPhotoPath,
       }
 
       const response = await fetch('/api/provider-profile', {
@@ -149,6 +248,14 @@ export default function PerfilPage() {
       }
 
       if (result.id) setProfileId(result.id)
+      const imageVersion = String(Date.now())
+      setPhotoPaths({ profile: profilePhotoPath, work: workPhotoPath })
+      setPhotoFiles({ profile: null, work: null })
+      setRemovedPhotos({ profile: false, work: false })
+      setPhotoPreviews({
+        profile: getProviderImageUrl(profilePhotoPath, imageVersion),
+        work: getProviderImageUrl(workPhotoPath, imageVersion),
+      })
       setSuccess(true)
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (err: unknown) {
@@ -264,6 +371,90 @@ export default function PerfilPage() {
               className="form-input"
             />
           </div>
+        </div>
+
+        {/* Photos */}
+        <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-5">
+          <div className="border-b border-gray-50 pb-3">
+            <h2 className="font-semibold text-gray-900">Fotos</h2>
+            <p className="text-sm text-gray-500 mt-1">Una foto de perfil y una foto de un trabajo realizado.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label htmlFor="perfil-foto" className="block text-sm font-medium text-gray-700 mb-2">
+                Foto de perfil
+              </label>
+              <div className="relative w-40 aspect-square overflow-hidden rounded-lg bg-gray-100 border border-gray-200 mb-3">
+                {photoPreviews.profile ? (
+                  <Image
+                    src={photoPreviews.profile}
+                    alt="Vista previa de la foto de perfil"
+                    fill
+                    sizes="160px"
+                    className="object-cover"
+                    unoptimized
+                  />
+                ) : (
+                  <div className="h-full flex items-center justify-center text-sm text-gray-400">Sin foto</div>
+                )}
+              </div>
+              <input
+                id="perfil-foto"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={(event) => handlePhotoChange('profile', event.target.files?.[0])}
+                className="block w-full text-sm text-gray-600 file:mr-3 file:rounded-lg file:border-0 file:bg-blue-50 file:px-3 file:py-2 file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
+              />
+              {photoPreviews.profile && (
+                <button
+                  type="button"
+                  onClick={() => removePhoto('profile')}
+                  className="mt-2 text-sm font-medium text-red-600 hover:text-red-700"
+                >
+                  Eliminar foto
+                </button>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="trabajo-foto" className="block text-sm font-medium text-gray-700 mb-2">
+                Foto de trabajo
+              </label>
+              <div className="relative w-full max-w-sm aspect-[4/3] overflow-hidden rounded-lg bg-gray-100 border border-gray-200 mb-3">
+                {photoPreviews.work ? (
+                  <Image
+                    src={photoPreviews.work}
+                    alt="Vista previa de un trabajo realizado"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 384px"
+                    className="object-cover"
+                    unoptimized
+                  />
+                ) : (
+                  <div className="h-full flex items-center justify-center text-sm text-gray-400">Sin foto</div>
+                )}
+              </div>
+              <input
+                id="trabajo-foto"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={(event) => handlePhotoChange('work', event.target.files?.[0])}
+                className="block w-full text-sm text-gray-600 file:mr-3 file:rounded-lg file:border-0 file:bg-blue-50 file:px-3 file:py-2 file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
+              />
+              {photoPreviews.work && (
+                <button
+                  type="button"
+                  onClick={() => removePhoto('work')}
+                  className="mt-2 text-sm font-medium text-red-600 hover:text-red-700"
+                >
+                  Eliminar foto
+                </button>
+              )}
+            </div>
+          </div>
+
+          <p className="text-xs text-gray-400">JPG, PNG o WebP. Se comprimen automáticamente y cada archivo final queda por debajo de 1 MB.</p>
         </div>
 
         {/* Service details */}

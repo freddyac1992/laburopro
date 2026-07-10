@@ -14,6 +14,8 @@ type ProviderDashboardProfile = {
   price_reference: string | null
   whatsapp: string | null
   availability: string | null
+  profile_photo_path: string | null
+  work_photo_path: string | null
   is_approved: boolean
   is_verified: boolean
   is_active: boolean
@@ -64,6 +66,11 @@ function getProfileChecklist(providerProfile: ProviderDashboardProfile) {
       done: Boolean(providerProfile.availability),
       hint: 'Indica horarios o días de atención.',
     },
+    {
+      label: 'Fotos del perfil',
+      done: Boolean(providerProfile.profile_photo_path && providerProfile.work_photo_path),
+      hint: 'Añade tu foto y una muestra de un trabajo realizado.',
+    },
   ]
 }
 
@@ -82,7 +89,7 @@ export default async function DashboardPage() {
 
   const { data: providerProfile } = (await supabase
     .from('provider_profiles')
-    .select('id, display_name, slug, zone, description, services, years_experience, price_reference, whatsapp, availability, is_approved, is_verified, is_active, rating, review_count, category:categories(name), city:cities(name)')
+    .select('id, display_name, slug, zone, description, services, years_experience, price_reference, whatsapp, availability, profile_photo_path, work_photo_path, is_approved, is_verified, is_active, rating, review_count, category:categories(name), city:cities(name)')
     .eq('user_id', user.id)
     .maybeSingle()) as { data: ProviderDashboardProfile | null }
 

@@ -133,6 +133,8 @@ export default async function CategoriaPage({ params, searchParams }: PageProps)
                   reviewCount={p.review_count}
                   isVerified={p.is_verified}
                   yearsExperience={p.years_experience}
+                  profilePhotoPath={p.profile_photo_path}
+                  imageVersion={p.updated_at}
                 />
               )
             })}

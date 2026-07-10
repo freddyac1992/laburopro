@@ -13,6 +13,8 @@ type ProviderProfileRequestBody = {
   price_reference?: unknown
   whatsapp?: unknown
   availability?: unknown
+  profile_photo_path?: unknown
+  work_photo_path?: unknown
 }
 
 function optionalString(value: unknown) {
@@ -108,6 +110,20 @@ export async function POST(request: Request) {
     resolveReferenceId(supabase, 'cities', optionalString(body.city_id)),
   ])
 
+  const expectedProfilePhotoPath = `${user.id}/profile.webp`
+  const expectedWorkPhotoPath = `${user.id}/work.webp`
+  const hasProfilePhotoPath = Object.prototype.hasOwnProperty.call(body, 'profile_photo_path')
+  const hasWorkPhotoPath = Object.prototype.hasOwnProperty.call(body, 'work_photo_path')
+  const profilePhotoPath = optionalString(body.profile_photo_path)
+  const workPhotoPath = optionalString(body.work_photo_path)
+
+  if (profilePhotoPath && profilePhotoPath !== expectedProfilePhotoPath) {
+    return NextResponse.json({ message: 'La foto de perfil no es válida.' }, { status: 400 })
+  }
+  if (workPhotoPath && workPhotoPath !== expectedWorkPhotoPath) {
+    return NextResponse.json({ message: 'La foto de trabajo no es válida.' }, { status: 400 })
+  }
+
   const payload = {
     display_name: displayName,
     category_id: categoryId,
@@ -119,6 +135,8 @@ export async function POST(request: Request) {
     price_reference: optionalString(body.price_reference),
     whatsapp,
     availability: optionalString(body.availability),
+    ...(hasProfilePhotoPath ? { profile_photo_path: profilePhotoPath } : {}),
+    ...(hasWorkPhotoPath ? { work_photo_path: workPhotoPath } : {}),
   }
 
   const { data: existing, error: existingError } = await supabase
@@ -149,7 +167,13 @@ export async function POST(request: Request) {
   const slug = `${slugify(displayName)}-${Math.random().toString(36).slice(2, 6)}`
   const { data, error } = await supabase
     .from('provider_profiles')
-    .insert({ ...payload, user_id: user.id, slug })
+    .insert({
+      ...payload,
+      profile_photo_path: profilePhotoPath,
+      work_photo_path: workPhotoPath,
+      user_id: user.id,
+      slug,
+    })
     .select('id')
     .single()
 

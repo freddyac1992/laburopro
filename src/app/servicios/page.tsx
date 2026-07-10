@@ -71,6 +71,8 @@ export default async function ServiciosPage({ searchParams }: ServiciosPageProps
                     reviewCount={provider.review_count}
                     isVerified={provider.is_verified}
                     yearsExperience={provider.years_experience}
+                    profilePhotoPath={provider.profile_photo_path}
+                    imageVersion={provider.updated_at}
                   />
                 ))}
               </div>

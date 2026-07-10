@@ -147,6 +147,8 @@ export default async function CategoriayCiudadPage({ params, searchParams }: Pag
                   reviewCount={p.review_count}
                   isVerified={p.is_verified}
                   yearsExperience={p.years_experience}
+                  profilePhotoPath={p.profile_photo_path}
+                  imageVersion={p.updated_at}
                 />
               )
             })}

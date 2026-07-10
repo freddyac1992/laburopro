@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import WhatsAppButton from '@/components/ui/WhatsAppButton'
 import VerificationBadge from '@/components/ui/VerificationBadge'
 import ReviewForm from '@/components/ui/ReviewForm'
@@ -9,6 +10,7 @@ import ProfileViewTracker from '@/components/analytics/ProfileViewTracker'
 import { SITE_NAME, SITE_URL } from '@/lib/constants'
 import { createClient } from '@/lib/supabase/server'
 import { getInitials } from '@/lib/utils'
+import { getProviderImageUrl } from '@/lib/provider-images'
 import type { ProviderProfile, Review } from '@/types/database'
 
 interface PageProps {
@@ -52,6 +54,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const cityName = provider.city?.name
     const title = `${provider.display_name} — ${catName ?? 'Proveedor'} en ${cityName ?? 'Bolivia'} | ${SITE_NAME}`
     const description = provider.description ?? `Perfil de ${provider.display_name} en LaburoPro. ${catName} en ${cityName}.`
+    const socialImage = getProviderImageUrl(provider.work_photo_path ?? provider.profile_photo_path, provider.updated_at)
 
     return {
       title,
@@ -60,6 +63,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         title,
         description,
         url: `${SITE_URL}/proveedores/${slug}`,
+        ...(socialImage ? { images: [{ url: socialImage }] } : {}),
       },
     }
   } catch {
@@ -134,6 +138,8 @@ export default async function ProviderProfilePage({ params, searchParams }: Page
   const category = provider.category
   const city = provider.city
   const initials = getInitials(provider.display_name)
+  const profilePhotoUrl = getProviderImageUrl(provider.profile_photo_path, provider.updated_at)
+  const workPhotoUrl = getProviderImageUrl(provider.work_photo_path, provider.updated_at)
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -167,8 +173,16 @@ export default async function ProviderProfilePage({ params, searchParams }: Page
           <div className="bg-white rounded-2xl border border-gray-100 p-6">
             <div className="flex items-start gap-5">
               {/* Avatar */}
-              <div className="w-20 h-20 rounded-2xl bg-blue-700 flex items-center justify-center text-white font-bold text-2xl flex-shrink-0">
-                {initials}
+              <div className="relative w-20 h-20 rounded-2xl overflow-hidden bg-blue-700 flex items-center justify-center text-white font-bold text-2xl flex-shrink-0">
+                {profilePhotoUrl ? (
+                  <Image
+                    src={profilePhotoUrl}
+                    alt={`Foto de perfil de ${provider.display_name}`}
+                    fill
+                    sizes="80px"
+                    className="object-cover"
+                  />
+                ) : initials}
               </div>
               <div className="flex-1">
                 <div className="flex items-start flex-wrap gap-2 mb-1">
@@ -217,6 +231,21 @@ export default async function ProviderProfilePage({ params, searchParams }: Page
             <div className="bg-white rounded-2xl border border-gray-100 p-6">
               <h2 className="font-semibold text-gray-900 mb-3">Sobre mí</h2>
               <p className="text-gray-700 leading-relaxed">{provider.description}</p>
+            </div>
+          )}
+
+          {workPhotoUrl && (
+            <div className="bg-white rounded-2xl border border-gray-100 p-6">
+              <h2 className="font-semibold text-gray-900 mb-3">Trabajo realizado</h2>
+              <div className="relative w-full aspect-[4/3] overflow-hidden rounded-lg bg-gray-100">
+                <Image
+                  src={workPhotoUrl}
+                  alt={`Trabajo realizado por ${provider.display_name}`}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 600px"
+                  className="object-cover"
+                />
+              </div>
             </div>
           )}
 
