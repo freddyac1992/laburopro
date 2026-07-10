@@ -146,7 +146,7 @@ export default function AdminProviderActions({ initialProviders }: Props) {
                 {/* Actions */}
                 <div className="flex flex-wrap gap-2 sm:flex-col sm:items-end">
                   <Link
-                    href={`/proveedores/${p.slug}`}
+                    href={`/proveedores/${p.slug}?preview=admin`}
                     target="_blank"
                     className="text-xs px-3 py-1.5 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50"
                   >

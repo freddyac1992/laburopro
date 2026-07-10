@@ -12,6 +12,7 @@ import type { ProviderProfile, Review } from '@/types/database'
 
 interface PageProps {
   params: Promise<{ slug: string }>
+  searchParams: Promise<{ preview?: string | string[] }>
 }
 
 type ProviderMetadata = ProviderProfile & {
@@ -65,16 +66,39 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 }
 
-async function getProvider(slug: string) {
+async function canPreviewUnpublishedProfile(preview: string | string[] | undefined) {
+  if (preview !== 'admin') return false
+
   try {
     const supabase = await createClient()
-    const { data } = await supabase
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return false
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .maybeSingle()
+
+    return profile?.role === 'admin'
+  } catch {
+    return false
+  }
+}
+
+async function getProvider(slug: string, includeUnpublished = false) {
+  try {
+    const supabase = await createClient()
+    let query = supabase
       .from('provider_profiles')
       .select('*, category:categories(name, slug, icon), city:cities(name, slug)')
       .eq('slug', slug)
-      .eq('is_approved', true)
-      .eq('is_active', true)
-      .single()
+
+    if (!includeUnpublished) {
+      query = query.eq('is_approved', true).eq('is_active', true)
+    }
+
+    const { data } = await query.single()
     return data as unknown as PublicProviderProfile | null
   } catch {
     return null
@@ -98,9 +122,11 @@ async function getApprovedReviews(providerId: string) {
   }
 }
 
-export default async function ProviderProfilePage({ params }: PageProps) {
+export default async function ProviderProfilePage({ params, searchParams }: PageProps) {
   const { slug } = await params
-  const provider = await getProvider(slug)
+  const { preview } = await searchParams
+  const isAdminPreview = await canPreviewUnpublishedProfile(preview)
+  const provider = await getProvider(slug, isAdminPreview)
   if (!provider) notFound()
 
   const reviews = await getApprovedReviews(provider.id)
@@ -110,6 +136,12 @@ export default async function ProviderProfilePage({ params }: PageProps) {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      {isAdminPreview && (!provider.is_approved || !provider.is_active) && (
+        <div className="mb-6 border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 rounded-lg">
+          Vista previa de administrador: este perfil {provider.is_active ? 'todavía no está aprobado' : 'está inactivo'} y no es visible públicamente.
+        </div>
+      )}
+
       {/* Breadcrumb */}
       <nav className="text-sm text-gray-500 mb-6 flex items-center gap-2 flex-wrap">
         <Link href="/" className="hover:text-blue-700">Inicio</Link>

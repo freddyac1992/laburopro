@@ -20,5 +20,6 @@ export async function POST(request: NextRequest) {
   const { supabase, applyAuthCookies } = createRouteClient(request)
   await supabase.auth.signOut()
 
-  return applyAuthCookies(NextResponse.redirect(`${origin}/login`))
+  // A 303 turns the form POST into a GET when opening the login page.
+  return applyAuthCookies(NextResponse.redirect(`${origin}/login`, 303))
 }

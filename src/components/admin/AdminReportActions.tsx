@@ -150,7 +150,7 @@ export default function AdminReportActions({ initialReports }: AdminReportAction
                 <div className="flex flex-wrap gap-2 lg:flex-col lg:items-end">
                   {report.provider?.slug && (
                     <Link
-                      href={`/proveedores/${report.provider.slug}`}
+                      href={`/proveedores/${report.provider.slug}?preview=admin`}
                       target="_blank"
                       className="text-xs px-3 py-1.5 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50"
                     >

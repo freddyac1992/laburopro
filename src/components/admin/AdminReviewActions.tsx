@@ -200,7 +200,7 @@ export default function AdminReviewActions({ initialReviews }: AdminReviewAction
                 <div className="flex flex-wrap gap-2 lg:flex-col lg:items-end">
                   {review.provider?.slug && (
                     <Link
-                      href={`/proveedores/${review.provider.slug}`}
+                      href={`/proveedores/${review.provider.slug}?preview=admin`}
                       target="_blank"
                       className="text-xs px-3 py-1.5 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50"
                     >
