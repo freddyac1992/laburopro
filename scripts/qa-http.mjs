@@ -89,6 +89,35 @@ for (const forbidden of ['signInWithPassword', '.auth.signUp(', 'type="password"
 }
 assert(authSource.includes("provider: 'google'"), 'Google OAuth provider must remain configured')
 
+const protectedApiRoutes = [
+  ['../src/app/api/leads/route.ts', "'lead'"],
+  ['../src/app/api/profile-views/route.ts', "'profile_view'"],
+  ['../src/app/api/reviews/route.ts', "'review'"],
+  ['../src/app/api/provider-reports/route.ts', "'provider_report'"],
+]
+for (const [path, action] of protectedApiRoutes) {
+  const source = await readFile(new URL(path, import.meta.url), 'utf8')
+  assert(source.includes('getRateLimitResponse'), `${path} must enforce rate limiting`)
+  assert(source.includes('createAdminClient'), `${path} must use the private Supabase client`)
+  assert(source.includes(action), `${path} must use rate limit action ${action}`)
+}
+
+const rateLimitSource = await readFile(new URL('../src/lib/rate-limit.ts', import.meta.url), 'utf8')
+const adminClientSource = await readFile(new URL('../src/lib/supabase/admin.ts', import.meta.url), 'utf8')
+const rateLimitSql = await readFile(new URL('../supabase/rate-limits.sql', import.meta.url), 'utf8')
+const schemaSql = await readFile(new URL('../supabase/schema.sql', import.meta.url), 'utf8')
+assert(rateLimitSource.includes('status: 429'), 'Rate limiting must return HTTP 429')
+assert(rateLimitSource.includes("'Retry-After'"), 'Rate limiting must include Retry-After')
+assert(adminClientSource.includes("import 'server-only'"), 'Admin Supabase client must remain server-only')
+assert(adminClientSource.includes('SUPABASE_SERVICE_ROLE_KEY'), 'Admin Supabase client must use the service role key')
+assert(!adminClientSource.includes('NEXT_PUBLIC_SUPABASE_SERVICE'), 'Service role key must never be public')
+assert(rateLimitSql.includes('TO service_role'), 'Rate limit RPC must only be granted to service_role')
+assert(!rateLimitSql.includes('TO anon, authenticated'), 'Rate limit RPC must not be public')
+for (const policy of ['leads', 'profile views', 'reviews', 'provider reports']) {
+  assert(rateLimitSql.includes(`DROP POLICY IF EXISTS "Anyone can insert ${policy}"`), `Public insert policy must be removed for ${policy}`)
+  assert(!schemaSql.includes(`CREATE POLICY "Anyone can insert ${policy}"`), `Base schema must not recreate public insert policy for ${policy}`)
+}
+
 await expectRedirect('/dashboard', '/login')
 await expectRedirect('/dashboard/perfil', '/login')
 await expectRedirect('/dashboard/contactos', '/login')

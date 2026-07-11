@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { getRateLimitResponse } from '@/lib/rate-limit'
 
 const VALID_REASONS = new Set([
   'no_responde',
@@ -64,7 +66,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'Proveedor no encontrado.' }, { status: 404 })
   }
 
-  const { error } = await supabase.from('provider_reports').insert({
+  const adminSupabase = createAdminClient()
+  if (!adminSupabase) {
+    return NextResponse.json({ message: 'El servicio no está configurado temporalmente.' }, { status: 503 })
+  }
+
+  const rateLimitResponse = await getRateLimitResponse(request, adminSupabase, 'provider_report')
+  if (rateLimitResponse) return rateLimitResponse
+
+  const { error } = await adminSupabase.from('provider_reports').insert({
     provider_id: providerId,
     reason,
     details,

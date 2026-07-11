@@ -130,35 +130,97 @@ export interface Database {
         Row: ProviderProfile
         Insert: Omit<ProviderProfile, 'id' | 'created_at' | 'updated_at' | 'rating' | 'review_count' | 'is_approved' | 'is_verified' | 'is_active' | 'category' | 'city'>
         Update: Partial<Omit<ProviderProfile, 'id' | 'user_id' | 'created_at' | 'category' | 'city'>>
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: 'provider_profiles_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'provider_profiles_category_id_fkey'
+            columns: ['category_id']
+            isOneToOne: false
+            referencedRelation: 'categories'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'provider_profiles_city_id_fkey'
+            columns: ['city_id']
+            isOneToOne: false
+            referencedRelation: 'cities'
+            referencedColumns: ['id']
+          },
+        ]
       }
       leads: {
         Row: Lead
         Insert: LeadInsert
         Update: Partial<Omit<Lead, 'id' | 'created_at'>>
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: 'leads_provider_id_fkey'
+            columns: ['provider_id']
+            isOneToOne: false
+            referencedRelation: 'provider_profiles'
+            referencedColumns: ['id']
+          },
+        ]
       }
       profile_views: {
         Row: ProfileView
         Insert: Omit<ProfileView, 'id' | 'created_at'>
         Update: never
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: 'profile_views_provider_id_fkey'
+            columns: ['provider_id']
+            isOneToOne: false
+            referencedRelation: 'provider_profiles'
+            referencedColumns: ['id']
+          },
+        ]
       }
       reviews: {
         Row: Review
         Insert: Omit<Review, 'id' | 'created_at' | 'is_approved'>
         Update: Partial<Omit<Review, 'id' | 'created_at'>>
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: 'reviews_provider_id_fkey'
+            columns: ['provider_id']
+            isOneToOne: false
+            referencedRelation: 'provider_profiles'
+            referencedColumns: ['id']
+          },
+        ]
       }
       provider_reports: {
         Row: ProviderReport
         Insert: Omit<ProviderReport, 'id' | 'created_at' | 'updated_at' | 'status'>
         Update: Partial<Omit<ProviderReport, 'id' | 'created_at'>>
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: 'provider_reports_provider_id_fkey'
+            columns: ['provider_id']
+            isOneToOne: false
+            referencedRelation: 'provider_profiles'
+            referencedColumns: ['id']
+          },
+        ]
       }
     }
     Views: Record<string, never>
-    Functions: Record<string, never>
+    Functions: {
+      check_rate_limit: {
+        Args: {
+          p_action: string
+          p_identifier_hash: string
+        }
+        Returns: boolean
+      }
+    }
     Enums: Record<string, never>
     CompositeTypes: Record<string, never>
   }

@@ -19,8 +19,6 @@ CREATE INDEX IF NOT EXISTS idx_provider_reports_provider ON public.provider_repo
 ALTER TABLE public.provider_reports ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Anyone can insert provider reports" ON public.provider_reports;
-CREATE POLICY "Anyone can insert provider reports" ON public.provider_reports
-  FOR INSERT WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Admins can manage provider reports" ON public.provider_reports;
 CREATE POLICY "Admins can manage provider reports" ON public.provider_reports

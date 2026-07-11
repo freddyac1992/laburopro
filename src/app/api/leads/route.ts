@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { getRateLimitResponse } from '@/lib/rate-limit'
 
 type LeadRequestBody = {
   providerId?: unknown
@@ -41,11 +43,21 @@ export async function POST(request: Request) {
     .from('provider_profiles')
     .select('id')
     .eq('id', providerId)
+    .eq('is_approved', true)
+    .eq('is_active', true)
     .maybeSingle()
 
   if (!provider) {
     return NextResponse.json({ message: 'Proveedor no encontrado.' }, { status: 404 })
   }
+
+  const adminSupabase = createAdminClient()
+  if (!adminSupabase) {
+    return NextResponse.json({ message: 'El servicio no está configurado temporalmente.' }, { status: 503 })
+  }
+
+  const rateLimitResponse = await getRateLimitResponse(request, adminSupabase, 'lead')
+  if (rateLimitResponse) return rateLimitResponse
 
   const enrichedLead = {
     provider_id: providerId,
@@ -61,10 +73,10 @@ export async function POST(request: Request) {
     },
   }
 
-  const { error } = await supabase.from('leads').insert(enrichedLead)
+  const { error } = await adminSupabase.from('leads').insert(enrichedLead)
 
   if (error && error.code === 'PGRST204') {
-    const { error: fallbackError } = await supabase.from('leads').insert({
+    const { error: fallbackError } = await adminSupabase.from('leads').insert({
       provider_id: providerId,
       customer_name: null,
       customer_phone: null,

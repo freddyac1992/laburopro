@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { getRateLimitResponse } from '@/lib/rate-limit'
 
 type ProfileViewRequestBody = {
   providerId?: unknown
@@ -58,7 +60,15 @@ export async function POST(request: Request) {
     }
   }
 
-  const { error } = await supabase.from('profile_views').insert({
+  const adminSupabase = createAdminClient()
+  if (!adminSupabase) {
+    return NextResponse.json({ message: 'El servicio no está configurado temporalmente.' }, { status: 503 })
+  }
+
+  const rateLimitResponse = await getRateLimitResponse(request, adminSupabase, 'profile_view')
+  if (rateLimitResponse) return rateLimitResponse
+
+  const { error } = await adminSupabase.from('profile_views').insert({
     provider_id: providerId,
     visitor_id: cleanText(body.visitorId, 100),
     page_url: cleanText(body.pageUrl, 1000),

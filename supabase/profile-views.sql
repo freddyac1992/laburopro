@@ -18,8 +18,6 @@ CREATE INDEX IF NOT EXISTS idx_profile_views_provider_created
 ALTER TABLE public.profile_views ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Anyone can insert profile views" ON public.profile_views;
-CREATE POLICY "Anyone can insert profile views" ON public.profile_views
-  FOR INSERT WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Providers can view own profile views" ON public.profile_views;
 CREATE POLICY "Providers can view own profile views" ON public.profile_views
