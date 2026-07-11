@@ -32,14 +32,35 @@ function formatDate(value: string) {
   }).format(new Date(value))
 }
 
-export default function LeadPipeline({ initialLeads }: { initialLeads: DashboardLead[] }) {
+function getWaitingLabel(value: string, referenceTime: number) {
+  const hours = Math.max(0, Math.floor((referenceTime - new Date(value).getTime()) / 3_600_000))
+  if (hours < 1) return 'Recibido hace menos de una hora'
+  if (hours < 24) return `Sin atender hace ${hours} hora${hours === 1 ? '' : 's'}`
+  const days = Math.floor(hours / 24)
+  return `Sin atender hace ${days} día${days === 1 ? '' : 's'}`
+}
+
+export default function LeadPipeline({
+  initialLeads,
+  initialFilter = 'all',
+  referenceTime,
+}: {
+  initialLeads: DashboardLead[]
+  initialFilter?: LeadStatus | 'all'
+  referenceTime: string
+}) {
   const [leads, setLeads] = useState(initialLeads)
-  const [filter, setFilter] = useState<LeadStatus | 'all'>('all')
+  const [filter, setFilter] = useState<LeadStatus | 'all'>(initialFilter)
   const [saving, setSaving] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const referenceTimeMs = new Date(referenceTime).getTime()
 
   const filteredLeads = useMemo(
-    () => filter === 'all' ? leads : leads.filter((lead) => lead.status === filter),
+    () => (filter === 'all' ? leads : leads.filter((lead) => lead.status === filter)).toSorted((a, b) => {
+      if (a.status === 'new' && b.status !== 'new') return -1
+      if (a.status !== 'new' && b.status === 'new') return 1
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    }),
     [filter, leads]
   )
 
@@ -141,6 +162,15 @@ export default function LeadPipeline({ initialLeads }: { initialLeads: Dashboard
                       </span>
                     </div>
                     <p className="text-sm text-gray-500">{formatDate(lead.created_at)} · {lead.source ?? 'whatsapp'}</p>
+                    {lead.status === 'new' && (
+                      <p className={`mt-1 text-xs font-semibold ${
+                        referenceTimeMs - new Date(lead.created_at).getTime() >= 86_400_000
+                          ? 'text-red-700'
+                          : 'text-amber-700'
+                      }`}>
+                        {getWaitingLabel(lead.created_at, referenceTimeMs)}
+                      </p>
+                    )}
                     {lead.message && (
                       <p className="mt-3 text-sm text-gray-700 bg-gray-50 rounded-lg p-3">{lead.message}</p>
                     )}

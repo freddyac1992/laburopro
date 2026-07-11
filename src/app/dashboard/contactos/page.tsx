@@ -4,7 +4,12 @@ import DashboardShell from '@/components/dashboard/DashboardShell'
 import LeadPipeline, { type DashboardLead } from '@/components/dashboard/LeadPipeline'
 import { createClient } from '@/lib/supabase/server'
 
-export default async function DashboardContactosPage() {
+export default async function DashboardContactosPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ filter?: string | string[] }>
+}) {
+  const query = await searchParams
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
@@ -33,9 +38,10 @@ export default async function DashboardContactosPage() {
     : { data: [] }
 
   const leadRows = (leads ?? []) as DashboardLead[]
+  const newLeadCount = leadRows.filter((lead) => lead.status === 'new').length
 
   return (
-    <DashboardShell title="Contactos recibidos">
+    <DashboardShell title="Contactos recibidos" newLeadCount={newLeadCount}>
       <div className="space-y-6">
         {!providerProfile ? (
           <div className="bg-white rounded-2xl border border-gray-100 p-6 text-center">
@@ -68,7 +74,11 @@ export default async function DashboardContactosPage() {
               </div>
 
               <div className="p-5">
-                <LeadPipeline initialLeads={leadRows} />
+                <LeadPipeline
+                  initialLeads={leadRows}
+                  initialFilter={query.filter === 'new' ? 'new' : 'all'}
+                  referenceTime={new Date().toISOString()}
+                />
               </div>
             </div>
           </>

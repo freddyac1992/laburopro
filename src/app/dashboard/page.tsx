@@ -103,6 +103,8 @@ export default async function DashboardPage() {
         supabase.from('profile_views').select('id', { count: 'exact', head: true }).eq('provider_id', providerProfile.id).gte('created_at', startOfTodayInLaPaz()),
         supabase.from('profile_views').select('id', { count: 'exact', head: true }).eq('provider_id', providerProfile.id).gte('created_at', since(7)),
         supabase.from('profile_views').select('id', { count: 'exact', head: true }).eq('provider_id', providerProfile.id).gte('created_at', since(30)),
+        supabase.from('leads').select('id', { count: 'exact', head: true }).eq('provider_id', providerProfile.id).eq('status', 'new'),
+        supabase.from('leads').select('id', { count: 'exact', head: true }).eq('provider_id', providerProfile.id).eq('status', 'new').lt('created_at', since(1)),
       ])
     : []
 
@@ -114,6 +116,8 @@ export default async function DashboardPage() {
   const profileViewsToday = analytics[5]?.count ?? 0
   const profileViewsLastSevenDays = analytics[6]?.count ?? 0
   const profileViewsLastThirtyDays = analytics[7]?.count ?? 0
+  const newLeadCount = analytics[8]?.count ?? 0
+  const staleLeadCount = analytics[9]?.count ?? 0
   const conversionLastThirtyDays = profileViewsLastThirtyDays > 0
     ? Math.round((leadsLastThirtyDays / profileViewsLastThirtyDays) * 100)
     : 0
@@ -122,8 +126,32 @@ export default async function DashboardPage() {
   const completionPercent = checklist.length > 0 ? Math.round((completedChecklist / checklist.length) * 100) : 0
 
   return (
-    <DashboardShell title={`Hola, ${profile?.full_name ?? 'Proveedor'} 👋`}>
+    <DashboardShell title={`Hola, ${profile?.full_name ?? 'Proveedor'} 👋`} newLeadCount={newLeadCount}>
       <div className="space-y-6">
+        {providerProfile && newLeadCount > 0 && (
+          <Link
+            href="/dashboard/contactos?filter=new"
+            className={`block rounded-lg border p-5 ${
+              staleLeadCount > 0
+                ? 'border-red-200 bg-red-50 text-red-900'
+                : 'border-amber-200 bg-amber-50 text-amber-900'
+            }`}
+          >
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div>
+                <p className="font-semibold">
+                  Tienes {newLeadCount} contacto{newLeadCount === 1 ? '' : 's'} por atender
+                </p>
+                <p className="text-sm mt-1 opacity-80">
+                  {staleLeadCount > 0
+                    ? `${staleLeadCount} lleva${staleLeadCount === 1 ? '' : 'n'} más de 24 horas esperando seguimiento.`
+                    : 'Responder pronto aumenta las posibilidades de concretar el trabajo.'}
+                </p>
+              </div>
+              <span className="text-sm font-semibold whitespace-nowrap">Revisar contactos →</span>
+            </div>
+          </Link>
+        )}
         {/* Status card */}
         <div className="bg-white rounded-2xl border border-gray-100 p-6">
           <h2 className="font-semibold text-gray-900 mb-4">Estado de tu perfil</h2>

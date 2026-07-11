@@ -11,9 +11,10 @@ const navItems = [
 interface DashboardShellProps {
   children: React.ReactNode
   title?: string
+  newLeadCount?: number
 }
 
-export default function DashboardShell({ children, title }: DashboardShellProps) {
+export default function DashboardShell({ children, title, newLeadCount = 0 }: DashboardShellProps) {
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
@@ -34,6 +35,11 @@ export default function DashboardShell({ children, title }: DashboardShellProps)
             >
               <span>{item.icon}</span>
               {item.label}
+              {item.href === '/dashboard/contactos' && newLeadCount > 0 && (
+                <span className="ml-auto min-w-5 h-5 px-1.5 inline-flex items-center justify-center rounded-full bg-red-600 text-white text-xs font-bold">
+                  {newLeadCount > 99 ? '99+' : newLeadCount}
+                </span>
+              )}
             </Link>
           ))}
         </nav>
@@ -56,6 +62,11 @@ export default function DashboardShell({ children, title }: DashboardShellProps)
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-700 font-medium text-sm whitespace-nowrap"
           >
             {item.icon} {item.label}
+            {item.href === '/dashboard/contactos' && newLeadCount > 0 && (
+              <span className="min-w-5 h-5 px-1.5 inline-flex items-center justify-center rounded-full bg-red-600 text-white text-xs font-bold">
+                {newLeadCount > 99 ? '99+' : newLeadCount}
+              </span>
+            )}
           </Link>
         ))}
         <LogoutButton

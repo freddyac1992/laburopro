@@ -128,6 +128,13 @@ for (const status of ['new', 'contacted', 'converted', 'lost']) {
 assert(leadPipelineRoute.includes(".eq('provider_id', provider.id)"), 'Lead updates must be scoped to the provider owner')
 assert(leadPipelineSql.includes('GRANT UPDATE (status, updated_at)'), 'Authenticated users may only update lead workflow fields')
 
+const leadPipelineUi = await readFile(new URL('../src/components/dashboard/LeadPipeline.tsx', import.meta.url), 'utf8')
+const dashboardShellSource = await readFile(new URL('../src/components/dashboard/DashboardShell.tsx', import.meta.url), 'utf8')
+const providerDashboardSource = await readFile(new URL('../src/app/dashboard/page.tsx', import.meta.url), 'utf8')
+assert(leadPipelineUi.includes('getWaitingLabel'), 'New leads must display their waiting time')
+assert(dashboardShellSource.includes('newLeadCount'), 'Provider navigation must show the new lead counter')
+assert(providerDashboardSource.includes(".eq('status', 'new').lt('created_at', since(1))"), 'Provider dashboard must detect unattended leads older than 24 hours')
+
 await expectRedirect('/dashboard', '/login')
 await expectRedirect('/dashboard/perfil', '/login')
 await expectRedirect('/dashboard/contactos', '/login')
