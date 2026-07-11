@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import LogoutButton from '@/components/auth/LogoutButton'
+import FavoritesNavLink from './FavoritesNavLink'
 import { NAV_LINKS, SITE_NAME } from '@/lib/constants'
 import { createClient } from '@/lib/supabase/client'
 import type { Role } from '@/types/database'
@@ -153,6 +154,7 @@ export default function Header() {
 
           {/* Desktop auth buttons */}
           <div className="hidden md:flex items-center gap-3">
+            <FavoritesNavLink />
             {!checkingSession && authLinks}
           </div>
 
@@ -188,6 +190,7 @@ export default function Header() {
                 {link.label}
               </Link>
             ))}
+            <FavoritesNavLink mobile onClick={closeMenu} />
             <div className="pt-2 border-t border-gray-100 space-y-2">
               {!checkingSession && mobileAuthLinks}
             </div>

@@ -61,6 +61,7 @@ const publicPages = [
   '/servicios/plomeros/el-alto?verified=1&sort=experience',
   '/login',
   '/registro',
+  '/guardados',
   '/privacidad',
   '/terminos',
 ]
@@ -88,6 +89,14 @@ for (const forbidden of ['signInWithPassword', '.auth.signUp(', 'type="password"
   assert(!authSource.includes(forbidden), `Google-only auth must not include ${forbidden}`)
 }
 assert(authSource.includes("provider: 'google'"), 'Google OAuth provider must remain configured')
+
+const favoritesSource = await readFile(new URL('../src/lib/favorites.ts', import.meta.url), 'utf8')
+const favoriteButtonSource = await readFile(new URL('../src/components/ui/FavoriteButton.tsx', import.meta.url), 'utf8')
+const favoritesPageSource = await readFile(new URL('../src/app/guardados/page.tsx', import.meta.url), 'utf8')
+assert(favoritesSource.includes("laburopro:favorites:v1"), 'Saved providers must use a versioned storage key')
+assert(favoritesSource.includes('.slice(0, 50)'), 'Saved providers must have a local storage limit')
+assert(favoriteButtonSource.includes('aria-pressed={isFavorite}'), 'Favorite buttons must expose their selected state')
+assert(favoritesPageSource.includes('ProviderCard'), 'Saved providers page must reuse provider cards')
 
 const protectedApiRoutes = [
   ['../src/app/api/leads/route.ts', "'lead'"],

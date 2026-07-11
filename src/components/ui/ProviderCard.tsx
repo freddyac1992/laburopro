@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import VerificationBadge from './VerificationBadge'
+import FavoriteButton from './FavoriteButton'
 import { truncate, getInitials } from '@/lib/utils'
 import { getProviderImageUrl } from '@/lib/provider-images'
 
@@ -22,6 +23,7 @@ interface ProviderCardProps {
 }
 
 export default function ProviderCard({
+  id,
   slug,
   displayName,
   categoryName,
@@ -38,13 +40,30 @@ export default function ProviderCard({
 }: ProviderCardProps) {
   const initials = getInitials(displayName)
   const profilePhotoUrl = getProviderImageUrl(profilePhotoPath, imageVersion)
+  const favoriteProvider = {
+    id,
+    slug,
+    displayName,
+    categoryName,
+    cityName,
+    zone,
+    description,
+    priceReference,
+    rating,
+    reviewCount,
+    isVerified,
+    yearsExperience,
+    profilePhotoPath,
+    imageVersion,
+  }
 
   return (
-    <Link
-      href={`/proveedores/${slug}`}
-      className="provider-card flex flex-col bg-white rounded-lg border border-slate-200 overflow-hidden hover:border-teal-300 group"
-      id={`provider-card-${slug}`}
-    >
+    <article className="provider-card relative flex flex-col bg-white rounded-lg border border-slate-200 overflow-hidden hover:border-teal-300 group">
+      <FavoriteButton
+        provider={favoriteProvider}
+        className="absolute z-10 top-3 right-3 w-9 h-9 rounded-full"
+      />
+      <Link href={`/proveedores/${slug}`} className="flex flex-col flex-1" id={`provider-card-${slug}`}>
       {/* Header */}
       <div className="flex items-start gap-4 p-5">
         {/* Avatar */}
@@ -62,7 +81,7 @@ export default function ProviderCard({
 
         {/* Info */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2">
+          <div className="flex items-start justify-between gap-2 pr-9">
             <h3 className="font-semibold text-gray-900 text-base leading-tight truncate group-hover:text-teal-700 transition-colors">
               {displayName}
             </h3>
@@ -113,6 +132,7 @@ export default function ProviderCard({
           </div>
         )}
       </div>
-    </Link>
+      </Link>
+    </article>
   )
 }

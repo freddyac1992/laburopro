@@ -6,6 +6,7 @@ import WhatsAppButton from '@/components/ui/WhatsAppButton'
 import VerificationBadge from '@/components/ui/VerificationBadge'
 import ReviewForm from '@/components/ui/ReviewForm'
 import ProviderReportForm from '@/components/ui/ProviderReportForm'
+import FavoriteButton from '@/components/ui/FavoriteButton'
 import ProfileViewTracker from '@/components/analytics/ProfileViewTracker'
 import { SITE_NAME, SITE_URL } from '@/lib/constants'
 import { createClient } from '@/lib/supabase/server'
@@ -140,6 +141,22 @@ export default async function ProviderProfilePage({ params, searchParams }: Page
   const initials = getInitials(provider.display_name)
   const profilePhotoUrl = getProviderImageUrl(provider.profile_photo_path, provider.updated_at)
   const workPhotoUrl = getProviderImageUrl(provider.work_photo_path, provider.updated_at)
+  const favoriteProvider = {
+    id: provider.id,
+    slug: provider.slug,
+    displayName: provider.display_name,
+    categoryName: category?.name,
+    cityName: city?.name,
+    zone: provider.zone,
+    description: provider.description,
+    priceReference: provider.price_reference,
+    rating: provider.rating,
+    reviewCount: provider.review_count,
+    isVerified: provider.is_verified,
+    yearsExperience: provider.years_experience,
+    profilePhotoPath: provider.profile_photo_path,
+    imageVersion: provider.updated_at,
+  }
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -185,9 +202,14 @@ export default async function ProviderProfilePage({ params, searchParams }: Page
                 ) : initials}
               </div>
               <div className="flex-1">
-                <div className="flex items-start flex-wrap gap-2 mb-1">
-                  <h1 className="text-2xl font-bold text-gray-900">{provider.display_name}</h1>
-                  {provider.is_verified && <VerificationBadge size="md" />}
+                <div className="flex items-start justify-between gap-3 mb-1">
+                  <div className="flex items-start flex-wrap gap-2 min-w-0">
+                    <h1 className="text-2xl font-bold text-gray-900">{provider.display_name}</h1>
+                    {provider.is_verified && <VerificationBadge size="md" />}
+                  </div>
+                  {!isAdminPreview && (
+                    <FavoriteButton provider={favoriteProvider} className="w-10 h-10 rounded-full flex-shrink-0" />
+                  )}
                 </div>
                 {category && (
                   <p className="text-blue-600 font-semibold text-base">
