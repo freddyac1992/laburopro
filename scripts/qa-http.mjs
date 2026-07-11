@@ -1,3 +1,5 @@
+import { readFile } from 'node:fs/promises'
+
 const baseUrl = process.env.QA_BASE_URL ?? 'http://127.0.0.1:3000'
 
 async function request(path, init = {}) {
@@ -37,6 +39,18 @@ async function expectRedirect(path, target, init, status = 307) {
   )
 }
 
+async function expectBody(path, { contains = [], excludes = [] }) {
+  const response = await expectStatus(path, 200)
+  const body = await response.text()
+
+  for (const text of contains) {
+    assert(body.includes(text), `${path} expected body to include ${text}`)
+  }
+  for (const text of excludes) {
+    assert(!body.includes(text), `${path} expected body not to include ${text}`)
+  }
+}
+
 const publicPages = [
   '/',
   '/servicios',
@@ -54,6 +68,26 @@ const publicPages = [
 for (const path of publicPages) {
   await expectStatus(path, 200)
 }
+
+await expectBody('/login', {
+  contains: ['login-google-only', 'data-auth-method="google"'],
+  excludes: ['login-email', 'login-password'],
+})
+await expectBody('/registro', {
+  contains: ['register-google-only', 'data-auth-method="google"'],
+  excludes: ['registro-email', 'registro-password'],
+})
+
+const authSources = await Promise.all([
+  readFile(new URL('../src/app/login/page.tsx', import.meta.url), 'utf8'),
+  readFile(new URL('../src/app/registro/page.tsx', import.meta.url), 'utf8'),
+  readFile(new URL('../src/components/auth/GoogleAuthPanel.tsx', import.meta.url), 'utf8'),
+])
+const authSource = authSources.join('\n')
+for (const forbidden of ['signInWithPassword', '.auth.signUp(', 'type="password"']) {
+  assert(!authSource.includes(forbidden), `Google-only auth must not include ${forbidden}`)
+}
+assert(authSource.includes("provider: 'google'"), 'Google OAuth provider must remain configured')
 
 await expectRedirect('/dashboard', '/login')
 await expectRedirect('/dashboard/perfil', '/login')

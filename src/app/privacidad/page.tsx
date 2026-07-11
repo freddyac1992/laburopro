@@ -35,7 +35,7 @@ export default function PrivacidadPage() {
           <h2 className="text-xl font-semibold text-gray-900 mb-3">3. Seguridad</h2>
           <p>
             Utilizamos Supabase como plataforma de base de datos con Row Level Security habilitado.
-            Las contraseñas son gestionadas de forma segura a través de Supabase Auth.
+            El acceso se realiza con Google y la sesión es gestionada de forma segura a través de Supabase Auth. LaburoPro no recibe ni almacena tu contraseña de Google.
           </p>
         </section>
 
