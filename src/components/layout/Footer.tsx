@@ -5,13 +5,13 @@ export default function Footer() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="bg-gray-900 text-gray-300">
+    <footer className="bg-[#102a33] text-slate-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="md:col-span-2">
             <Link href="/" className="flex items-center gap-2 font-bold text-xl text-white mb-3">
-              <span className="bg-blue-500 text-white px-2 py-1 rounded-lg text-sm font-extrabold">LP</span>
+              <span className="bg-teal-500 text-white px-2 py-1 rounded-md text-sm font-extrabold">LP</span>
               {SITE_NAME}
             </Link>
             <p className="text-gray-400 text-sm leading-relaxed max-w-sm">
@@ -24,18 +24,18 @@ export default function Footer() {
 
           {/* Links */}
           <div>
-            <h3 className="font-semibold text-white mb-4 text-sm uppercase tracking-wider">Servicios</h3>
+            <h3 className="font-bold text-white mb-4 text-sm">Servicios</h3>
             <ul className="space-y-2 text-sm">
               <li><Link href="/servicios/albaniles" className="hover:text-white transition-colors">Albañiles</Link></li>
               <li><Link href="/servicios/plomeros" className="hover:text-white transition-colors">Plomeros</Link></li>
               <li><Link href="/servicios/electricistas" className="hover:text-white transition-colors">Electricistas</Link></li>
               <li><Link href="/servicios/fletes-y-mudanzas" className="hover:text-white transition-colors">Fletes y Mudanzas</Link></li>
-              <li><Link href="/servicios" className="hover:text-white transition-colors text-blue-400">Ver todos →</Link></li>
+              <li><Link href="/servicios" className="hover:text-white transition-colors text-teal-300">Ver todos →</Link></li>
             </ul>
           </div>
 
           <div>
-            <h3 className="font-semibold text-white mb-4 text-sm uppercase tracking-wider">Plataforma</h3>
+            <h3 className="font-bold text-white mb-4 text-sm">Plataforma</h3>
             <ul className="space-y-2 text-sm">
               <li><Link href="/registro" className="hover:text-white transition-colors">Publicar mi servicio</Link></li>
               <li><Link href="/login" className="hover:text-white transition-colors">Ingresar</Link></li>

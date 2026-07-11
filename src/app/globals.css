@@ -1,20 +1,20 @@
 @import "tailwindcss";
 
 :root {
-  --brand-primary: #1a56db;
-  --brand-primary-dark: #1e429f;
-  --brand-accent: #ff6b00;
-  --brand-success: #0e9f6e;
+  --brand-primary: #0f766e;
+  --brand-primary-dark: #115e59;
+  --brand-accent: #e85d3f;
+  --brand-success: #15803d;
   --brand-whatsapp: #25d366;
   --brand-whatsapp-dark: #128c7e;
-  --text-primary: #111827;
-  --text-secondary: #6b7280;
-  --bg-base: #f9fafb;
+  --text-primary: #102a33;
+  --text-secondary: #60737a;
+  --bg-base: #f6f8f7;
   --bg-card: #ffffff;
-  --border-color: #e5e7eb;
-  --radius: 0.75rem;
-  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --border-color: #dce5e2;
+  --radius: 0.5rem;
+  --shadow-card: 0 1px 2px rgb(16 42 51 / 0.06), 0 8px 24px rgb(16 42 51 / 0.05);
+  --shadow-lg: 0 18px 45px rgb(16 42 51 / 0.13);
 }
 
 * {
@@ -28,7 +28,7 @@ html {
 body {
   background-color: var(--bg-base);
   color: var(--text-primary);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: var(--font-manrope), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -61,17 +61,12 @@ body {
   animation: pulse-badge 3s ease-in-out infinite;
 }
 
-/* Hero gradient */
-.hero-gradient {
-  background: linear-gradient(135deg, #1a56db 0%, #1e429f 60%, #1e3a8a 100%);
-}
-
 /* Category card hover */
 .category-card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 .category-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
 }
 
@@ -82,6 +77,14 @@ body {
 .provider-card:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
+}
+
+.hero-photo {
+  filter: saturate(0.88) contrast(1.04) brightness(0.58);
+}
+
+.hero-search {
+  box-shadow: 0 20px 55px rgb(3 23 29 / 0.28);
 }
 
 /* Trust section */
@@ -107,7 +110,7 @@ a, button {
 /* Form input styles */
 .form-input {
   width: 100%;
-  border: 1.5px solid var(--border-color);
+  border: 1px solid var(--border-color);
   border-radius: 0.5rem;
   padding: 0.625rem 0.875rem;
   font-size: 0.9375rem;
@@ -118,7 +121,7 @@ a, button {
 .form-input:focus {
   outline: none;
   border-color: var(--brand-primary);
-  box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.12);
+  box-shadow: 0 0 0 3px rgb(15 118 110 / 0.14);
 }
 .form-input::placeholder {
   color: #9ca3af;
@@ -126,13 +129,13 @@ a, button {
 
 /* Section spacing */
 .section-padding {
-  padding-top: 4rem;
-  padding-bottom: 4rem;
+  padding-top: 3.5rem;
+  padding-bottom: 3.5rem;
 }
 
 @media (min-width: 768px) {
   .section-padding {
-    padding-top: 5rem;
-    padding-bottom: 5rem;
+    padding-top: 4.5rem;
+    padding-bottom: 4.5rem;
   }
 }

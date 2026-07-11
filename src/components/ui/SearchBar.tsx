@@ -35,7 +35,7 @@ export default function SearchBar() {
   return (
     <form
       onSubmit={handleSearch}
-      className="flex flex-col sm:flex-row gap-3 w-full max-w-2xl"
+      className="hero-search grid grid-cols-1 md:grid-cols-[1.25fr_1fr_1fr_auto] gap-2 w-full max-w-5xl bg-white rounded-lg p-2"
       id="search-form"
     >
       <input
@@ -44,7 +44,7 @@ export default function SearchBar() {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="¿Qué necesitas?"
-        className="form-input flex-1 bg-white text-gray-900"
+        className="w-full min-h-12 rounded-md border border-slate-200 bg-slate-50 px-4 text-sm text-slate-900 outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-600/15"
         aria-label="Buscar servicio o detalle"
       />
 
@@ -52,7 +52,7 @@ export default function SearchBar() {
         id="search-category"
         value={category}
         onChange={(e) => setCategory(e.target.value)}
-        className="form-input flex-1 bg-white text-gray-900 cursor-pointer"
+        className="w-full min-h-12 rounded-md border border-slate-200 bg-slate-50 px-4 text-sm text-slate-900 outline-none cursor-pointer focus:border-teal-600 focus:ring-2 focus:ring-teal-600/15"
         aria-label="Seleccionar categoría"
       >
         <option value="">¿Qué servicio necesitas?</option>
@@ -67,7 +67,7 @@ export default function SearchBar() {
         id="search-city"
         value={city}
         onChange={(e) => setCity(e.target.value)}
-        className="form-input flex-1 bg-white text-gray-900 cursor-pointer"
+        className="w-full min-h-12 rounded-md border border-slate-200 bg-slate-50 px-4 text-sm text-slate-900 outline-none cursor-pointer focus:border-teal-600 focus:ring-2 focus:ring-teal-600/15"
         aria-label="Seleccionar ciudad"
       >
         <option value="">¿En qué ciudad?</option>
@@ -81,7 +81,7 @@ export default function SearchBar() {
       <button
         type="submit"
         id="search-submit-btn"
-        className="px-8 py-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-xl transition-colors whitespace-nowrap"
+        className="min-h-12 px-7 bg-[#e85d3f] hover:bg-[#cf4f34] text-white font-bold rounded-md whitespace-nowrap"
       >
         Buscar
       </button>

@@ -42,13 +42,13 @@ export default function ProviderCard({
   return (
     <Link
       href={`/proveedores/${slug}`}
-      className="provider-card flex flex-col bg-white rounded-2xl border border-gray-100 overflow-hidden hover:border-blue-200 group"
+      className="provider-card flex flex-col bg-white rounded-lg border border-slate-200 overflow-hidden hover:border-teal-300 group"
       id={`provider-card-${slug}`}
     >
       {/* Header */}
       <div className="flex items-start gap-4 p-5">
         {/* Avatar */}
-        <div className="relative flex-shrink-0 w-14 h-14 overflow-hidden rounded-2xl bg-blue-700 flex items-center justify-center text-white font-bold text-lg">
+        <div className="relative flex-shrink-0 w-14 h-14 overflow-hidden rounded-md bg-teal-700 flex items-center justify-center text-white font-bold text-lg">
           {profilePhotoUrl ? (
             <Image
               src={profilePhotoUrl}
@@ -63,14 +63,14 @@ export default function ProviderCard({
         {/* Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
-            <h3 className="font-semibold text-gray-900 text-base leading-tight truncate group-hover:text-blue-700 transition-colors">
+            <h3 className="font-semibold text-gray-900 text-base leading-tight truncate group-hover:text-teal-700 transition-colors">
               {displayName}
             </h3>
             {isVerified && <VerificationBadge size="sm" />}
           </div>
 
           {categoryName && (
-            <p className="text-blue-600 text-sm font-medium mt-0.5">{categoryName}</p>
+            <p className="text-teal-700 text-sm font-semibold mt-0.5">{categoryName}</p>
           )}
 
           {(cityName || zone) && (

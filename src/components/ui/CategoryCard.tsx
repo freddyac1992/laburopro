@@ -12,18 +12,18 @@ export default function CategoryCard({ name, slug, icon, description, providerCo
   return (
     <Link
       href={`/servicios/${slug}`}
-      className="category-card flex flex-col items-center text-center bg-white rounded-2xl border border-gray-100 p-6 hover:border-blue-200 group"
+      className="category-card flex flex-col items-start text-left bg-white rounded-lg border border-slate-200 p-5 hover:border-teal-300 group"
       id={`category-card-${slug}`}
     >
-      <div className="w-14 h-14 flex items-center justify-center bg-blue-50 rounded-2xl text-3xl mb-3 group-hover:bg-blue-100 transition-colors">
+      <div className="w-12 h-12 flex items-center justify-center bg-teal-50 rounded-md text-2xl mb-4 group-hover:bg-teal-100 transition-colors">
         {icon}
       </div>
-      <h3 className="font-semibold text-gray-900 text-sm leading-tight mb-1">{name}</h3>
+      <h3 className="font-bold text-[#102a33] text-sm leading-tight mb-1">{name}</h3>
       {description && (
         <p className="text-gray-500 text-xs leading-relaxed line-clamp-2 hidden sm:block">{description}</p>
       )}
       {typeof providerCount === 'number' && (
-        <span className="mt-2 text-xs text-blue-600 font-medium">
+        <span className="mt-2 text-xs text-teal-700 font-semibold">
           {providerCount} proveedor{providerCount !== 1 ? 'es' : ''}
         </span>
       )}

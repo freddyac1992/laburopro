@@ -59,13 +59,13 @@ export default function Header() {
       <Link
         href={dashboardHref}
         id="header-dashboard-btn"
-        className="text-sm font-semibold bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-800"
+        className="text-sm font-semibold bg-teal-700 text-white px-4 py-2 rounded-md hover:bg-teal-800"
       >
         Mi panel
       </Link>
       <LogoutButton
         id="header-logout-btn"
-        className="text-sm font-medium text-gray-700 hover:text-red-600 px-4 py-2 rounded-lg hover:bg-red-50"
+        className="text-sm font-medium text-slate-700 hover:text-red-600 px-4 py-2 rounded-md hover:bg-red-50"
       >
         Cerrar sesión
       </LogoutButton>
@@ -75,14 +75,14 @@ export default function Header() {
       <Link
         href="/login"
         id="header-login-btn"
-        className="text-sm font-medium text-gray-700 hover:text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-50"
+        className="text-sm font-medium text-slate-700 hover:text-teal-700 px-4 py-2 rounded-md hover:bg-teal-50"
       >
         Ingresar
       </Link>
       <Link
         href="/registro"
         id="header-register-btn"
-        className="text-sm font-semibold bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-800"
+        className="text-sm font-semibold bg-[#e85d3f] text-white px-4 py-2 rounded-md hover:bg-[#cf4f34]"
       >
         Publicar servicio
       </Link>
@@ -93,7 +93,7 @@ export default function Header() {
     <>
       <Link
         href={dashboardHref}
-        className="block px-4 py-2 bg-blue-700 text-white rounded-lg font-semibold text-center hover:bg-blue-800"
+        className="block px-4 py-2 bg-teal-700 text-white rounded-md font-semibold text-center hover:bg-teal-800"
         onClick={closeMenu}
       >
         Mi panel
@@ -109,14 +109,14 @@ export default function Header() {
     <>
       <Link
         href="/login"
-        className="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg font-medium"
+        className="block px-4 py-2 text-slate-700 hover:bg-teal-50 hover:text-teal-700 rounded-md font-medium"
         onClick={closeMenu}
       >
         Ingresar
       </Link>
       <Link
         href="/registro"
-        className="block px-4 py-2 bg-blue-700 text-white rounded-lg font-semibold text-center hover:bg-blue-800"
+        className="block px-4 py-2 bg-[#e85d3f] text-white rounded-md font-semibold text-center hover:bg-[#cf4f34]"
         onClick={closeMenu}
       >
         Publicar servicio
@@ -125,15 +125,15 @@ export default function Header() {
   )
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+    <header className="sticky top-0 z-50 bg-white/95 border-b border-slate-200 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 font-bold text-xl" id="header-logo">
-            <span className="bg-blue-700 text-white px-2 py-1 rounded-lg text-sm font-extrabold tracking-tight">
+          <Link href="/" className="flex items-center gap-2.5 font-extrabold text-xl" id="header-logo">
+            <span className="bg-teal-700 text-white px-2 py-1 rounded-md text-sm font-extrabold tracking-normal shadow-sm">
               LP
             </span>
-            <span className="text-gray-900">
+            <span className="text-[#102a33]">
               {SITE_NAME}
             </span>
           </Link>
@@ -144,7 +144,7 @@ export default function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-gray-600 hover:text-blue-700 font-medium text-sm"
+                className="text-slate-600 hover:text-teal-700 font-semibold text-sm"
               >
                 {link.label}
               </Link>

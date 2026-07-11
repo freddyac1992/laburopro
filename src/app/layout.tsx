@@ -1,14 +1,14 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Manrope } from 'next/font/google'
 import './globals.css'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import { SITE_NAME, SITE_DESCRIPTION, SITE_URL } from '@/lib/constants'
 
-const inter = Inter({
+const manrope = Manrope({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-inter',
+  variable: '--font-manrope',
 })
 
 export const metadata: Metadata = {
@@ -28,11 +28,13 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     title: `${SITE_NAME} — Servicios verificados cerca de ti`,
     description: SITE_DESCRIPTION,
+    images: ['/images/laburopro-hero.png'],
   },
   twitter: {
     card: 'summary_large_image',
     title: `${SITE_NAME} — Servicios verificados cerca de ti`,
     description: SITE_DESCRIPTION,
+    images: ['/images/laburopro-hero.png'],
   },
   robots: {
     index: true,
@@ -46,7 +48,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="es" className={inter.variable}>
+    <html lang="es" className={manrope.variable}>
       <body className="min-h-screen flex flex-col">
         <Header />
         <main className="flex-1">{children}</main>
