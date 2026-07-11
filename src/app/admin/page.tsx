@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import AdminShell from '@/components/admin/AdminShell'
+import StarRating from '@/components/ui/StarRating'
 import { createClient } from '@/lib/supabase/server'
 
 type RecentLead = {
@@ -205,9 +206,10 @@ export default async function AdminPage() {
             {reviewRows.length > 0 ? reviewRows.map((review) => (
               <div key={review.id} className="p-4">
                 <p className="font-medium text-gray-900 text-sm">{review.provider?.display_name ?? 'Proveedor eliminado'}</p>
-                <p className="text-xs text-gray-500 mt-1">
-                  {review.rating} estrella{review.rating !== 1 ? 's' : ''} · {review.reviewer_name ?? 'Cliente'}
-                </p>
+                <div className="flex items-center gap-2 mt-1">
+                  <StarRating value={review.rating} size="sm" label="Calificación de la reseña" />
+                  <span className="text-xs text-gray-500">{review.reviewer_name ?? 'Cliente'}</span>
+                </div>
                 {review.comment && (
                   <p className="text-xs text-gray-600 mt-2 line-clamp-2">{review.comment}</p>
                 )}

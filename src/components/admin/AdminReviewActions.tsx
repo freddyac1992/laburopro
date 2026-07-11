@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import StarRating from '@/components/ui/StarRating'
 
 type ReviewStatus = 'pending' | 'approved'
 
@@ -175,8 +176,9 @@ export default function AdminReviewActions({ initialReviews }: AdminReviewAction
                     <span className="font-semibold text-gray-900">
                       {review.provider?.display_name ?? 'Proveedor eliminado'}
                     </span>
-                    <span className="text-xs bg-yellow-50 text-yellow-700 px-2 py-0.5 rounded-full font-medium">
-                      {review.rating} estrella{review.rating !== 1 ? 's' : ''}
+                    <span className="inline-flex items-center gap-1.5 bg-amber-50 px-2 py-1 rounded-md">
+                      <StarRating value={review.rating} size="sm" label="Calificación de la reseña" />
+                      <span className="text-xs font-semibold text-amber-800">{review.rating}/5</span>
                     </span>
                     {review.is_approved && (
                       <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">

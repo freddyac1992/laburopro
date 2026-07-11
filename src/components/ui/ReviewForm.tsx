@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import StarRating from './StarRating'
 
 interface ReviewFormProps {
   providerId: string
@@ -64,23 +65,17 @@ export default function ReviewForm({ providerId, providerName }: ReviewFormProps
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="review-rating" className="block text-sm font-medium text-gray-700 mb-1.5">
+        <fieldset>
+          <legend className="block text-sm font-medium text-gray-700 mb-1.5">
             Calificación
-          </label>
-          <select
-            id="review-rating"
-            value={rating}
-            onChange={(event) => setRating(Number(event.target.value))}
-            className="form-input bg-white text-gray-900 cursor-pointer"
-          >
-            <option value={5}>5 estrellas</option>
-            <option value={4}>4 estrellas</option>
-            <option value={3}>3 estrellas</option>
-            <option value={2}>2 estrellas</option>
-            <option value={1}>1 estrella</option>
-          </select>
-        </div>
+          </legend>
+          <div className="flex items-center gap-3">
+            <StarRating value={rating} onChange={setRating} size="lg" label="Calificación de la reseña" />
+            <span className="text-sm font-semibold text-slate-600" aria-live="polite">
+              {rating} de 5
+            </span>
+          </div>
+        </fieldset>
 
         <div>
           <label htmlFor="reviewer-name" className="block text-sm font-medium text-gray-700 mb-1.5">

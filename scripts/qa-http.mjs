@@ -98,6 +98,13 @@ assert(favoritesSource.includes('.slice(0, 50)'), 'Saved providers must have a l
 assert(favoriteButtonSource.includes('aria-pressed={isFavorite}'), 'Favorite buttons must expose their selected state')
 assert(favoritesPageSource.includes('ProviderCard'), 'Saved providers page must reuse provider cards')
 
+const reviewFormSource = await readFile(new URL('../src/components/ui/ReviewForm.tsx', import.meta.url), 'utf8')
+const starRatingSource = await readFile(new URL('../src/components/ui/StarRating.tsx', import.meta.url), 'utf8')
+assert(!reviewFormSource.includes('<select'), 'Review rating must not use a select control')
+assert(reviewFormSource.includes('StarRating'), 'Review form must use the visual star rating control')
+assert(starRatingSource.includes('role="radiogroup"'), 'Interactive stars must expose a radio group')
+assert(starRatingSource.includes('aria-checked={value === star}'), 'Each star must expose its selected state')
+
 const protectedApiRoutes = [
   ['../src/app/api/leads/route.ts', "'lead'"],
   ['../src/app/api/profile-views/route.ts', "'profile_view'"],
