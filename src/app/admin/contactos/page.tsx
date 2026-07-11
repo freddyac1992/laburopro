@@ -1,11 +1,13 @@
 import { redirect } from 'next/navigation'
 import AdminShell from '@/components/admin/AdminShell'
 import { createClient } from '@/lib/supabase/server'
+import type { LeadStatus } from '@/types/database'
 
 type AdminLead = {
   id: string
   message: string | null
   source: string | null
+  status: LeadStatus
   created_at: string
   provider: {
     display_name: string | null
@@ -45,7 +47,7 @@ export default async function AdminContactosPage() {
 
   const { data: leads } = await supabase
     .from('leads')
-    .select('id, message, source, created_at, provider:provider_profiles(display_name, slug, whatsapp, category:categories(name), city:cities(name))')
+    .select('id, message, source, status, created_at, provider:provider_profiles(display_name, slug, whatsapp, category:categories(name), city:cities(name))')
     .order('created_at', { ascending: false })
     .limit(200)
 
@@ -53,11 +55,14 @@ export default async function AdminContactosPage() {
   const total = leadRows.length
   const lastSevenDays = leadRows.filter((lead) => isWithinDays(lead.created_at, 7)).length
   const uniqueProviders = new Set(leadRows.map((lead) => lead.provider?.slug).filter(Boolean)).size
+  const converted = leadRows.filter((lead) => lead.status === 'converted').length
+  const resolved = leadRows.filter((lead) => lead.status === 'converted' || lead.status === 'lost').length
+  const closeRate = resolved > 0 ? Math.round((converted / resolved) * 100) : 0
 
   return (
     <AdminShell title="Leads y contactos">
       <div className="space-y-6">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
           <div className="bg-white rounded-2xl border border-gray-100 p-5">
             <div className="text-sm text-gray-500 mb-1">Contactos registrados</div>
             <div className="text-3xl font-bold text-gray-900">{total}</div>
@@ -69,6 +74,14 @@ export default async function AdminContactosPage() {
           <div className="bg-white rounded-2xl border border-gray-100 p-5">
             <div className="text-sm text-gray-500 mb-1">Proveedores contactados</div>
             <div className="text-3xl font-bold text-gray-900">{uniqueProviders}</div>
+          </div>
+          <div className="bg-white rounded-2xl border border-gray-100 p-5">
+            <div className="text-sm text-gray-500 mb-1">Trabajos ganados</div>
+            <div className="text-3xl font-bold text-green-700">{converted}</div>
+          </div>
+          <div className="bg-white rounded-2xl border border-gray-100 p-5">
+            <div className="text-sm text-gray-500 mb-1">Tasa de cierre</div>
+            <div className="text-3xl font-bold text-gray-900">{closeRate}%</div>
           </div>
         </div>
 
@@ -96,6 +109,17 @@ export default async function AdminContactosPage() {
                   <div className="flex flex-wrap gap-2 text-xs mb-3">
                     <span className="px-2.5 py-1 rounded-full bg-green-50 text-green-700 font-semibold">
                       {lead.source ?? 'whatsapp'}
+                    </span>
+                    <span className={`px-2.5 py-1 rounded-full font-semibold ${
+                      lead.status === 'converted'
+                        ? 'bg-green-50 text-green-700'
+                        : lead.status === 'contacted'
+                          ? 'bg-amber-50 text-amber-700'
+                          : lead.status === 'lost'
+                            ? 'bg-gray-100 text-gray-600'
+                            : 'bg-blue-50 text-blue-700'
+                    }`}>
+                      {{ new: 'Nuevo', contacted: 'Atendido', converted: 'Trabajo ganado', lost: 'No concretado' }[lead.status]}
                     </span>
                     {lead.provider?.whatsapp && (
                       <span className="px-2.5 py-1 rounded-full bg-gray-100 text-gray-600">

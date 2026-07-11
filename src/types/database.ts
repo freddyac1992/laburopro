@@ -65,10 +65,14 @@ export type Lead = {
   referrer: string | null
   user_agent: string | null
   metadata: Record<string, unknown>
+  status: LeadStatus
   created_at: string
+  updated_at: string
 }
 
-export type LeadInsert = Omit<Lead, 'id' | 'created_at' | 'page_url' | 'referrer' | 'user_agent' | 'metadata'> &
+export type LeadStatus = 'new' | 'contacted' | 'converted' | 'lost'
+
+export type LeadInsert = Omit<Lead, 'id' | 'created_at' | 'updated_at' | 'status' | 'page_url' | 'referrer' | 'user_agent' | 'metadata'> &
   Partial<Pick<Lead, 'page_url' | 'referrer' | 'user_agent' | 'metadata'>>
 
 export type ProfileView = {
@@ -157,7 +161,7 @@ export interface Database {
       leads: {
         Row: Lead
         Insert: LeadInsert
-        Update: Partial<Omit<Lead, 'id' | 'created_at'>>
+        Update: Partial<Pick<Lead, 'status' | 'updated_at'>>
         Relationships: [
           {
             foreignKeyName: 'leads_provider_id_fkey'

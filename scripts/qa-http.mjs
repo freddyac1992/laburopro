@@ -109,7 +109,8 @@ const schemaSql = await readFile(new URL('../supabase/schema.sql', import.meta.u
 assert(rateLimitSource.includes('status: 429'), 'Rate limiting must return HTTP 429')
 assert(rateLimitSource.includes("'Retry-After'"), 'Rate limiting must include Retry-After')
 assert(adminClientSource.includes("import 'server-only'"), 'Admin Supabase client must remain server-only')
-assert(adminClientSource.includes('SUPABASE_SERVICE_ROLE_KEY'), 'Admin Supabase client must use the service role key')
+assert(adminClientSource.includes('SUPABASE_SECRET_KEY'), 'Admin Supabase client must prefer a modern secret key')
+assert(adminClientSource.includes('SUPABASE_SERVICE_ROLE_KEY'), 'Admin Supabase client must support the legacy service role key')
 assert(!adminClientSource.includes('NEXT_PUBLIC_SUPABASE_SERVICE'), 'Service role key must never be public')
 assert(rateLimitSql.includes('TO service_role'), 'Rate limit RPC must only be granted to service_role')
 assert(!rateLimitSql.includes('TO anon, authenticated'), 'Rate limit RPC must not be public')
@@ -117,6 +118,15 @@ for (const policy of ['leads', 'profile views', 'reviews', 'provider reports']) 
   assert(rateLimitSql.includes(`DROP POLICY IF EXISTS "Anyone can insert ${policy}"`), `Public insert policy must be removed for ${policy}`)
   assert(!schemaSql.includes(`CREATE POLICY "Anyone can insert ${policy}"`), `Base schema must not recreate public insert policy for ${policy}`)
 }
+
+const leadPipelineRoute = await readFile(new URL('../src/app/api/leads/[id]/route.ts', import.meta.url), 'utf8')
+const leadPipelineSql = await readFile(new URL('../supabase/lead-pipeline.sql', import.meta.url), 'utf8')
+for (const status of ['new', 'contacted', 'converted', 'lost']) {
+  assert(leadPipelineRoute.includes(`'${status}'`), `Lead pipeline API must allow ${status}`)
+  assert(leadPipelineSql.includes(`'${status}'`), `Lead pipeline schema must allow ${status}`)
+}
+assert(leadPipelineRoute.includes(".eq('provider_id', provider.id)"), 'Lead updates must be scoped to the provider owner')
+assert(leadPipelineSql.includes('GRANT UPDATE (status, updated_at)'), 'Authenticated users may only update lead workflow fields')
 
 await expectRedirect('/dashboard', '/login')
 await expectRedirect('/dashboard/perfil', '/login')
@@ -136,6 +146,11 @@ await expectStatus('/api/provider-profile', 401, {
     display_name: 'QA Provider',
     whatsapp: '59170000000',
   }),
+})
+
+await expectStatus('/api/leads/00000000-0000-4000-8000-000000000000', 401, {
+  method: 'PATCH',
+  body: JSON.stringify({ status: 'contacted' }),
 })
 
 await expectStatus('/api/leads', 400, {

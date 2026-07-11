@@ -115,11 +115,14 @@ CREATE TABLE IF NOT EXISTS public.leads (
   referrer      text,
   user_agent    text,
   metadata      jsonb NOT NULL DEFAULT '{}'::jsonb,
-  created_at    timestamptz DEFAULT now()
+  status        text NOT NULL DEFAULT 'new' CHECK (status IN ('new', 'contacted', 'converted', 'lost')),
+  created_at    timestamptz NOT NULL DEFAULT now(),
+  updated_at    timestamptz NOT NULL DEFAULT now()
 );
 
 CREATE INDEX IF NOT EXISTS idx_leads_created_at ON public.leads(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_leads_provider_created ON public.leads(provider_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_leads_provider_status ON public.leads(provider_id, status);
 
 -- ============================================================
 -- PROFILE VIEWS
@@ -325,6 +328,20 @@ CREATE POLICY "Providers can view own leads" ON public.leads
       SELECT id FROM public.provider_profiles WHERE user_id = auth.uid()
     )
   );
+
+CREATE POLICY "Providers can update own lead status" ON public.leads
+  FOR UPDATE USING (
+    provider_id IN (
+      SELECT id FROM public.provider_profiles WHERE user_id = auth.uid()
+    )
+  ) WITH CHECK (
+    provider_id IN (
+      SELECT id FROM public.provider_profiles WHERE user_id = auth.uid()
+    )
+  );
+
+REVOKE UPDATE ON public.leads FROM anon, authenticated;
+GRANT UPDATE (status, updated_at) ON public.leads TO authenticated;
 
 CREATE POLICY "Admins can view all leads" ON public.leads
   FOR SELECT USING (public.is_admin());

@@ -1,27 +1,8 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import DashboardShell from '@/components/dashboard/DashboardShell'
+import LeadPipeline, { type DashboardLead } from '@/components/dashboard/LeadPipeline'
 import { createClient } from '@/lib/supabase/server'
-
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat('es-BO', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-    timeZone: 'America/La_Paz',
-  }).format(new Date(value))
-}
-
-function isToday(value: string) {
-  const now = new Date()
-  const date = new Date(value)
-  return date.toLocaleDateString('en-CA', { timeZone: 'America/La_Paz' }) === now.toLocaleDateString('en-CA', { timeZone: 'America/La_Paz' })
-}
-
-function isWithinDays(value: string, days: number) {
-  const date = new Date(value).getTime()
-  const since = Date.now() - days * 24 * 60 * 60 * 1000
-  return date >= since
-}
 
 export default async function DashboardContactosPage() {
   const supabase = await createClient()
@@ -45,16 +26,13 @@ export default async function DashboardContactosPage() {
   const { data: leads } = providerProfile
     ? await supabase
         .from('leads')
-        .select('id, message, source, created_at')
+        .select('id, message, source, status, created_at, updated_at')
         .eq('provider_id', providerProfile.id)
         .order('created_at', { ascending: false })
         .limit(100)
     : { data: [] }
 
-  const leadRows = leads ?? []
-  const total = leadRows.length
-  const today = leadRows.filter((lead) => isToday(lead.created_at)).length
-  const lastSevenDays = leadRows.filter((lead) => isWithinDays(lead.created_at, 7)).length
+  const leadRows = (leads ?? []) as DashboardLead[]
 
   return (
     <DashboardShell title="Contactos recibidos">
@@ -72,22 +50,7 @@ export default async function DashboardContactosPage() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="bg-white rounded-2xl border border-gray-100 p-5">
-                <div className="text-sm text-gray-500 mb-1">Total</div>
-                <div className="text-3xl font-bold text-gray-900">{total}</div>
-              </div>
-              <div className="bg-white rounded-2xl border border-gray-100 p-5">
-                <div className="text-sm text-gray-500 mb-1">Hoy</div>
-                <div className="text-3xl font-bold text-gray-900">{today}</div>
-              </div>
-              <div className="bg-white rounded-2xl border border-gray-100 p-5">
-                <div className="text-sm text-gray-500 mb-1">Últimos 7 días</div>
-                <div className="text-3xl font-bold text-gray-900">{lastSevenDays}</div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+            <div className="bg-white rounded-lg border border-gray-100 overflow-hidden">
               <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between gap-3">
                 <div>
                   <h2 className="font-semibold text-gray-900">Historial de contactos</h2>
@@ -104,26 +67,9 @@ export default async function DashboardContactosPage() {
                 )}
               </div>
 
-              {leadRows.length > 0 ? (
-                <div className="divide-y divide-gray-100">
-                  {leadRows.map((lead) => (
-                    <div key={lead.id} className="p-5">
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
-                        <span className="font-semibold text-gray-900">Click a WhatsApp</span>
-                        <span className="text-sm text-gray-500">{formatDate(lead.created_at)}</span>
-                      </div>
-                      <div className="text-sm text-gray-500 mb-2">Origen: {lead.source ?? 'whatsapp'}</div>
-                      {lead.message && (
-                        <p className="text-sm text-gray-700 bg-gray-50 rounded-xl p-3">{lead.message}</p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="p-8 text-center">
-                  <p className="text-gray-500 text-sm">Todavía no tienes contactos registrados.</p>
-                </div>
-              )}
+              <div className="p-5">
+                <LeadPipeline initialLeads={leadRows} />
+              </div>
             </div>
           </>
         )}

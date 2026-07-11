@@ -41,6 +41,7 @@ Edita `.env.local` con tus valores de Supabase:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://tu-proyecto.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=tu-anon-key
+SUPABASE_SECRET_KEY=sb_secret_tu-clave-privada-del-servidor
 ```
 
 ### 5. Correr localmente
@@ -162,6 +163,7 @@ vercel
 # Configurar variables de entorno en vercel.com → Settings → Environment Variables:
 # NEXT_PUBLIC_SUPABASE_URL
 # NEXT_PUBLIC_SUPABASE_ANON_KEY
+# SUPABASE_SECRET_KEY (solo servidor; nunca usar NEXT_PUBLIC_)
 ```
 
 ### Cloudflare Pages
@@ -195,13 +197,13 @@ Consulta: [developers.cloudflare.com/pages/framework-guides/nextjs](https://deve
 - ✅ Proveedores solo pueden editar **su propio perfil**
 - ✅ Admins tienen acceso completo
 - ✅ Ciudades y categorías son públicas
-- ✅ La clave `service_role` no se expone al frontend
+- ✅ La clave privada `secret`/`service_role` no se expone al frontend
 
 ---
 
 ## 🔒 Seguridad
 
-- Sin clave `service_role` en el frontend
+- Sin claves `secret` o `service_role` en el frontend
 - RLS habilitado en todas las tablas
 - Rol `admin` solo asignable via SQL directo
 - Contraseñas gestionadas por Supabase Auth
