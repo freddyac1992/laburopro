@@ -171,11 +171,11 @@ export default async function ProviderProfilePage({ params, searchParams }: Page
 
       {/* Breadcrumb */}
       <nav className="text-sm text-gray-500 mb-6 flex items-center gap-2 flex-wrap">
-        <Link href="/" className="hover:text-blue-700">Inicio</Link>
+        <Link href="/" className="hover:text-teal-700">Inicio</Link>
         <span>›</span>
         {category && (
           <>
-            <Link href={`/servicios/${category.slug}`} className="hover:text-blue-700">
+            <Link href={`/servicios/${category.slug}`} className="hover:text-teal-700">
               {category.name}
             </Link>
             <span>›</span>
@@ -191,7 +191,7 @@ export default async function ProviderProfilePage({ params, searchParams }: Page
           <div className="bg-white rounded-2xl border border-gray-100 p-6">
             <div className="flex items-start gap-5">
               {/* Avatar */}
-              <div className="relative w-20 h-20 rounded-2xl overflow-hidden bg-blue-700 flex items-center justify-center text-white font-bold text-2xl flex-shrink-0">
+              <div className="relative w-20 h-20 rounded-2xl overflow-hidden bg-teal-700 flex items-center justify-center text-white font-bold text-2xl flex-shrink-0">
                 {profilePhotoUrl ? (
                   <Image
                     src={profilePhotoUrl}
@@ -213,7 +213,7 @@ export default async function ProviderProfilePage({ params, searchParams }: Page
                   )}
                 </div>
                 {category && (
-                  <p className="text-blue-600 font-semibold text-base">
+                  <p className="text-teal-700 font-semibold text-base">
                     {category.icon} {category.name}
                   </p>
                 )}
@@ -269,7 +269,7 @@ export default async function ProviderProfilePage({ params, searchParams }: Page
                 {provider.services.map((service: string) => (
                   <span
                     key={service}
-                    className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full text-sm font-medium border border-blue-100"
+                    className="px-3 py-1.5 bg-teal-50 text-teal-800 rounded-full text-sm font-medium border border-teal-100"
                   >
                     {service}
                   </span>

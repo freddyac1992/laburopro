@@ -49,7 +49,7 @@ export default async function DashboardContactosPage({
             <p className="text-sm text-gray-500 mb-4">Cuando alguien toque el botón de WhatsApp en tu perfil, aparecerá aquí.</p>
             <Link
               href="/dashboard/perfil"
-              className="inline-flex px-5 py-3 rounded-xl bg-blue-700 text-white font-semibold hover:bg-blue-800 transition-colors"
+              className="inline-flex px-5 py-3 rounded-xl bg-teal-700 text-white font-semibold hover:bg-teal-800 transition-colors"
             >
               Crear mi perfil
             </Link>
@@ -66,7 +66,7 @@ export default async function DashboardContactosPage({
                   <Link
                     href={`/proveedores/${providerProfile.slug}`}
                     target="_blank"
-                    className="text-sm font-semibold text-blue-700 hover:underline"
+                    className="text-sm font-semibold text-teal-700 hover:underline"
                   >
                     Ver perfil
                   </Link>

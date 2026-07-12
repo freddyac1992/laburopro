@@ -404,7 +404,7 @@ export default function PerfilPage() {
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
                 onChange={(event) => handlePhotoChange('profile', event.target.files?.[0])}
-                className="block w-full text-sm text-gray-600 file:mr-3 file:rounded-lg file:border-0 file:bg-blue-50 file:px-3 file:py-2 file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
+                className="block w-full text-sm text-gray-600 file:mr-3 file:rounded-lg file:border-0 file:bg-teal-50 file:px-3 file:py-2 file:font-semibold file:text-teal-700 hover:file:bg-teal-100"
               />
               {photoPreviews.profile && (
                 <button
@@ -440,7 +440,7 @@ export default function PerfilPage() {
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
                 onChange={(event) => handlePhotoChange('work', event.target.files?.[0])}
-                className="block w-full text-sm text-gray-600 file:mr-3 file:rounded-lg file:border-0 file:bg-blue-50 file:px-3 file:py-2 file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
+                className="block w-full text-sm text-gray-600 file:mr-3 file:rounded-lg file:border-0 file:bg-teal-50 file:px-3 file:py-2 file:font-semibold file:text-teal-700 hover:file:bg-teal-100"
               />
               {photoPreviews.work && (
                 <button
@@ -573,7 +573,7 @@ export default function PerfilPage() {
           type="submit"
           disabled={saving}
           id="perfil-submit-btn"
-          className="w-full py-4 bg-blue-700 hover:bg-blue-800 disabled:opacity-60 text-white font-bold rounded-xl transition-colors text-base"
+          className="w-full py-4 bg-teal-700 hover:bg-teal-800 disabled:opacity-60 text-white font-bold rounded-xl transition-colors text-base"
         >
           {saving ? 'Guardando…' : profileId ? 'Guardar cambios' : 'Publicar mi perfil'}
         </button>

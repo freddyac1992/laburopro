@@ -109,7 +109,7 @@ export default function AdminProviderActions({ initialProviders }: Props) {
             <div
               key={p.id}
               className={`bg-white rounded-2xl border p-5 ${
-                !p.is_active ? 'opacity-50 border-gray-100' : p.is_verified ? 'border-green-200' : p.is_approved ? 'border-blue-100' : 'border-amber-200'
+                !p.is_active ? 'opacity-50 border-gray-100' : p.is_verified ? 'border-green-200' : p.is_approved ? 'border-teal-100' : 'border-amber-200'
               }`}
               id={`admin-provider-${p.id}`}
             >

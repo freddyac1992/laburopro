@@ -175,7 +175,7 @@ export default async function DashboardPage() {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">Contactos recibidos</span>
-                <span className="font-semibold text-sm text-blue-700">{leadCount ?? 0}</span>
+                <span className="font-semibold text-sm text-teal-700">{leadCount ?? 0}</span>
               </div>
               {!providerProfile.is_approved && (
                 <div className="mt-3 bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
@@ -186,7 +186,7 @@ export default async function DashboardPage() {
                 <div className="mt-3">
                   <Link
                     href={`/proveedores/${providerProfile.slug}`}
-                    className="text-sm text-blue-700 hover:underline font-medium"
+                    className="text-sm text-teal-700 hover:underline font-medium"
                     target="_blank"
                     id="dashboard-view-profile-link"
                   >
@@ -203,7 +203,7 @@ export default async function DashboardPage() {
               <Link
                 href="/dashboard/perfil"
                 id="dashboard-create-profile-btn"
-                className="inline-block px-6 py-3 bg-blue-700 text-white font-semibold rounded-xl hover:bg-blue-800 transition-colors"
+                className="inline-block px-6 py-3 bg-teal-700 text-white font-semibold rounded-xl hover:bg-teal-800 transition-colors"
               >
                 Crear mi perfil
               </Link>
@@ -220,7 +220,7 @@ export default async function DashboardPage() {
                   <p className="text-sm text-gray-500">Personas que abrieron tu ficha pública.</p>
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl font-bold text-blue-700">{conversionLastThirtyDays}%</div>
+                  <div className="text-2xl font-bold text-teal-700">{conversionLastThirtyDays}%</div>
                   <div className="text-xs text-gray-500">conversión a contacto</div>
                 </div>
               </div>
@@ -249,7 +249,7 @@ export default async function DashboardPage() {
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               <Link
                 href="/dashboard/contactos"
-                className="bg-white rounded-2xl border border-gray-100 p-5 hover:border-blue-200 hover:shadow-md transition-all"
+                className="bg-white rounded-2xl border border-gray-100 p-5 hover:border-teal-200 hover:shadow-md transition-all"
               >
                 <div className="text-sm text-gray-500 mb-1">Contactos totales</div>
                 <div className="text-3xl font-bold text-gray-900">{leadCount}</div>
@@ -284,7 +284,7 @@ export default async function DashboardPage() {
 
                 <div className="h-2 bg-gray-100 rounded-full overflow-hidden mb-5">
                   <div
-                    className="h-full bg-blue-700 rounded-full"
+                    className="h-full bg-teal-700 rounded-full"
                     style={{ width: `${completionPercent}%` }}
                   />
                 </div>
@@ -307,7 +307,7 @@ export default async function DashboardPage() {
 
                 <Link
                   href="/dashboard/perfil"
-                  className="mt-5 inline-flex px-4 py-2 rounded-xl bg-blue-700 text-white text-sm font-semibold hover:bg-blue-800 transition-colors"
+                  className="mt-5 inline-flex px-4 py-2 rounded-xl bg-teal-700 text-white text-sm font-semibold hover:bg-teal-800 transition-colors"
                 >
                   Mejorar perfil
                 </Link>
@@ -354,7 +354,7 @@ export default async function DashboardPage() {
                   <Link
                     href={`/proveedores/${providerProfile.slug}`}
                     target="_blank"
-                    className="mt-5 inline-flex px-4 py-2 rounded-xl border border-gray-200 text-gray-700 text-sm font-semibold hover:border-blue-300 hover:text-blue-700 transition-colors"
+                    className="mt-5 inline-flex px-4 py-2 rounded-xl border border-gray-200 text-gray-700 text-sm font-semibold hover:border-teal-300 hover:text-teal-700 transition-colors"
                   >
                     Ver como cliente
                   </Link>
@@ -373,7 +373,7 @@ export default async function DashboardPage() {
           <Link
             href="/dashboard/perfil"
             id="dashboard-edit-profile-card"
-            className="bg-white rounded-2xl border border-gray-100 p-5 hover:border-blue-200 hover:shadow-md transition-all"
+            className="bg-white rounded-2xl border border-gray-100 p-5 hover:border-teal-200 hover:shadow-md transition-all"
           >
             <div className="text-3xl mb-3">👤</div>
             <h3 className="font-semibold text-gray-900 mb-1">
@@ -391,7 +391,7 @@ export default async function DashboardPage() {
           <Link
             href="/dashboard/contactos"
             id="dashboard-contacts-card"
-            className="bg-white rounded-2xl border border-gray-100 p-5 hover:border-blue-200 hover:shadow-md transition-all"
+            className="bg-white rounded-2xl border border-gray-100 p-5 hover:border-teal-200 hover:shadow-md transition-all"
           >
             <div className="text-3xl mb-3">📲</div>
             <h3 className="font-semibold text-gray-900 mb-1">Contactos</h3>

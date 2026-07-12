@@ -117,7 +117,7 @@ export default async function AdminContactosPage() {
                           ? 'bg-amber-50 text-amber-700'
                           : lead.status === 'lost'
                             ? 'bg-gray-100 text-gray-600'
-                            : 'bg-blue-50 text-blue-700'
+                            : 'bg-teal-50 text-teal-800'
                     }`}>
                       {{ new: 'Nuevo', contacted: 'Atendido', converted: 'Trabajo ganado', lost: 'No concretado' }[lead.status]}
                     </span>

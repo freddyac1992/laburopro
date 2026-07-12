@@ -100,7 +100,7 @@ export default async function ServiciosPage({ searchParams }: ServiciosPageProps
       </div>
 
       {/* Cities hint */}
-      <div className="mt-12 bg-blue-50 rounded-2xl p-6 text-center">
+      <div className="mt-12 bg-teal-50 rounded-2xl p-6 text-center">
         <p className="text-gray-700 font-medium mb-2">¿Buscas en una ciudad específica?</p>
         <p className="text-gray-500 text-sm">
           Selecciona una categoría y luego filtra por tu ciudad: Santa Cruz, La Paz, Cochabamba y más.

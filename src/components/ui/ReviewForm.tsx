@@ -111,7 +111,7 @@ export default function ReviewForm({ providerId, providerName }: ReviewFormProps
         <button
           type="submit"
           disabled={status === 'saving'}
-          className="w-full px-5 py-3 bg-blue-700 text-white font-semibold rounded-xl hover:bg-blue-800 transition-colors disabled:opacity-60"
+          className="w-full px-5 py-3 bg-teal-700 text-white font-semibold rounded-xl hover:bg-teal-800 transition-colors disabled:opacity-60"
         >
           {status === 'saving' ? 'Enviando...' : 'Enviar reseña'}
         </button>

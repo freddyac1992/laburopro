@@ -158,7 +158,7 @@ export default async function AdminPage() {
           <Link
             key={item.label}
             href={item.href}
-            className="bg-white rounded-2xl border border-gray-100 p-5 hover:border-blue-200 hover:shadow-md transition-all"
+            className="bg-white rounded-2xl border border-gray-100 p-5 hover:border-teal-200 hover:shadow-md transition-all"
           >
             <div className="flex items-start justify-between gap-4">
               <div>
@@ -171,7 +171,7 @@ export default async function AdminPage() {
                 </span>
               )}
             </div>
-            <p className="mt-4 text-sm font-semibold text-blue-700">{item.action}</p>
+            <p className="mt-4 text-sm font-semibold text-teal-700">{item.action}</p>
           </Link>
         ))}
       </div>
@@ -246,7 +246,7 @@ export default async function AdminPage() {
         <Link
           href="/admin/proveedores"
           id="admin-providers-link"
-          className="bg-white rounded-2xl border border-gray-100 p-6 hover:border-blue-200 hover:shadow-md transition-all"
+          className="bg-white rounded-2xl border border-gray-100 p-6 hover:border-teal-200 hover:shadow-md transition-all"
         >
           <div className="text-3xl mb-3">👥</div>
           <h3 className="font-semibold text-gray-900 mb-1">Gestionar proveedores</h3>
@@ -261,7 +261,7 @@ export default async function AdminPage() {
         <Link
           href="/admin/contactos"
           id="admin-leads-link"
-          className="bg-white rounded-2xl border border-gray-100 p-6 hover:border-blue-200 hover:shadow-md transition-all"
+          className="bg-white rounded-2xl border border-gray-100 p-6 hover:border-teal-200 hover:shadow-md transition-all"
         >
           <div className="text-3xl mb-3">📲</div>
           <h3 className="font-semibold text-gray-900 mb-1">Ver contactos</h3>
@@ -271,7 +271,7 @@ export default async function AdminPage() {
         <Link
           href="/admin/resenas"
           id="admin-reviews-link"
-          className="bg-white rounded-2xl border border-gray-100 p-6 hover:border-blue-200 hover:shadow-md transition-all"
+          className="bg-white rounded-2xl border border-gray-100 p-6 hover:border-teal-200 hover:shadow-md transition-all"
         >
           <div className="text-3xl mb-3">⭐</div>
           <h3 className="font-semibold text-gray-900 mb-1">Moderar reseñas</h3>
@@ -281,7 +281,7 @@ export default async function AdminPage() {
         <Link
           href="/admin/reportes"
           id="admin-reports-link"
-          className="bg-white rounded-2xl border border-gray-100 p-6 hover:border-blue-200 hover:shadow-md transition-all"
+          className="bg-white rounded-2xl border border-gray-100 p-6 hover:border-teal-200 hover:shadow-md transition-all"
         >
           <div className="text-3xl mb-3">🛡️</div>
           <h3 className="font-semibold text-gray-900 mb-1">Revisar reportes</h3>

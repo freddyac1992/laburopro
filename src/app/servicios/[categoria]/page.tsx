@@ -49,9 +49,9 @@ export default async function CategoriaPage({ params, searchParams }: PageProps)
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       {/* Breadcrumb */}
       <nav className="text-sm text-gray-500 mb-6 flex items-center gap-2">
-        <Link href="/" className="hover:text-blue-700">Inicio</Link>
+        <Link href="/" className="hover:text-teal-700">Inicio</Link>
         <span>›</span>
-        <Link href="/servicios" className="hover:text-blue-700">Servicios</Link>
+        <Link href="/servicios" className="hover:text-teal-700">Servicios</Link>
         <span>›</span>
         <span className="text-gray-900 font-medium">{cat.name}</span>
       </nav>
@@ -71,7 +71,7 @@ export default async function CategoriaPage({ params, searchParams }: PageProps)
       </div>
 
       {/* SEO text */}
-      <div className="bg-blue-50 rounded-2xl p-5 mb-8 text-sm text-gray-700 leading-relaxed">
+      <div className="bg-teal-50 rounded-2xl p-5 mb-8 text-sm text-gray-700 leading-relaxed">
         <p>
           Encuentra <strong>{cat.name.toLowerCase()} verificados</strong> en Bolivia a través de LaburoPro.
           Compara perfiles, revisa experiencia, precios de referencia y contacta directamente por WhatsApp.
@@ -95,14 +95,14 @@ export default async function CategoriaPage({ params, searchParams }: PageProps)
             hasFilters ? (
               <Link
                 href={`/servicios/${categoria}`}
-                className="inline-block px-6 py-3 bg-blue-700 text-white font-semibold rounded-xl hover:bg-blue-800"
+                className="inline-block px-6 py-3 bg-teal-700 text-white font-semibold rounded-xl hover:bg-teal-800"
               >
                 Limpiar filtros
               </Link>
             ) : (
               <Link
                 href="/registro"
-                className="inline-block px-6 py-3 bg-blue-700 text-white font-semibold rounded-xl hover:bg-blue-800"
+                className="inline-block px-6 py-3 bg-teal-700 text-white font-semibold rounded-xl hover:bg-teal-800"
               >
                 Publicar mi servicio
               </Link>
@@ -152,7 +152,7 @@ export default async function CategoriaPage({ params, searchParams }: PageProps)
             <Link
               key={city.slug}
               href={`/servicios/${categoria}/${city.slug}`}
-              className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm text-gray-700 hover:border-blue-400 hover:text-blue-700 transition-colors"
+              className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm text-gray-700 hover:border-teal-400 hover:text-teal-700 transition-colors"
             >
               {cat.name} en {city.name}
             </Link>

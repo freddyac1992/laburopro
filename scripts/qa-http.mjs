@@ -114,6 +114,25 @@ assert(providerFiltersSource.includes('Solo verificados'), 'Public filters must 
 assert(providerFiltersSource.includes('Todos aprobados'), 'Public filters must explain approval status')
 assert(providerSearchSource.includes(".eq('is_approved', true)"), 'Public provider results must always be approved')
 
+const brandedSurfacePaths = [
+  '../src/app/dashboard/page.tsx',
+  '../src/app/dashboard/perfil/page.tsx',
+  '../src/app/dashboard/contactos/page.tsx',
+  '../src/app/admin/page.tsx',
+  '../src/app/admin/contactos/page.tsx',
+  '../src/app/proveedores/[slug]/page.tsx',
+  '../src/app/servicios/page.tsx',
+  '../src/app/servicios/[categoria]/page.tsx',
+  '../src/app/servicios/[categoria]/[ciudad]/page.tsx',
+  '../src/components/dashboard/DashboardShell.tsx',
+  '../src/components/dashboard/LeadPipeline.tsx',
+  '../src/components/ui/ReviewForm.tsx',
+]
+const brandedSurfaceSource = (await Promise.all(
+  brandedSurfacePaths.map((path) => readFile(new URL(path, import.meta.url), 'utf8'))
+)).join('\n')
+assert(!brandedSurfaceSource.includes('blue-'), 'Branded application surfaces must use the teal/coral palette')
+
 const protectedApiRoutes = [
   ['../src/app/api/leads/route.ts', "'lead'"],
   ['../src/app/api/profile-views/route.ts', "'profile_view'"],

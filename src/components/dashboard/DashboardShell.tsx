@@ -20,7 +20,7 @@ export default function DashboardShell({ children, title, newLeadCount = 0 }: Da
       {/* Sidebar */}
       <aside className="hidden md:flex flex-col w-64 bg-white border-r border-gray-200 min-h-screen">
         <div className="px-6 py-5 border-b border-gray-100">
-          <Link href="/" className="font-bold text-blue-700 text-lg">
+          <Link href="/" className="font-bold text-teal-700 text-lg">
             {SITE_NAME}
           </Link>
           <p className="text-xs text-gray-500 mt-0.5">Panel de proveedor</p>
@@ -30,7 +30,7 @@ export default function DashboardShell({ children, title, newLeadCount = 0 }: Da
             <Link
               key={item.href}
               href={item.href}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-blue-50 hover:text-blue-700 font-medium text-sm transition-colors"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-teal-50 hover:text-teal-700 font-medium text-sm transition-colors"
               id={`dashboard-nav-${item.href.replace(/\//g, '-')}`}
             >
               <span>{item.icon}</span>
@@ -59,7 +59,7 @@ export default function DashboardShell({ children, title, newLeadCount = 0 }: Da
           <Link
             key={item.href}
             href={item.href}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-700 font-medium text-sm whitespace-nowrap"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-gray-700 hover:bg-teal-50 hover:text-teal-700 font-medium text-sm whitespace-nowrap"
           >
             {item.icon} {item.label}
             {item.href === '/dashboard/contactos' && newLeadCount > 0 && (

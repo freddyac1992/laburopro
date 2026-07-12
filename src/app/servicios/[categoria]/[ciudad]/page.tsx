@@ -57,11 +57,11 @@ export default async function CategoriayCiudadPage({ params, searchParams }: Pag
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       {/* Breadcrumb */}
       <nav className="text-sm text-gray-500 mb-6 flex items-center gap-2 flex-wrap">
-        <Link href="/" className="hover:text-blue-700">Inicio</Link>
+        <Link href="/" className="hover:text-teal-700">Inicio</Link>
         <span>›</span>
-        <Link href="/servicios" className="hover:text-blue-700">Servicios</Link>
+        <Link href="/servicios" className="hover:text-teal-700">Servicios</Link>
         <span>›</span>
-        <Link href={`/servicios/${categoria}`} className="hover:text-blue-700">{cat.name}</Link>
+        <Link href={`/servicios/${categoria}`} className="hover:text-teal-700">{cat.name}</Link>
         <span>›</span>
         <span className="text-gray-900 font-medium">{city.name}</span>
       </nav>
@@ -102,21 +102,21 @@ export default async function CategoriayCiudadPage({ params, searchParams }: Pag
               {hasFilters ? (
                 <Link
                   href={`/servicios/${categoria}/${ciudad}`}
-                  className="px-6 py-3 bg-blue-700 text-white font-semibold rounded-xl hover:bg-blue-800"
+                  className="px-6 py-3 bg-teal-700 text-white font-semibold rounded-xl hover:bg-teal-800"
                 >
                   Limpiar filtros
                 </Link>
               ) : (
                 <Link
                   href="/registro"
-                  className="px-6 py-3 bg-blue-700 text-white font-semibold rounded-xl hover:bg-blue-800"
+                  className="px-6 py-3 bg-teal-700 text-white font-semibold rounded-xl hover:bg-teal-800"
                 >
                   Publicar mi servicio
                 </Link>
               )}
               <Link
                 href={`/servicios/${categoria}`}
-                className="px-6 py-3 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:border-blue-400"
+                className="px-6 py-3 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:border-teal-400"
               >
                 Ver en toda Bolivia
               </Link>
@@ -166,7 +166,7 @@ export default async function CategoriayCiudadPage({ params, searchParams }: Pag
             <Link
               key={c.slug}
               href={`/servicios/${categoria}/${c.slug}`}
-              className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm text-gray-700 hover:border-blue-400 hover:text-blue-700 transition-colors"
+              className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm text-gray-700 hover:border-teal-400 hover:text-teal-700 transition-colors"
             >
               {c.name}
             </Link>

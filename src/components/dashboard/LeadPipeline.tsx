@@ -18,7 +18,7 @@ const STATUS_OPTIONS: Array<{
   shortLabel: string
   badge: string
 }> = [
-  { value: 'new', label: 'Nuevo', shortLabel: 'Nuevos', badge: 'bg-blue-50 text-blue-700' },
+  { value: 'new', label: 'Nuevo', shortLabel: 'Nuevos', badge: 'bg-teal-50 text-teal-800' },
   { value: 'contacted', label: 'Atendido', shortLabel: 'Atendidos', badge: 'bg-amber-50 text-amber-700' },
   { value: 'converted', label: 'Trabajo ganado', shortLabel: 'Ganados', badge: 'bg-green-50 text-green-700' },
   { value: 'lost', label: 'No concretado', shortLabel: 'No concretados', badge: 'bg-gray-100 text-gray-600' },

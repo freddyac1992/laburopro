@@ -184,7 +184,7 @@ export default function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg font-medium"
+                className="block px-4 py-2 text-gray-700 hover:bg-teal-50 hover:text-teal-700 rounded-lg font-medium"
                 onClick={closeMenu}
               >
                 {link.label}
