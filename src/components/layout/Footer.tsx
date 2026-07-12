@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import BrandLogo from '@/components/brand/BrandLogo'
 import { SITE_NAME, SITE_TAGLINE } from '@/lib/constants'
 
 export default function Footer() {
@@ -10,9 +11,8 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="md:col-span-2">
-            <Link href="/" className="flex items-center gap-2 font-bold text-xl text-white mb-3">
-              <span className="bg-teal-500 text-white px-2 py-1 rounded-md text-sm font-extrabold">LP</span>
-              {SITE_NAME}
+            <Link href="/" className="inline-flex text-xl mb-3" aria-label="LaburoPro, inicio">
+              <BrandLogo markClassName="h-9 w-9" textClassName="text-white" inverseMark />
             </Link>
             <p className="text-gray-400 text-sm leading-relaxed max-w-sm">
               {SITE_TAGLINE}. Conectamos bolivianos con proveedores de servicios verificados en todo el país.

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { BrandMark } from '@/components/brand/BrandLogo'
 
 type AuthMode = 'login' | 'register'
 
@@ -55,9 +56,7 @@ export default function GoogleAuthPanel({ mode }: { mode: AuthMode }) {
     <div className="min-h-[72vh] bg-[#f1f6f4] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <div className="mb-7 text-center">
-          <div className="mx-auto mb-5 w-11 h-11 rounded-md bg-teal-700 text-white flex items-center justify-center text-sm font-extrabold shadow-sm">
-            LP
-          </div>
+          <BrandMark className="mx-auto mb-5 w-12 h-12" />
           <h1 className="text-3xl font-extrabold text-[#102a33] mb-2">
             {isRegister ? 'Publica tu servicio' : 'Bienvenido de vuelta'}
           </h1>

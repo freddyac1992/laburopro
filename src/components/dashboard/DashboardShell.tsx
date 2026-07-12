@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import LogoutButton from '@/components/auth/LogoutButton'
-import { SITE_NAME } from '@/lib/constants'
+import BrandLogo from '@/components/brand/BrandLogo'
 
 const navItems = [
   { label: 'Panel principal', href: '/dashboard', icon: '🏠' },
@@ -20,8 +20,8 @@ export default function DashboardShell({ children, title, newLeadCount = 0 }: Da
       {/* Sidebar */}
       <aside className="hidden md:flex flex-col w-64 bg-white border-r border-gray-200 min-h-screen">
         <div className="px-6 py-5 border-b border-gray-100">
-          <Link href="/" className="font-bold text-teal-700 text-lg">
-            {SITE_NAME}
+          <Link href="/" className="text-lg" aria-label="LaburoPro, inicio">
+            <BrandLogo markClassName="h-8 w-8" />
           </Link>
           <p className="text-xs text-gray-500 mt-0.5">Panel de proveedor</p>
         </div>

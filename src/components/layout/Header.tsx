@@ -4,8 +4,9 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import LogoutButton from '@/components/auth/LogoutButton'
+import BrandLogo from '@/components/brand/BrandLogo'
 import FavoritesNavLink from './FavoritesNavLink'
-import { NAV_LINKS, SITE_NAME } from '@/lib/constants'
+import { NAV_LINKS } from '@/lib/constants'
 import { createClient } from '@/lib/supabase/client'
 import type { Role } from '@/types/database'
 
@@ -130,13 +131,8 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 font-extrabold text-xl" id="header-logo">
-            <span className="bg-teal-700 text-white px-2 py-1 rounded-md text-sm font-extrabold tracking-normal shadow-sm">
-              LP
-            </span>
-            <span className="text-[#102a33]">
-              {SITE_NAME}
-            </span>
+          <Link href="/" className="text-xl" id="header-logo" aria-label="LaburoPro, inicio">
+            <BrandLogo markClassName="h-9 w-9" />
           </Link>
 
           {/* Desktop nav */}

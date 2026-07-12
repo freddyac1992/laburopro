@@ -133,6 +133,13 @@ const brandedSurfaceSource = (await Promise.all(
 )).join('\n')
 assert(!brandedSurfaceSource.includes('blue-'), 'Branded application surfaces must use the teal/coral palette')
 
+const brandLogoSource = await readFile(new URL('../src/components/brand/BrandLogo.tsx', import.meta.url), 'utf8')
+const headerSource = await readFile(new URL('../src/components/layout/Header.tsx', import.meta.url), 'utf8')
+const footerSource = await readFile(new URL('../src/components/layout/Footer.tsx', import.meta.url), 'utf8')
+assert(brandLogoSource.includes('#e85d3f'), 'Brand mark must preserve the coral connection point')
+assert(headerSource.includes('<BrandLogo'), 'Header must use the shared brand logo')
+assert(footerSource.includes('inverseMark'), 'Dark surfaces must use the inverse brand mark')
+
 const protectedApiRoutes = [
   ['../src/app/api/leads/route.ts', "'lead'"],
   ['../src/app/api/profile-views/route.ts', "'profile_view'"],
