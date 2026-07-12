@@ -81,14 +81,14 @@ export default function AdminProviderActions({ initialProviders }: Props) {
             onClick={() => setFilter(tab.id)}
             className={`px-4 py-2.5 text-sm font-medium rounded-t-lg transition-colors border-b-2 -mb-px ${
               filter === tab.id
-                ? 'border-blue-600 text-blue-700 bg-blue-50'
+                ? 'border-teal-700 text-teal-800 bg-teal-50'
                 : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             }`}
           >
             {tab.label}
             {tab.count > 0 && (
               <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-xs ${
-                filter === tab.id ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
+                filter === tab.id ? 'bg-teal-100 text-teal-800' : 'bg-gray-100 text-gray-600'
               }`}>
                 {tab.count}
               </span>
@@ -122,7 +122,7 @@ export default function AdminProviderActions({ initialProviders }: Props) {
                       <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">✅ Verificado</span>
                     )}
                     {p.is_approved && !p.is_verified && (
-                      <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">Aprobado</span>
+                      <span className="text-xs bg-teal-100 text-teal-800 px-2 py-0.5 rounded-full font-medium">Aprobado</span>
                     )}
                     {!p.is_approved && (
                       <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">⏳ Pendiente</span>
@@ -158,7 +158,7 @@ export default function AdminProviderActions({ initialProviders }: Props) {
                       id={`admin-approve-${p.id}`}
                       disabled={saving === p.id}
                       onClick={() => updateProvider(p.id, { is_approved: true })}
-                      className="text-xs px-3 py-1.5 bg-blue-700 text-white rounded-lg hover:bg-blue-800 disabled:opacity-60"
+                      className="text-xs px-3 py-1.5 bg-teal-700 text-white rounded-lg hover:bg-teal-800 disabled:opacity-60"
                     >
                       {saving === p.id ? '…' : 'Aprobar'}
                     </button>

@@ -145,14 +145,14 @@ export default function AdminReviewActions({ initialReviews }: AdminReviewAction
             onClick={() => setFilter(tab.id)}
             className={`px-4 py-2.5 text-sm font-medium rounded-t-lg transition-colors border-b-2 -mb-px ${
               filter === tab.id
-                ? 'border-blue-600 text-blue-700 bg-blue-50'
+                ? 'border-teal-700 text-teal-800 bg-teal-50'
                 : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             }`}
           >
             {tab.label}
             {tab.count > 0 && (
               <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-xs ${
-                filter === tab.id ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
+                filter === tab.id ? 'bg-teal-100 text-teal-800' : 'bg-gray-100 text-gray-600'
               }`}>
                 {tab.count}
               </span>

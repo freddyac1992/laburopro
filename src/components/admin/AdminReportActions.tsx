@@ -95,14 +95,14 @@ export default function AdminReportActions({ initialReports }: AdminReportAction
             onClick={() => setFilter(tab.id)}
             className={`px-4 py-2.5 text-sm font-medium rounded-t-lg transition-colors border-b-2 -mb-px whitespace-nowrap ${
               filter === tab.id
-                ? 'border-blue-600 text-blue-700 bg-blue-50'
+                ? 'border-teal-700 text-teal-800 bg-teal-50'
                 : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             }`}
           >
             {tab.label}
             {tab.count > 0 && (
               <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-xs ${
-                filter === tab.id ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
+                filter === tab.id ? 'bg-teal-100 text-teal-800' : 'bg-gray-100 text-gray-600'
               }`}>
                 {tab.count}
               </span>
@@ -162,7 +162,7 @@ export default function AdminReportActions({ initialReports }: AdminReportAction
                     <button
                       disabled={saving === report.id}
                       onClick={() => updateReportStatus(report.id, 'reviewed')}
-                      className="text-xs px-3 py-1.5 border border-blue-200 text-blue-700 rounded-lg hover:bg-blue-50 disabled:opacity-60"
+                      className="text-xs px-3 py-1.5 border border-teal-200 text-teal-800 rounded-lg hover:bg-teal-50 disabled:opacity-60"
                     >
                       {saving === report.id ? '...' : 'Marcar revisado'}
                     </button>

@@ -105,6 +105,15 @@ assert(reviewFormSource.includes('StarRating'), 'Review form must use the visual
 assert(starRatingSource.includes('role="radiogroup"'), 'Interactive stars must expose a radio group')
 assert(starRatingSource.includes('aria-checked={value === star}'), 'Each star must expose its selected state')
 
+const logoutButtonSource = await readFile(new URL('../src/components/auth/LogoutButton.tsx', import.meta.url), 'utf8')
+const providerFiltersSource = await readFile(new URL('../src/components/ui/ProviderFilters.tsx', import.meta.url), 'utf8')
+const providerSearchSource = await readFile(new URL('../src/lib/provider-search.ts', import.meta.url), 'utf8')
+assert(logoutButtonSource.includes("fetch('/api/auth/logout'"), 'Mobile logout must complete before its menu unmounts')
+assert(logoutButtonSource.includes("window.location.assign('/login')"), 'Logout must force a clean login reload')
+assert(providerFiltersSource.includes('Solo verificados'), 'Public filters must expose verified providers')
+assert(providerFiltersSource.includes('Todos aprobados'), 'Public filters must explain approval status')
+assert(providerSearchSource.includes(".eq('is_approved', true)"), 'Public provider results must always be approved')
+
 const protectedApiRoutes = [
   ['../src/app/api/leads/route.ts', "'lead'"],
   ['../src/app/api/profile-views/route.ts', "'profile_view'"],
