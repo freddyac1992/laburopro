@@ -10,12 +10,26 @@ import { NAV_LINKS } from '@/lib/constants'
 import { createClient } from '@/lib/supabase/client'
 import type { Role } from '@/types/database'
 
+function getGoogleAccountName(user: {
+  email?: string | null
+  user_metadata?: Record<string, unknown>
+}) {
+  const fullName = user.user_metadata?.full_name
+  if (typeof fullName === 'string' && fullName.trim()) return fullName.trim()
+
+  const name = user.user_metadata?.name
+  if (typeof name === 'string' && name.trim()) return name.trim()
+
+  return user.email ?? 'Usuario'
+}
+
 export default function Header() {
   const router = useRouter()
   const [menuOpen, setMenuOpen] = useState(false)
   const [checkingSession, setCheckingSession] = useState(true)
   const [dashboardHref, setDashboardHref] = useState('/dashboard')
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [accountName, setAccountName] = useState('')
 
   useEffect(() => {
     const supabase = createClient()
@@ -30,11 +44,14 @@ export default function Header() {
       if (user) {
         const { data: profile } = (await supabase
           .from('profiles')
-          .select('role')
+          .select('role, full_name')
           .eq('id', user.id)
-          .maybeSingle()) as { data: { role: Role } | null }
+          .maybeSingle()) as { data: { role: Role; full_name: string | null } | null }
 
         setDashboardHref(profile?.role === 'admin' ? '/admin' : '/dashboard')
+        setAccountName(profile?.full_name?.trim() || getGoogleAccountName(user))
+      } else {
+        setAccountName('')
       }
 
       setCheckingSession(false)
@@ -46,6 +63,7 @@ export default function Header() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setIsLoggedIn(Boolean(session?.user))
+      setAccountName(session?.user ? getGoogleAccountName(session.user) : '')
       setDashboardHref('/dashboard')
       setCheckingSession(false)
       router.refresh()
@@ -58,6 +76,10 @@ export default function Header() {
 
   const authLinks = isLoggedIn ? (
     <>
+      <div className="min-w-0 max-w-40" title={`Cuenta: ${accountName}`}>
+        <p className="text-xs text-slate-500">Cuenta</p>
+        <p className="truncate text-sm font-semibold text-slate-800">{accountName}</p>
+      </div>
       <Link
         href={dashboardHref}
         id="header-dashboard-btn"
@@ -93,6 +115,10 @@ export default function Header() {
 
   const mobileAuthLinks = isLoggedIn ? (
     <>
+      <div className="rounded-md bg-slate-50 px-4 py-3">
+        <p className="text-xs text-slate-500">Has ingresado como</p>
+        <p className="break-words font-semibold text-slate-900">{accountName}</p>
+      </div>
       <Link
         href={dashboardHref}
         className="block px-4 py-2 bg-teal-700 text-white rounded-md font-semibold text-center hover:bg-teal-800"
@@ -153,6 +179,13 @@ export default function Header() {
             <FavoritesNavLink />
             {!checkingSession && authLinks}
           </div>
+
+          {!checkingSession && isLoggedIn && (
+            <div className="ml-auto min-w-0 max-w-24 md:hidden" title={`Cuenta: ${accountName}`}>
+              <p className="text-[11px] leading-tight text-slate-500">Cuenta</p>
+              <p className="truncate text-xs font-semibold text-slate-800">{accountName}</p>
+            </div>
+          )}
 
           {/* Mobile menu button */}
           <button
