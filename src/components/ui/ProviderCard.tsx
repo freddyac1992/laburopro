@@ -112,7 +112,7 @@ export default function ProviderCard({
       )}
 
       {/* Footer */}
-      <div className="px-5 py-3 border-t border-gray-50 flex items-center justify-between mt-auto">
+      <div className="px-5 py-3 border-t border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-auto">
         <div className="flex items-center gap-3">
           {priceReference && (
             <span className="text-sm font-semibold text-gray-800">{priceReference}</span>
@@ -131,6 +131,9 @@ export default function ProviderCard({
             </span>
           </div>
         )}
+        <span className="min-h-11 inline-flex items-center justify-center rounded-md bg-teal-700 px-4 text-sm font-bold text-white group-hover:bg-teal-800">
+          Ver perfil y WhatsApp
+        </span>
       </div>
       </Link>
     </article>

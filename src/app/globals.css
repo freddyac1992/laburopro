@@ -23,6 +23,7 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
 }
 
 body {
@@ -107,16 +108,75 @@ a, button {
   transition: opacity 0.15s ease, color 0.15s ease, background-color 0.15s ease;
 }
 
+button, select, input, textarea, summary {
+  font: inherit;
+}
+
 /* Form input styles */
 .form-input {
   width: 100%;
   border: 1px solid var(--border-color);
   border-radius: 0.5rem;
-  padding: 0.625rem 0.875rem;
-  font-size: 0.9375rem;
+  min-height: 3rem;
+  padding: 0.75rem 0.875rem;
+  font-size: 1rem;
   color: var(--text-primary);
   background: white;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.wizard-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  background: white;
+  padding: 1.25rem;
+}
+
+.wizard-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.wizard-label {
+  display: block;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #374151;
+}
+
+.wizard-help, .wizard-optional {
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #64748b;
+}
+
+.easy-file-input::file-selector-button {
+  min-height: 2.75rem;
+  margin-right: 0.75rem;
+  border: 0;
+  border-radius: 0.375rem;
+  background: #ccfbf1;
+  padding: 0.625rem 0.875rem;
+  color: #115e59;
+  font-weight: 700;
+}
+
+@media (min-width: 640px) {
+  .wizard-panel { padding: 1.5rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 .form-input:focus {
   outline: none;

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getRateLimitResponse } from '@/lib/rate-limit'
+import { sendNewLeadNotification } from '@/lib/email/lead-notification'
 
 type LeadRequestBody = {
   providerId?: unknown
@@ -73,25 +74,63 @@ export async function POST(request: Request) {
     },
   }
 
-  const { error } = await adminSupabase.from('leads').insert(enrichedLead)
+  const { data: insertedLead, error } = await adminSupabase
+    .from('leads')
+    .insert(enrichedLead)
+    .select('id')
+    .single()
+
+  let leadId = insertedLead?.id ?? null
+  let degraded = false
 
   if (error && error.code === 'PGRST204') {
-    const { error: fallbackError } = await adminSupabase.from('leads').insert({
-      provider_id: providerId,
-      customer_name: null,
-      customer_phone: null,
-      message,
-      source,
-    })
+    const { data: fallbackLead, error: fallbackError } = await adminSupabase
+      .from('leads')
+      .insert({
+        provider_id: providerId,
+        customer_name: null,
+        customer_phone: null,
+        message,
+        source,
+      })
+      .select('id')
+      .single()
 
     if (!fallbackError) {
-      return NextResponse.json({ ok: true, degraded: true })
+      leadId = fallbackLead?.id ?? null
+      degraded = true
+    } else {
+      return NextResponse.json({ message: 'No se pudo registrar el contacto.' }, { status: 500 })
     }
-  }
-
-  if (error) {
+  } else if (error) {
     return NextResponse.json({ message: 'No se pudo registrar el contacto.' }, { status: 500 })
   }
 
-  return NextResponse.json({ ok: true })
+  let notification: 'sent' | 'skipped' | 'failed' = 'skipped'
+  if (leadId) {
+    const { data: providerOwner } = await adminSupabase
+      .from('provider_profiles')
+      .select('display_name, user_id')
+      .eq('id', providerId)
+      .maybeSingle()
+
+    if (providerOwner) {
+      const { data: ownerProfile } = await adminSupabase
+        .from('profiles')
+        .select('email')
+        .eq('id', providerOwner.user_id)
+        .maybeSingle()
+
+      if (ownerProfile?.email) {
+        notification = await sendNewLeadNotification({
+          leadId,
+          providerEmail: ownerProfile.email,
+          providerName: providerOwner.display_name,
+          message,
+        })
+      }
+    }
+  }
+
+  return NextResponse.json({ ok: true, degraded, notification })
 }

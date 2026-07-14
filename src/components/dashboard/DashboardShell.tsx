@@ -3,9 +3,9 @@ import LogoutButton from '@/components/auth/LogoutButton'
 import BrandLogo from '@/components/brand/BrandLogo'
 
 const navItems = [
-  { label: 'Panel principal', href: '/dashboard', icon: '🏠' },
-  { label: 'Mi perfil', href: '/dashboard/perfil', icon: '👤' },
-  { label: 'Contactos', href: '/dashboard/contactos', icon: '📲' },
+  { label: 'Inicio', href: '/dashboard' },
+  { label: 'Mi información', href: '/dashboard/perfil' },
+  { label: 'Personas interesadas', href: '/dashboard/contactos' },
 ]
 
 interface DashboardShellProps {
@@ -23,7 +23,7 @@ export default function DashboardShell({ children, title, newLeadCount = 0 }: Da
           <Link href="/" className="text-lg" aria-label="LaburoPro, inicio">
             <BrandLogo markClassName="h-8 w-8" />
           </Link>
-          <p className="text-xs text-gray-500 mt-0.5">Panel de proveedor</p>
+          <p className="text-sm text-gray-600 mt-1">Mi cuenta de trabajo</p>
         </div>
         <nav className="flex-1 px-4 py-4 space-y-1">
           {navItems.map((item) => (
@@ -33,7 +33,6 @@ export default function DashboardShell({ children, title, newLeadCount = 0 }: Da
               className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-teal-50 hover:text-teal-700 font-medium text-sm transition-colors"
               id={`dashboard-nav-${item.href.replace(/\//g, '-')}`}
             >
-              <span>{item.icon}</span>
               {item.label}
               {item.href === '/dashboard/contactos' && newLeadCount > 0 && (
                 <span className="ml-auto min-w-5 h-5 px-1.5 inline-flex items-center justify-center rounded-full bg-red-600 text-white text-xs font-bold">
@@ -48,7 +47,7 @@ export default function DashboardShell({ children, title, newLeadCount = 0 }: Da
             className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-500 hover:bg-red-50 hover:text-red-600 font-medium text-sm transition-colors w-full"
             id="dashboard-logout-btn"
           >
-            <span>🚪</span> Cerrar sesión
+            Cerrar sesión
           </LogoutButton>
         </div>
       </aside>
@@ -61,7 +60,7 @@ export default function DashboardShell({ children, title, newLeadCount = 0 }: Da
             href={item.href}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-gray-700 hover:bg-teal-50 hover:text-teal-700 font-medium text-sm whitespace-nowrap"
           >
-            {item.icon} {item.label}
+            {item.label}
             {item.href === '/dashboard/contactos' && newLeadCount > 0 && (
               <span className="min-w-5 h-5 px-1.5 inline-flex items-center justify-center rounded-full bg-red-600 text-white text-xs font-bold">
                 {newLeadCount > 99 ? '99+' : newLeadCount}
@@ -73,7 +72,7 @@ export default function DashboardShell({ children, title, newLeadCount = 0 }: Da
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-gray-700 hover:bg-red-50 hover:text-red-600 font-medium text-sm whitespace-nowrap"
           id="dashboard-mobile-logout-btn"
         >
-          🚪 Cerrar sesión
+          Cerrar sesión
         </LogoutButton>
       </div>
 

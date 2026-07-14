@@ -42,7 +42,15 @@ Edita `.env.local` con tus valores de Supabase:
 NEXT_PUBLIC_SUPABASE_URL=https://tu-proyecto.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=tu-anon-key
 SUPABASE_SECRET_KEY=sb_secret_tu-clave-privada-del-servidor
+RESEND_API_KEY=re_tu-clave-privada
+RESEND_FROM_EMAIL="LaburoPro <notificaciones@updates.laburopro.com>"
+RESEND_REPLY_TO=laburo.pro.bolivia@gmail.com
 ```
+
+Las variables de Resend son opcionales. Al configurarlas, cada nuevo contacto de
+WhatsApp genera una notificación por correo para el proveedor. El subdominio del
+remitente debe estar verificado en Resend; si el servicio de correo no está
+configurado o falla, el contacto se registra igualmente.
 
 ### 5. Correr localmente
 
@@ -164,6 +172,9 @@ vercel
 # NEXT_PUBLIC_SUPABASE_URL
 # NEXT_PUBLIC_SUPABASE_ANON_KEY
 # SUPABASE_SECRET_KEY (solo servidor; nunca usar NEXT_PUBLIC_)
+# RESEND_API_KEY (opcional; solo servidor)
+# RESEND_FROM_EMAIL (opcional; remitente de un dominio verificado)
+# RESEND_REPLY_TO (opcional)
 ```
 
 ### Cloudflare Pages
@@ -213,7 +224,7 @@ Consulta: [developers.cloudflare.com/pages/framework-guides/nextjs](https://deve
 
 ## 📞 Contacto
 
-Para soporte o preguntas: hola@laburopro.com
+Para soporte o preguntas: laburo.pro.bolivia@gmail.com
 
 ---
 

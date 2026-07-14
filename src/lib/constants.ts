@@ -34,9 +34,9 @@ export const SITE_TAGLINE = 'Servicios verificados cerca de ti'
 export const SITE_DESCRIPTION = 'Encuentra plomeros, albañiles, fletes, cuidadores, tutores, mecánicos y más en Bolivia. Proveedores verificados en Santa Cruz, La Paz, Cochabamba y todo el país.'
 
 export const NAV_LINKS = [
-  { label: 'Servicios', href: '/servicios' },
+  { label: 'Buscar trabajador', href: '/servicios' },
   { label: 'Cómo funciona', href: '/#como-funciona' },
-  { label: 'Para proveedores', href: '/registro' },
+  { label: 'Ofrecer mi trabajo', href: '/registro' },
 ]
 
 export const WHATSAPP_BASE_URL = 'https://wa.me/'

@@ -150,4 +150,4 @@ WHERE slug = 'juan-perez-plomeria-abc1';
 ## 9. Contact & Support
 
 For technical issues with the platform, contact the development team.
-For business questions, use: hola@laburopro.com
+For business questions, use: laburo.pro.bolivia@gmail.com

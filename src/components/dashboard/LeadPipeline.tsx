@@ -18,10 +18,10 @@ const STATUS_OPTIONS: Array<{
   shortLabel: string
   badge: string
 }> = [
-  { value: 'new', label: 'Nuevo', shortLabel: 'Nuevos', badge: 'bg-teal-50 text-teal-800' },
-  { value: 'contacted', label: 'Atendido', shortLabel: 'Atendidos', badge: 'bg-amber-50 text-amber-700' },
-  { value: 'converted', label: 'Trabajo ganado', shortLabel: 'Ganados', badge: 'bg-green-50 text-green-700' },
-  { value: 'lost', label: 'No concretado', shortLabel: 'No concretados', badge: 'bg-gray-100 text-gray-600' },
+  { value: 'new', label: 'Debo responder', shortLabel: 'Por responder', badge: 'bg-teal-50 text-teal-800' },
+  { value: 'contacted', label: 'Ya respondí', shortLabel: 'Respondidos', badge: 'bg-amber-50 text-amber-700' },
+  { value: 'converted', label: 'Conseguí el trabajo', shortLabel: 'Trabajos conseguidos', badge: 'bg-green-50 text-green-700' },
+  { value: 'lost', label: 'No se realizó', shortLabel: 'No realizados', badge: 'bg-gray-100 text-gray-600' },
 ]
 
 function formatDate(value: string) {
@@ -76,7 +76,7 @@ export default function LeadPipeline({
       })
       const result = await response.json() as { message?: string; lead?: { updated_at: string } }
 
-      if (!response.ok) throw new Error(result.message ?? 'No se pudo actualizar el contacto.')
+      if (!response.ok) throw new Error(result.message ?? 'No pudimos guardar el cambio. Inténtalo nuevamente.')
 
       setLeads((current) => current.map((lead) => (
         lead.id === id
@@ -84,15 +84,13 @@ export default function LeadPipeline({
           : lead
       )))
     } catch (updateError) {
-      setError(updateError instanceof Error ? updateError.message : 'No se pudo actualizar el contacto.')
+      setError(updateError instanceof Error ? updateError.message : 'No pudimos guardar el cambio. Revisa tu conexión e inténtalo nuevamente.')
     } finally {
       setSaving(null)
     }
   }
 
   const converted = leads.filter((lead) => lead.status === 'converted').length
-  const resolved = leads.filter((lead) => lead.status === 'converted' || lead.status === 'lost').length
-  const closeRate = resolved > 0 ? Math.round((converted / resolved) * 100) : 0
 
   const filters = [
     { value: 'all' as const, label: 'Todos', count: leads.length },
@@ -115,8 +113,8 @@ export default function LeadPipeline({
           </div>
         ))}
         <div className="bg-white border border-gray-100 rounded-lg p-4 col-span-2 lg:col-span-1">
-          <div className="text-xs text-gray-500 mb-1">Tasa de cierre</div>
-          <div className="text-2xl font-bold text-green-700">{closeRate}%</div>
+          <div className="text-xs text-gray-500 mb-1">Trabajos que conseguiste</div>
+          <div className="text-2xl font-bold text-green-700">{converted}</div>
         </div>
       </div>
 
@@ -127,7 +125,7 @@ export default function LeadPipeline({
       )}
 
       <div className="border-b border-gray-200 overflow-x-auto">
-        <div className="flex min-w-max" role="tablist" aria-label="Filtrar contactos">
+        <div className="flex min-w-max" role="tablist" aria-label="Mostrar personas por estado">
           {filters.map((item) => (
             <button
               key={item.value}
@@ -156,7 +154,7 @@ export default function LeadPipeline({
                 <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap mb-2">
-                      <h3 className="font-semibold text-gray-900">Contacto por WhatsApp</h3>
+                      <h3 className="font-semibold text-gray-900">Una persona quiso escribirte</h3>
                       <span className={`text-xs font-semibold px-2 py-1 rounded-full ${currentStatus.badge}`}>
                         {currentStatus.label}
                       </span>
@@ -176,13 +174,13 @@ export default function LeadPipeline({
                     )}
                   </div>
 
-                  <label className="text-xs font-medium text-gray-600 lg:w-44">
-                    Estado
+                  <label className="text-sm font-bold text-gray-700 lg:w-52">
+                    ¿Qué pasó con esta persona?
                     <select
                       value={lead.status}
                       disabled={saving === lead.id}
                       onChange={(event) => updateStatus(lead.id, event.target.value as LeadStatus)}
-                      className="mt-1 w-full border border-gray-200 rounded-lg bg-white px-3 py-2 text-sm text-gray-900 disabled:opacity-60"
+                      className="mt-2 min-h-12 w-full border border-gray-300 rounded-lg bg-white px-3 py-2 text-base text-gray-900 disabled:opacity-60"
                     >
                       {STATUS_OPTIONS.map((option) => (
                         <option key={option.value} value={option.value}>{option.label}</option>
@@ -196,7 +194,7 @@ export default function LeadPipeline({
         </div>
       ) : (
         <div className="py-10 text-center text-sm text-gray-500">
-          No hay contactos en este estado.
+          No hay personas en este grupo.
         </div>
       )}
     </div>

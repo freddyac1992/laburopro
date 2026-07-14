@@ -126,7 +126,7 @@ export default async function DashboardPage() {
   const completionPercent = checklist.length > 0 ? Math.round((completedChecklist / checklist.length) * 100) : 0
 
   return (
-    <DashboardShell title={`Hola, ${profile?.full_name ?? 'Proveedor'} 👋`} newLeadCount={newLeadCount}>
+    <DashboardShell title={`Hola, ${profile?.full_name ?? 'trabajador'}`} newLeadCount={newLeadCount}>
       <div className="space-y-6">
         {providerProfile && newLeadCount > 0 && (
           <Link
@@ -140,7 +140,7 @@ export default async function DashboardPage() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div>
                 <p className="font-semibold">
-                  Tienes {newLeadCount} contacto{newLeadCount === 1 ? '' : 's'} por atender
+                  {newLeadCount === 1 ? 'Una persona espera tu respuesta' : `${newLeadCount} personas esperan tu respuesta`}
                 </p>
                 <p className="text-sm mt-1 opacity-80">
                   {staleLeadCount > 0
@@ -148,38 +148,38 @@ export default async function DashboardPage() {
                     : 'Responder pronto aumenta las posibilidades de concretar el trabajo.'}
                 </p>
               </div>
-              <span className="text-sm font-semibold whitespace-nowrap">Revisar contactos →</span>
+              <span className="text-sm font-semibold whitespace-nowrap">Ver quién escribió</span>
             </div>
           </Link>
         )}
         {/* Status card */}
         <div className="bg-white rounded-2xl border border-gray-100 p-6">
-          <h2 className="font-semibold text-gray-900 mb-4">Estado de tu perfil</h2>
+          <h2 className="font-semibold text-gray-900 mb-4">Lo más importante</h2>
           {providerProfile ? (
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Perfil creado</span>
-                <span className="text-green-600 font-semibold text-sm">✅ Sí</span>
+                <span className="text-sm text-gray-600">Tu información está guardada</span>
+                <span className="text-green-700 font-semibold text-sm">Sí</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Aprobado por el equipo</span>
+                <span className="text-sm text-gray-600">Revisión de LaburoPro</span>
                 <span className={`font-semibold text-sm ${providerProfile.is_approved ? 'text-green-600' : 'text-amber-600'}`}>
-                  {providerProfile.is_approved ? '✅ Aprobado' : '⏳ Pendiente'}
+                  {providerProfile.is_approved ? 'Listo' : 'Estamos revisando'}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Verificado</span>
+                <span className="text-sm text-gray-600">Identidad confirmada</span>
                 <span className={`font-semibold text-sm ${providerProfile.is_verified ? 'text-green-600' : 'text-gray-400'}`}>
-                  {providerProfile.is_verified ? '✅ Verificado' : '— No verificado'}
+                  {providerProfile.is_verified ? 'Sí' : 'Todavía no'}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Contactos recibidos</span>
+                <span className="text-sm text-gray-600">Personas interesadas</span>
                 <span className="font-semibold text-sm text-teal-700">{leadCount ?? 0}</span>
               </div>
               {!providerProfile.is_approved && (
                 <div className="mt-3 bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
-                  Tu perfil está pendiente de revisión. Nuestro equipo lo aprobará pronto.
+                  Estamos revisando tu perfil. Te mostraremos públicamente cuando esté listo.
                 </div>
               )}
               {providerProfile.is_approved && (
@@ -190,7 +190,7 @@ export default async function DashboardPage() {
                     target="_blank"
                     id="dashboard-view-profile-link"
                   >
-                    Ver mi perfil público →
+                    Ver mi perfil como lo ven los clientes
                   </Link>
                 </div>
               )}
@@ -198,14 +198,14 @@ export default async function DashboardPage() {
           ) : (
             <div className="text-center py-6">
               <p className="text-gray-500 mb-4 text-sm">
-                Aún no has creado tu perfil de proveedor.
+                Todavía no mostraste qué trabajo realizas.
               </p>
               <Link
                 href="/dashboard/perfil"
                 id="dashboard-create-profile-btn"
                 className="inline-block px-6 py-3 bg-teal-700 text-white font-semibold rounded-xl hover:bg-teal-800 transition-colors"
               >
-                Crear mi perfil
+                Crear mi perfil de trabajo
               </Link>
             </div>
           )}
@@ -216,12 +216,12 @@ export default async function DashboardPage() {
             <div>
               <div className="flex items-end justify-between gap-4 mb-3">
                 <div>
-                  <h2 className="font-semibold text-gray-900">Visitas al perfil</h2>
-                  <p className="text-sm text-gray-500">Personas que abrieron tu ficha pública.</p>
+                  <h2 className="font-semibold text-gray-900">Personas que vieron tu perfil</h2>
+                  <p className="text-sm text-gray-500">Cada visita es una persona que quiso conocer tu trabajo.</p>
                 </div>
                 <div className="text-right">
                   <div className="text-2xl font-bold text-teal-700">{conversionLastThirtyDays}%</div>
-                  <div className="text-xs text-gray-500">conversión a contacto</div>
+                  <div className="text-xs text-gray-500">de cada 100 visitas escribieron</div>
                 </div>
               </div>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -245,13 +245,13 @@ export default async function DashboardPage() {
             </div>
 
             <div>
-              <h2 className="font-semibold text-gray-900 mb-3">Contactos por WhatsApp</h2>
+              <h2 className="font-semibold text-gray-900 mb-3">Personas que tocaron tu WhatsApp</h2>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               <Link
                 href="/dashboard/contactos"
                 className="bg-white rounded-2xl border border-gray-100 p-5 hover:border-teal-200 hover:shadow-md transition-all"
               >
-                <div className="text-sm text-gray-500 mb-1">Contactos totales</div>
+                <div className="text-sm text-gray-500 mb-1">En total</div>
                 <div className="text-3xl font-bold text-gray-900">{leadCount}</div>
               </Link>
               <div className="bg-white rounded-2xl border border-gray-100 p-5">
@@ -273,8 +273,8 @@ export default async function DashboardPage() {
               <div className="bg-white rounded-2xl border border-gray-100 p-6">
                 <div className="flex items-start justify-between gap-4 mb-5">
                   <div>
-                    <h2 className="font-semibold text-gray-900">Salud del perfil</h2>
-                    <p className="text-sm text-gray-500">Mientras más completo, mejor convierte.</p>
+                    <h2 className="font-semibold text-gray-900">Completa tu información</h2>
+                    <p className="text-sm text-gray-500">Más información ayuda a que confíen en tu trabajo.</p>
                   </div>
                   <div className="text-right">
                     <div className="text-2xl font-bold text-gray-900">{completionPercent}%</div>
@@ -309,7 +309,7 @@ export default async function DashboardPage() {
                   href="/dashboard/perfil"
                   className="mt-5 inline-flex px-4 py-2 rounded-xl bg-teal-700 text-white text-sm font-semibold hover:bg-teal-800 transition-colors"
                 >
-                  Mejorar perfil
+                  Completar mi información
                 </Link>
               </div>
 
@@ -394,7 +394,7 @@ export default async function DashboardPage() {
             className="bg-white rounded-2xl border border-gray-100 p-5 hover:border-teal-200 hover:shadow-md transition-all"
           >
             <div className="text-3xl mb-3">📲</div>
-            <h3 className="font-semibold text-gray-900 mb-1">Contactos</h3>
+            <h3 className="font-semibold text-gray-900 mb-1">Personas interesadas</h3>
             <p className="text-gray-500 text-sm">
               {providerProfile
                 ? `${leadCount ?? 0} persona${leadCount === 1 ? '' : 's'} hicieron click para contactarte por WhatsApp.`

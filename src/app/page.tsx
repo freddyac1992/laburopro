@@ -54,20 +54,31 @@ export default function HomePage() {
 
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
           <div className="max-w-4xl">
-            <p className="border-l-4 border-[#e85d3f] pl-3 text-sm font-bold mb-5">
-              Servicios locales verificados en Bolivia
-            </p>
+            <p className="border-l-4 border-[#e85d3f] pl-3 text-sm font-bold mb-5">Hecho para Bolivia</p>
             <h1 className="max-w-3xl text-4xl md:text-6xl font-extrabold leading-[1.08] mb-5">
-              Profesionales de confianza, cerca de ti.
+              Encuentra a alguien para hacer el trabajo.
             </h1>
             <p className="max-w-2xl text-base md:text-xl text-white/90 leading-relaxed mb-8">
-              Encuentra, compara y contacta directamente a personas que saben hacer el trabajo.
+              Elige el oficio y tu ciudad. Después habla directamente por WhatsApp.
             </p>
+            <div className="grid sm:grid-cols-2 gap-3 max-w-2xl mb-7" aria-label="Elige lo que quieres hacer">
+              <a
+                href="#buscar-trabajador"
+                className="min-h-14 inline-flex items-center justify-center rounded-md bg-[#e85d3f] px-5 py-3 text-center font-extrabold text-white hover:bg-[#cf4f34]"
+              >
+                Necesito un trabajador
+              </a>
+              <Link
+                href="/registro"
+                className="min-h-14 inline-flex items-center justify-center rounded-md border-2 border-white bg-white/10 px-5 py-3 text-center font-extrabold text-white hover:bg-white hover:text-[#102a33]"
+              >
+                Quiero ofrecer mi trabajo
+              </Link>
+            </div>
             <SearchBar />
             <div className="flex flex-wrap gap-x-6 gap-y-2 mt-5 text-sm text-white/85">
-              <span>Perfiles revisados</span>
-              <span>Contacto por WhatsApp</span>
-              <span>Sin comisiones</span>
+              <span>Perfiles revisados por nuestro equipo</span>
+              <span>Hablas directamente por WhatsApp</span>
             </div>
           </div>
         </div>
@@ -96,8 +107,8 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-end justify-between gap-6 mb-8">
             <div>
-              <p className="text-sm font-bold text-teal-700 mb-2">Explora por oficio</p>
-              <h2 className="text-2xl md:text-3xl font-extrabold text-[#102a33]">Servicios más buscados</h2>
+              <p className="text-sm font-bold text-teal-700 mb-2">Elige un tipo de trabajo</p>
+              <h2 className="text-2xl md:text-3xl font-extrabold text-[#102a33]">¿A quién necesitas?</h2>
             </div>
             <Link
               href="/servicios"
@@ -129,9 +140,9 @@ export default function HomePage() {
       <section id="como-funciona" className="section-padding bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl mb-10">
-            <p className="text-sm font-bold text-[#e85d3f] mb-2">Simple desde el inicio</p>
-            <h2 className="text-2xl md:text-3xl font-extrabold text-[#102a33] mb-3">Del problema al contacto en tres pasos</h2>
-            <p className="text-slate-600">Información útil para elegir bien, sin añadir fricción al proceso.</p>
+            <p className="text-sm font-bold text-[#e85d3f] mb-2">Es sencillo</p>
+            <h2 className="text-2xl md:text-3xl font-extrabold text-[#102a33] mb-3">Encuentra ayuda en tres pasos</h2>
+            <p className="text-slate-600">No necesitas saber de tecnología. Solo sigue estos pasos.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 border-t border-slate-200">
             {HOW_IT_WORKS.map((step) => (
@@ -149,9 +160,9 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-[0.8fr_1.2fr] gap-10 lg:gap-16 items-start">
             <div>
-              <p className="text-sm font-bold text-teal-200 mb-2">Confianza con señales reales</p>
-              <h2 className="text-2xl md:text-3xl font-extrabold mb-4">Más claridad antes de contratar.</h2>
-              <p className="text-slate-300 leading-relaxed">LaburoPro organiza la información que normalmente está dispersa para que puedas decidir con calma.</p>
+              <p className="text-sm font-bold text-teal-200 mb-2">Decide con más información</p>
+              <h2 className="text-2xl md:text-3xl font-extrabold mb-4">Revisa antes de llamar.</h2>
+              <p className="text-slate-300 leading-relaxed">Mira el trabajo, la experiencia y las opiniones de otras personas antes de elegir.</p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 border-t border-white/15">
               {TRUST_FEATURES.map((feature) => (
@@ -171,9 +182,9 @@ export default function HomePage() {
       <section className="section-padding bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-7">
           <div className="max-w-2xl">
-            <p className="text-sm font-bold text-teal-700 mb-2">Para quienes hacen el trabajo</p>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-[#102a33] mb-3">Tu próximo cliente puede estar buscando ahora.</h2>
-            <p className="text-slate-600 text-lg">Publica tu servicio gratis y recibe contactos directos por WhatsApp.</p>
+            <p className="text-sm font-bold text-teal-700 mb-2">¿Trabajas por tu cuenta?</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-[#102a33] mb-3">Muestra tu trabajo y consigue clientes.</h2>
+            <p className="text-slate-600 text-lg">Te guiaremos paso a paso para crear tu perfil. Publicarlo es gratis.</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 flex-shrink-0">
             <Link
@@ -181,7 +192,7 @@ export default function HomePage() {
               id="provider-cta-btn"
               className="px-7 py-3.5 bg-[#e85d3f] hover:bg-[#cf4f34] text-white font-bold rounded-md text-center"
             >
-              Publicar mi servicio
+              Crear mi perfil de trabajo
             </Link>
             <Link
               href="/#como-funciona"

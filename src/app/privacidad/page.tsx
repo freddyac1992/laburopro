@@ -42,7 +42,7 @@ export default function PrivacidadPage() {
         <section>
           <h2 className="text-xl font-semibold text-gray-900 mb-3">4. Contacto</h2>
           <p>
-            Para consultas sobre privacidad, contáctanos en: hola@laburopro.com
+            Para consultas sobre privacidad, contáctanos en: laburo.pro.bolivia@gmail.com
           </p>
         </section>
 

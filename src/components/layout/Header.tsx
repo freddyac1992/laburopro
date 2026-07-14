@@ -63,7 +63,7 @@ export default function Header() {
         id="header-dashboard-btn"
         className="text-sm font-semibold bg-teal-700 text-white px-4 py-2 rounded-md hover:bg-teal-800"
       >
-        Mi panel
+        Mis trabajos
       </Link>
       <LogoutButton
         id="header-logout-btn"
@@ -86,7 +86,7 @@ export default function Header() {
         id="header-register-btn"
         className="text-sm font-semibold bg-[#e85d3f] text-white px-4 py-2 rounded-md hover:bg-[#cf4f34]"
       >
-        Publicar servicio
+        Ofrecer mi trabajo
       </Link>
     </>
   )
@@ -98,7 +98,7 @@ export default function Header() {
         className="block px-4 py-2 bg-teal-700 text-white rounded-md font-semibold text-center hover:bg-teal-800"
         onClick={closeMenu}
       >
-        Mi panel
+        Mis trabajos
       </Link>
       <LogoutButton
         className="block px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg font-medium"
@@ -121,7 +121,7 @@ export default function Header() {
         className="block px-4 py-2 bg-[#e85d3f] text-white rounded-md font-semibold text-center hover:bg-[#cf4f34]"
         onClick={closeMenu}
       >
-        Publicar servicio
+        Ofrecer mi trabajo
       </Link>
     </>
   )

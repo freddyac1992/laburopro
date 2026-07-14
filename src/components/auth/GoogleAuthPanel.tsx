@@ -58,12 +58,12 @@ export default function GoogleAuthPanel({ mode }: { mode: AuthMode }) {
         <div className="mb-7 text-center">
           <BrandMark className="mx-auto mb-5 w-12 h-12" />
           <h1 className="text-3xl font-extrabold text-[#102a33] mb-2">
-            {isRegister ? 'Publica tu servicio' : 'Bienvenido de vuelta'}
+            {isRegister ? 'Empieza a mostrar tu trabajo' : 'Entra a tu cuenta'}
           </h1>
           <p className="text-slate-600 text-sm leading-relaxed">
             {isRegister
-              ? 'Crea tu cuenta de proveedor y comienza a recibir contactos.'
-              : 'Accede a tu panel de LaburoPro con tu cuenta de Google.'}
+              ? 'Usa tu cuenta de Google. Después te guiaremos paso a paso.'
+              : 'Usa la misma cuenta de Google con la que te registraste.'}
           </p>
         </div>
 
@@ -79,7 +79,7 @@ export default function GoogleAuthPanel({ mode }: { mode: AuthMode }) {
             onClick={continueWithGoogle}
             disabled={loading}
             id={isRegister ? 'register-google-btn' : 'login-google-btn'}
-            className="w-full min-h-12 flex items-center justify-center gap-3 border border-slate-300 hover:border-teal-600 hover:bg-teal-50 disabled:opacity-60 text-[#102a33] font-bold rounded-md"
+            className="w-full min-h-14 flex items-center justify-center gap-3 border-2 border-slate-300 hover:border-teal-600 hover:bg-teal-50 disabled:opacity-60 text-[#102a33] text-base font-extrabold rounded-md"
           >
             <GoogleIcon />
             {loading ? 'Conectando con Google...' : 'Continuar con Google'}
@@ -88,7 +88,7 @@ export default function GoogleAuthPanel({ mode }: { mode: AuthMode }) {
           <div className="mt-6 pt-5 border-t border-slate-100 flex items-start gap-3">
             <span className="mt-0.5 w-5 h-5 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center text-xs font-extrabold flex-shrink-0">✓</span>
             <p className="text-xs text-slate-500 leading-relaxed">
-              Google confirma tu identidad y LaburoPro nunca recibe ni almacena tu contraseña.
+              Toca el botón y elige tu correo de Google. LaburoPro nunca ve tu contraseña.
             </p>
           </div>
 
@@ -103,12 +103,12 @@ export default function GoogleAuthPanel({ mode }: { mode: AuthMode }) {
         </div>
 
         <p className="text-center text-sm text-slate-500 mt-6">
-          {isRegister ? '¿Ya tienes una cuenta?' : '¿Quieres publicar un servicio?'}{' '}
+          {isRegister ? '¿Ya mostraste tu trabajo antes?' : '¿Quieres ofrecer tu trabajo?'}{' '}
           <Link
             href={isRegister ? '/login' : '/registro'}
             className="text-teal-700 font-bold hover:underline"
           >
-            {isRegister ? 'Ingresar' : 'Crear perfil'}
+            {isRegister ? 'Entrar a mi cuenta' : 'Crear mi perfil de trabajo'}
           </Link>
         </p>
       </div>

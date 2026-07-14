@@ -110,9 +110,24 @@ const providerFiltersSource = await readFile(new URL('../src/components/ui/Provi
 const providerSearchSource = await readFile(new URL('../src/lib/provider-search.ts', import.meta.url), 'utf8')
 assert(logoutButtonSource.includes("fetch('/api/auth/logout'"), 'Mobile logout must complete before its menu unmounts')
 assert(logoutButtonSource.includes("window.location.assign('/login')"), 'Logout must force a clean login reload')
-assert(providerFiltersSource.includes('Solo verificados'), 'Public filters must expose verified providers')
-assert(providerFiltersSource.includes('Todos aprobados'), 'Public filters must explain approval status')
+assert(providerFiltersSource.includes('Mostrar solamente identidades confirmadas'), 'Public filters must explain verified providers in plain language')
+assert(providerFiltersSource.includes('Solo mostramos perfiles revisados por LaburoPro'), 'Public filters must explain approval status')
 assert(providerSearchSource.includes(".eq('is_approved', true)"), 'Public provider results must always be approved')
+
+const homeSource = await readFile(new URL('../src/app/page.tsx', import.meta.url), 'utf8')
+const searchBarSource = await readFile(new URL('../src/components/ui/SearchBar.tsx', import.meta.url), 'utf8')
+const providerWizardSource = await readFile(new URL('../src/app/dashboard/perfil/page.tsx', import.meta.url), 'utf8')
+const leadUiSource = await readFile(new URL('../src/components/dashboard/LeadPipeline.tsx', import.meta.url), 'utf8')
+assert(homeSource.includes('Necesito un trabajador'), 'Home must give customers a clear starting path')
+assert(homeSource.includes('Quiero ofrecer mi trabajo'), 'Home must give workers a clear starting path')
+assert(searchBarSource.includes('Ver trabajadores'), 'Search must use an explicit result action')
+assert(searchBarSource.includes('<details'), 'Advanced search must not overload the initial form')
+assert(providerWizardSource.includes('Paso {currentStep} de 4'), 'Provider profile must be a four-step wizard')
+assert(providerWizardSource.includes('laburopro:profile-draft:v1'), 'New provider drafts must survive interruptions')
+assert(providerWizardSource.includes('inputMode="numeric"'), 'WhatsApp entry must use a number-friendly keyboard')
+assert(providerWizardSource.includes('fullWhatsAppNumber'), 'WhatsApp numbers must receive the Bolivia country code automatically')
+assert(leadUiSource.includes('Debo responder'), 'Lead states must use action-oriented plain language')
+assert(leadUiSource.includes('¿Qué pasó con esta persona?'), 'Lead updates must ask a concrete question')
 
 const brandedSurfacePaths = [
   '../src/app/dashboard/page.tsx',
@@ -171,6 +186,8 @@ for (const policy of ['leads', 'profile views', 'reviews', 'provider reports']) 
 }
 
 const leadPipelineRoute = await readFile(new URL('../src/app/api/leads/[id]/route.ts', import.meta.url), 'utf8')
+const leadCreateRoute = await readFile(new URL('../src/app/api/leads/route.ts', import.meta.url), 'utf8')
+const leadNotificationSource = await readFile(new URL('../src/lib/email/lead-notification.ts', import.meta.url), 'utf8')
 const leadPipelineSql = await readFile(new URL('../supabase/lead-pipeline.sql', import.meta.url), 'utf8')
 for (const status of ['new', 'contacted', 'converted', 'lost']) {
   assert(leadPipelineRoute.includes(`'${status}'`), `Lead pipeline API must allow ${status}`)
@@ -178,6 +195,13 @@ for (const status of ['new', 'contacted', 'converted', 'lost']) {
 }
 assert(leadPipelineRoute.includes(".eq('provider_id', provider.id)"), 'Lead updates must be scoped to the provider owner')
 assert(leadPipelineSql.includes('GRANT UPDATE (status, updated_at)'), 'Authenticated users may only update lead workflow fields')
+assert(leadCreateRoute.includes('sendNewLeadNotification'), 'New leads must trigger provider email notifications')
+assert(leadCreateRoute.includes("notification: 'sent' | 'skipped' | 'failed'"), 'Email delivery must not block lead creation')
+assert(leadNotificationSource.includes("import 'server-only'"), 'Email notifications must remain server-only')
+assert(leadNotificationSource.includes("'Idempotency-Key'"), 'Lead emails must use an idempotency key')
+assert(leadNotificationSource.includes('AbortSignal.timeout'), 'Email delivery must have a timeout')
+assert(leadNotificationSource.includes('RESEND_API_KEY'), 'Lead emails must use a private Resend key')
+assert(!leadNotificationSource.includes('NEXT_PUBLIC_RESEND'), 'Resend credentials must never be public')
 
 const leadPipelineUi = await readFile(new URL('../src/components/dashboard/LeadPipeline.tsx', import.meta.url), 'utf8')
 const dashboardShellSource = await readFile(new URL('../src/components/dashboard/DashboardShell.tsx', import.meta.url), 'utf8')

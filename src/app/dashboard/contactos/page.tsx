@@ -41,17 +41,17 @@ export default async function DashboardContactosPage({
   const newLeadCount = leadRows.filter((lead) => lead.status === 'new').length
 
   return (
-    <DashboardShell title="Contactos recibidos" newLeadCount={newLeadCount}>
+    <DashboardShell title="Personas interesadas en tu trabajo" newLeadCount={newLeadCount}>
       <div className="space-y-6">
         {!providerProfile ? (
           <div className="bg-white rounded-2xl border border-gray-100 p-6 text-center">
-            <h2 className="font-semibold text-gray-900 mb-2">Crea tu perfil para empezar a recibir contactos</h2>
-            <p className="text-sm text-gray-500 mb-4">Cuando alguien toque el botón de WhatsApp en tu perfil, aparecerá aquí.</p>
+            <h2 className="font-semibold text-gray-900 mb-2">Primero crea tu perfil de trabajo</h2>
+            <p className="text-sm text-gray-600 mb-4">Cuando una persona quiera hablar contigo por WhatsApp, aparecerá aquí.</p>
             <Link
               href="/dashboard/perfil"
               className="inline-flex px-5 py-3 rounded-xl bg-teal-700 text-white font-semibold hover:bg-teal-800 transition-colors"
             >
-              Crear mi perfil
+              Crear mi perfil de trabajo
             </Link>
           </div>
         ) : (
@@ -59,7 +59,7 @@ export default async function DashboardContactosPage({
             <div className="bg-white rounded-lg border border-gray-100 overflow-hidden">
               <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between gap-3">
                 <div>
-                  <h2 className="font-semibold text-gray-900">Historial de contactos</h2>
+                  <h2 className="font-semibold text-gray-900">Personas que quisieron contactarte</h2>
                   <p className="text-sm text-gray-500">{providerProfile.display_name}</p>
                 </div>
                 {providerProfile.is_approved && (
