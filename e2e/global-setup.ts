@@ -4,6 +4,8 @@ import {
   ADMIN_AUTH_FILE,
   FIXTURE_FILE,
   PROVIDER_AUTH_FILE,
+  PROVIDER_DESKTOP_LOGOUT_AUTH_FILE,
+  PROVIDER_MOBILE_LOGOUT_AUTH_FILE,
   PROVIDER_NAME,
   createQaAdminClient,
   signInForQa,
@@ -42,7 +44,9 @@ export default async function globalSetup(config: FullConfig) {
       throw new Error('QA_ADMIN_EMAIL no corresponde a un administrador del proyecto de QA')
     }
 
-    const [providerSession, adminSession] = await Promise.all([
+    const [providerSession, providerDesktopLogoutSession, providerMobileLogoutSession, adminSession] = await Promise.all([
+      signInForQa(providerEmail, providerPassword),
+      signInForQa(providerEmail, providerPassword),
       signInForQa(providerEmail, providerPassword),
       signInForQa(adminEmail, adminPassword),
     ])
@@ -50,6 +54,14 @@ export default async function globalSetup(config: FullConfig) {
     await mkdir('e2e/.auth', { recursive: true })
     await Promise.all([
       writeFile(PROVIDER_AUTH_FILE, JSON.stringify(storageStateForSession(providerSession, config))),
+      writeFile(
+        PROVIDER_DESKTOP_LOGOUT_AUTH_FILE,
+        JSON.stringify(storageStateForSession(providerDesktopLogoutSession, config)),
+      ),
+      writeFile(
+        PROVIDER_MOBILE_LOGOUT_AUTH_FILE,
+        JSON.stringify(storageStateForSession(providerMobileLogoutSession, config)),
+      ),
       writeFile(ADMIN_AUTH_FILE, JSON.stringify(storageStateForSession(adminSession, config))),
       writeFile(FIXTURE_FILE, JSON.stringify({ providerUserId, providerEmail })),
     ])

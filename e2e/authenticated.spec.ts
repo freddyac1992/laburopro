@@ -4,6 +4,8 @@ import {
   ADMIN_AUTH_FILE,
   FIXTURE_FILE,
   PROVIDER_AUTH_FILE,
+  PROVIDER_DESKTOP_LOGOUT_AUTH_FILE,
+  PROVIDER_MOBILE_LOGOUT_AUTH_FILE,
   PROVIDER_NAME,
   approveProviderForQa,
   createQaAdminClient,
@@ -67,10 +69,6 @@ test.describe('proveedor autenticado', () => {
       .single()
     expect(updatedLead?.status).toBe('contacted')
 
-    await page.locator('#header-logout-btn').click()
-    await expect(page).toHaveURL(/\/login$/)
-    await page.goto('/dashboard')
-    await expect(page).toHaveURL(/\/login$/)
   })
 
   test('impide que un proveedor entre al panel administrativo', async ({ page }) => {
@@ -79,7 +77,24 @@ test.describe('proveedor autenticado', () => {
     await expect(page.getByRole('heading', { name: 'Encuentra a alguien para hacer el trabajo.' })).toBeVisible()
   })
 
-  test('cierra la sesión desde un teléfono', async ({ page }) => {
+})
+
+test.describe('cierre de sesión en escritorio', () => {
+  test.use({ storageState: PROVIDER_DESKTOP_LOGOUT_AUTH_FILE })
+
+  test('cierra la sesión desde la cabecera', async ({ page }) => {
+    await page.goto('/dashboard')
+    await page.locator('#header-logout-btn').click()
+    await expect(page).toHaveURL(/\/login$/)
+    await page.goto('/dashboard')
+    await expect(page).toHaveURL(/\/login$/)
+  })
+})
+
+test.describe('cierre de sesión en teléfono', () => {
+  test.use({ storageState: PROVIDER_MOBILE_LOGOUT_AUTH_FILE })
+
+  test('cierra la sesión desde la navegación móvil', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 })
     await page.goto('/dashboard')
     await page.locator('#dashboard-mobile-logout-btn').click()

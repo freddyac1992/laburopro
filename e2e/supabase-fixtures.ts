@@ -5,6 +5,8 @@ const PRODUCTION_PROJECT_REF = 'gxaqrwrqlwvgrjhmfhti'
 const MAX_COOKIE_CHUNK_SIZE = 3180
 
 export const PROVIDER_AUTH_FILE = 'e2e/.auth/provider.json'
+export const PROVIDER_DESKTOP_LOGOUT_AUTH_FILE = 'e2e/.auth/provider-desktop-logout.json'
+export const PROVIDER_MOBILE_LOGOUT_AUTH_FILE = 'e2e/.auth/provider-mobile-logout.json'
 export const ADMIN_AUTH_FILE = 'e2e/.auth/admin.json'
 export const FIXTURE_FILE = 'e2e/.fixture.json'
 export const PROVIDER_NAME = 'QA Proveedor Automatizado'
