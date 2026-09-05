@@ -52,6 +52,49 @@ WhatsApp genera una notificación por correo para el proveedor. El subdominio de
 remitente debe estar verificado en Resend; si el servicio de correo no está
 configurado o falla, el contacto se registra igualmente.
 
+### QA autenticado
+
+Las pruebas E2E usan un proyecto Supabase separado para no crear ni modificar
+usuarios de producción. Crea un proyecto de QA, ejecuta allí los mismos archivos
+SQL indicados en el paso 3 y crea un usuario administrador exclusivo de pruebas.
+
+Configura estos secretos en GitHub Actions:
+
+```text
+QA_SUPABASE_URL
+QA_SUPABASE_ANON_KEY
+QA_SUPABASE_SERVICE_ROLE_KEY
+QA_ADMIN_EMAIL
+QA_ADMIN_PASSWORD
+```
+
+El administrador de QA debe existir en `auth.users`, tener contraseña confirmada
+y tener `role = 'admin'` en `public.profiles`. Después de crearlo en Supabase Auth,
+promuévelo **solamente en el proyecto de QA** desde el SQL Editor:
+
+```sql
+BEGIN;
+ALTER TABLE public.profiles DISABLE TRIGGER protect_profile_role;
+UPDATE public.profiles
+SET role = 'admin'
+WHERE email = 'admin-qa@ejemplo.com';
+ALTER TABLE public.profiles ENABLE TRIGGER protect_profile_role;
+COMMIT;
+```
+
+Comprueba que el `UPDATE` haya afectado exactamente una fila. El workflow se
+niega expresamente a ejecutar las pruebas autenticadas contra el proyecto
+Supabase de producción. Cada ejecución crea un proveedor temporal y lo elimina
+al finalizar.
+
+Para ejecutarlas localmente, configura las mismas variables `QA_*`, construye la
+aplicación con las variables públicas apuntando al proyecto de QA y ejecuta:
+
+```bash
+npm run build
+npm run qa:e2e
+```
+
 ### 5. Correr localmente
 
 ```bash
