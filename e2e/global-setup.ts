@@ -14,7 +14,7 @@ import {
 
 export default async function globalSetup(config: FullConfig) {
   const adminClient = createQaAdminClient()
-  const runId = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+  const runId = `${Date.now()}-${crypto.randomUUID().slice(0, 8)}`
   const providerEmail = `e2e-provider-${runId}@qa.laburopro.test`
   const providerPassword = `Qa-${crypto.randomUUID()}-9a!`
   let providerUserId: string | null = null

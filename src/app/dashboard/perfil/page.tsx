@@ -181,8 +181,13 @@ export default function PerfilPage() {
 
     const reader = new FileReader()
     reader.onload = () => {
+      const preview = reader.result
+      if (typeof preview !== 'string') {
+        setError('No pudimos leer esa imagen. Intenta con otra foto.')
+        return
+      }
       setPhotoFiles((current) => ({ ...current, [kind]: file }))
-      setPhotoPreviews((current) => ({ ...current, [kind]: String(reader.result) }))
+      setPhotoPreviews((current) => ({ ...current, [kind]: preview }))
       setRemovedPhotos((current) => ({ ...current, [kind]: false }))
       setError(null)
       setSuccess(false)
@@ -293,7 +298,7 @@ export default function PerfilPage() {
         zone: form.zone.trim() || null,
         description: form.description.trim() || null,
         services: servicesArray.length > 0 ? servicesArray : null,
-        years_experience: form.years_experience ? parseInt(form.years_experience) : null,
+        years_experience: form.years_experience ? Number.parseInt(form.years_experience, 10) : null,
         price_reference: form.price_reference.trim() || null,
         whatsapp: fullWhatsAppNumber(form.whatsapp),
         availability: form.availability.trim() || null,
@@ -349,6 +354,9 @@ export default function PerfilPage() {
   const cityOptions = dbCities.length > 0
     ? dbCities
     : CITIES.map((c) => ({ id: c.slug, name: c.name, slug: c.slug }))
+  let submitLabel = 'Enviar mi perfil para revisión'
+  if (profileId) submitLabel = 'Guardar mis cambios'
+  if (saving) submitLabel = 'Guardando, espera un momento...'
 
   return (
     <DashboardShell title={profileId ? 'Actualizar mi información' : 'Crear mi perfil de trabajo'}>
@@ -369,9 +377,9 @@ export default function PerfilPage() {
         </div>
 
         {success && (
-          <div role="status" className="bg-green-50 border border-green-200 text-green-800 rounded-lg p-4 font-semibold">
+          <output className="block bg-green-50 border border-green-200 text-green-800 rounded-lg p-4 font-semibold">
             Tu perfil fue guardado correctamente. Nuestro equipo lo revisará antes de mostrarlo al público.
-          </div>
+          </output>
         )}
         {error && (
           <div role="alert" className="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 font-semibold">
@@ -386,11 +394,11 @@ export default function PerfilPage() {
               <p className="wizard-help">Estos datos ayudan a que las personas te encuentren.</p>
             </div>
             <label className="wizard-label" htmlFor="perfil-nombre">
-              Tu nombre o el nombre de tu negocio
+              <span>Tu nombre o el nombre de tu negocio</span>
               <input id="perfil-nombre" name="display_name" type="text" value={form.display_name} onChange={handleChange} placeholder="Ejemplo: Juan Pérez o Plomería Don Juan" className="form-input mt-2" autoComplete="name" />
             </label>
             <label className="wizard-label" htmlFor="perfil-categoria">
-              ¿Qué trabajo realizas?
+              <span>¿Qué trabajo realizas?</span>
               <select id="perfil-categoria" name="category_id" value={form.category_id} onChange={handleChange} className="form-input mt-2">
                 <option value="">Toca aquí para elegir</option>
                 {categoryOptions.map((cat) => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
@@ -398,7 +406,7 @@ export default function PerfilPage() {
             </label>
             <div className="grid sm:grid-cols-2 gap-5">
               <label className="wizard-label" htmlFor="perfil-ciudad">
-                ¿En qué ciudad trabajas?
+                <span>¿En qué ciudad trabajas?</span>
                 <select id="perfil-ciudad" name="city_id" value={form.city_id} onChange={handleChange} className="form-input mt-2">
                   <option value="">Toca aquí para elegir</option>
                   {cityOptions.map((city) => <option key={city.id} value={city.id}>{city.name}</option>)}
@@ -419,7 +427,7 @@ export default function PerfilPage() {
               <p className="wizard-help">Usa palabras sencillas. Puedes dejar los datos que no sepas para después.</p>
             </div>
             <label className="wizard-label" htmlFor="perfil-descripcion">
-              Cuéntale a un cliente cómo puedes ayudarle
+              <span>Cuéntale a un cliente cómo puedes ayudarle</span>
               <textarea id="perfil-descripcion" name="description" rows={5} value={form.description} onChange={handleChange} placeholder="Ejemplo: Hago instalaciones y reparaciones eléctricas en casas y negocios. Trabajo en La Paz y El Alto." className="form-input mt-2 resize-none" />
             </label>
             <label className="wizard-label" htmlFor="perfil-servicios">
@@ -502,7 +510,7 @@ export default function PerfilPage() {
               <button type="button" onClick={goToNextStep} className="min-h-12 flex-1 rounded-md bg-teal-700 px-5 font-extrabold text-white hover:bg-teal-800">Continuar</button>
             ) : (
               <button type="submit" disabled={saving} id="perfil-submit-btn" className="min-h-12 flex-1 rounded-md bg-[#e85d3f] px-5 font-extrabold text-white hover:bg-[#cf4f34] disabled:opacity-60">
-                {saving ? 'Guardando, espera un momento...' : profileId ? 'Guardar mis cambios' : 'Enviar mi perfil para revisión'}
+                {submitLabel}
               </button>
             )}
           </div>

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 }
 
 interface ServiciosPageProps {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+  readonly searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
 function firstParam(value: string | string[] | undefined) {

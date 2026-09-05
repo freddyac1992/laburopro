@@ -1,8 +1,8 @@
 interface EmptyStateProps {
-  title: string
-  description?: string
-  icon?: string
-  action?: React.ReactNode
+  readonly title: string
+  readonly description?: string
+  readonly icon?: string
+  readonly action?: React.ReactNode
 }
 
 export default function EmptyState({ title, description, icon = '🔍', action }: EmptyStateProps) {

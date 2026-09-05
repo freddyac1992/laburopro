@@ -1,6 +1,23 @@
 import { NextResponse } from 'next/server'
+import type { User } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/server'
 import { slugify } from '@/lib/utils'
+
+type ServerClient = Awaited<ReturnType<typeof createClient>>
+type ProviderProfilePayload = {
+  display_name: string
+  category_id: string | null
+  city_id: string | null
+  zone: string | null
+  description: string | null
+  services: string[] | null
+  years_experience: number | null
+  price_reference: string | null
+  whatsapp: string
+  availability: string | null
+  profile_photo_path?: string | null
+  work_photo_path?: string | null
+}
 
 type ProviderProfileRequestBody = {
   display_name?: unknown
@@ -26,7 +43,7 @@ function looksLikeUuid(value: string) {
 }
 
 async function resolveReferenceId(
-  supabase: Awaited<ReturnType<typeof createClient>>,
+  supabase: ServerClient,
   table: 'categories' | 'cities',
   value: string | null
 ) {
@@ -39,6 +56,94 @@ async function resolveReferenceId(
     .maybeSingle()
 
   return data?.id ?? null
+}
+
+async function ensureOwnerProfile(supabase: ServerClient, user: User) {
+  const { data: profile, error } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('id', user.id)
+    .maybeSingle()
+
+  if (error || profile) return error?.message ?? null
+
+  const fullName = typeof user.user_metadata?.full_name === 'string'
+    ? user.user_metadata.full_name
+    : null
+  const { error: insertError } = await supabase.from('profiles').insert({
+    id: user.id,
+    email: user.email ?? null,
+    full_name: fullName,
+    role: 'provider',
+  })
+
+  return insertError?.message ?? null
+}
+
+function getPhotoInput(body: ProviderProfileRequestBody, userId: string) {
+  const profilePhotoPath = optionalString(body.profile_photo_path)
+  const workPhotoPath = optionalString(body.work_photo_path)
+  const invalidProfilePhoto = profilePhotoPath && profilePhotoPath !== `${userId}/profile.webp`
+  const invalidWorkPhoto = workPhotoPath && workPhotoPath !== `${userId}/work.webp`
+  let error: string | null = null
+  if (invalidProfilePhoto) error = 'La foto de perfil no es válida.'
+  if (invalidWorkPhoto) error = 'La foto de trabajo no es válida.'
+
+  return {
+    profilePhotoPath,
+    workPhotoPath,
+    hasProfilePhotoPath: Object.hasOwn(body, 'profile_photo_path'),
+    hasWorkPhotoPath: Object.hasOwn(body, 'work_photo_path'),
+    error,
+  }
+}
+
+async function saveProviderProfile(
+  supabase: ServerClient,
+  userId: string,
+  displayName: string,
+  payload: ProviderProfilePayload,
+) {
+  const { data: existing, error: existingError } = await supabase
+    .from('provider_profiles')
+    .select('id')
+    .eq('user_id', userId)
+    .maybeSingle()
+
+  if (existingError) {
+    return NextResponse.json({ message: existingError.message }, { status: 500 })
+  }
+
+  if (existing) {
+    const { data, error } = await supabase
+      .from('provider_profiles')
+      .update(payload)
+      .eq('id', existing.id)
+      .select('id')
+      .single()
+
+    return error
+      ? NextResponse.json({ message: error.message }, { status: 500 })
+      : NextResponse.json({ id: data.id })
+  }
+
+  const slug = `${slugify(displayName)}-${crypto.randomUUID().slice(0, 8)}`
+  const { data, error } = await supabase
+    .from('provider_profiles')
+    .insert({
+      ...payload,
+      profile_photo_path: payload.profile_photo_path ?? null,
+      work_photo_path: payload.work_photo_path ?? null,
+      user_id: userId,
+      slug,
+      display_name: displayName,
+    })
+    .select('id')
+    .single()
+
+  return error
+    ? NextResponse.json({ message: error.message }, { status: 500 })
+    : NextResponse.json({ id: data.id })
 }
 
 export async function POST(request: Request) {
@@ -70,30 +175,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'Tu sesión expiró. Vuelve a iniciar sesión.' }, { status: 401 })
   }
 
-  const { data: profile, error: profileLookupError } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('id', user.id)
-    .maybeSingle()
-
-  if (profileLookupError) {
-    return NextResponse.json({ message: profileLookupError.message }, { status: 500 })
-  }
-
-  if (!profile) {
-    const { error: profileInsertError } = await supabase.from('profiles').insert({
-      id: user.id,
-      email: user.email ?? null,
-      full_name:
-        typeof user.user_metadata?.full_name === 'string'
-          ? user.user_metadata.full_name
-          : null,
-      role: 'provider',
-    })
-
-    if (profileInsertError) {
-      return NextResponse.json({ message: profileInsertError.message }, { status: 500 })
-    }
+  const ownerProfileError = await ensureOwnerProfile(supabase, user)
+  if (ownerProfileError) {
+    return NextResponse.json({ message: ownerProfileError }, { status: 500 })
   }
 
   const services = Array.isArray(body.services)
@@ -110,18 +194,9 @@ export async function POST(request: Request) {
     resolveReferenceId(supabase, 'cities', optionalString(body.city_id)),
   ])
 
-  const expectedProfilePhotoPath = `${user.id}/profile.webp`
-  const expectedWorkPhotoPath = `${user.id}/work.webp`
-  const hasProfilePhotoPath = Object.prototype.hasOwnProperty.call(body, 'profile_photo_path')
-  const hasWorkPhotoPath = Object.prototype.hasOwnProperty.call(body, 'work_photo_path')
-  const profilePhotoPath = optionalString(body.profile_photo_path)
-  const workPhotoPath = optionalString(body.work_photo_path)
-
-  if (profilePhotoPath && profilePhotoPath !== expectedProfilePhotoPath) {
-    return NextResponse.json({ message: 'La foto de perfil no es válida.' }, { status: 400 })
-  }
-  if (workPhotoPath && workPhotoPath !== expectedWorkPhotoPath) {
-    return NextResponse.json({ message: 'La foto de trabajo no es válida.' }, { status: 400 })
+  const photoInput = getPhotoInput(body, user.id)
+  if (photoInput.error) {
+    return NextResponse.json({ message: photoInput.error }, { status: 400 })
   }
 
   const payload = {
@@ -135,51 +210,9 @@ export async function POST(request: Request) {
     price_reference: optionalString(body.price_reference),
     whatsapp,
     availability: optionalString(body.availability),
-    ...(hasProfilePhotoPath ? { profile_photo_path: profilePhotoPath } : {}),
-    ...(hasWorkPhotoPath ? { work_photo_path: workPhotoPath } : {}),
+    ...(photoInput.hasProfilePhotoPath ? { profile_photo_path: photoInput.profilePhotoPath } : {}),
+    ...(photoInput.hasWorkPhotoPath ? { work_photo_path: photoInput.workPhotoPath } : {}),
   }
 
-  const { data: existing, error: existingError } = await supabase
-    .from('provider_profiles')
-    .select('id')
-    .eq('user_id', user.id)
-    .maybeSingle()
-
-  if (existingError) {
-    return NextResponse.json({ message: existingError.message }, { status: 500 })
-  }
-
-  if (existing) {
-    const { data, error } = await supabase
-      .from('provider_profiles')
-      .update(payload)
-      .eq('id', existing.id)
-      .select('id')
-      .single()
-
-    if (error) {
-      return NextResponse.json({ message: error.message }, { status: 500 })
-    }
-
-    return NextResponse.json({ id: data.id })
-  }
-
-  const slug = `${slugify(displayName)}-${Math.random().toString(36).slice(2, 6)}`
-  const { data, error } = await supabase
-    .from('provider_profiles')
-    .insert({
-      ...payload,
-      profile_photo_path: profilePhotoPath,
-      work_photo_path: workPhotoPath,
-      user_id: user.id,
-      slug,
-    })
-    .select('id')
-    .single()
-
-  if (error) {
-    return NextResponse.json({ message: error.message }, { status: 500 })
-  }
-
-  return NextResponse.json({ id: data.id })
+  return saveProviderProfile(supabase, user.id, displayName, payload)
 }

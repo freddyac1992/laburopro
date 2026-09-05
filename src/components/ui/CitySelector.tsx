@@ -4,9 +4,9 @@ import { useRouter } from 'next/navigation'
 import { CITIES } from '@/lib/constants'
 
 interface CitySelectorProps {
-  currentCategory?: string
-  currentCity?: string
-  className?: string
+  readonly currentCategory?: string
+  readonly currentCity?: string
+  readonly className?: string
 }
 
 export default function CitySelector({ currentCategory, currentCity, className = '' }: CitySelectorProps) {

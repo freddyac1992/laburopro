@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/server'
 export default async function DashboardContactosPage({
   searchParams,
 }: {
-  searchParams: Promise<{ filter?: string | string[] }>
+  readonly searchParams: Promise<{ filter?: string | string[] }>
 }) {
   const query = await searchParams
   const supabase = await createClient()
@@ -55,7 +55,6 @@ export default async function DashboardContactosPage({
             </Link>
           </div>
         ) : (
-          <>
             <div className="bg-white rounded-lg border border-gray-100 overflow-hidden">
               <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between gap-3">
                 <div>
@@ -81,7 +80,6 @@ export default async function DashboardContactosPage({
                 />
               </div>
             </div>
-          </>
         )}
       </div>
     </DashboardShell>

@@ -4,8 +4,8 @@ import { useState } from 'react'
 import StarRating from './StarRating'
 
 interface ReviewFormProps {
-  providerId: string
-  providerName: string
+  readonly providerId: string
+  readonly providerName: string
 }
 
 export default function ReviewForm({ providerId, providerName }: ReviewFormProps) {

@@ -14,9 +14,9 @@ export default function FavoriteButton({
   showLabel = false,
   className = '',
 }: {
-  provider: FavoriteProvider
-  showLabel?: boolean
-  className?: string
+  readonly provider: FavoriteProvider
+  readonly showLabel?: boolean
+  readonly className?: string
 }) {
   const favorites = useSyncExternalStore(
     subscribeToFavorites,

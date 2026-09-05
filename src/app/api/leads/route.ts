@@ -4,6 +4,8 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { getRateLimitResponse } from '@/lib/rate-limit'
 import { sendNewLeadNotification } from '@/lib/email/lead-notification'
 
+type AdminClient = NonNullable<ReturnType<typeof createAdminClient>>
+
 type LeadRequestBody = {
   providerId?: unknown
   message?: unknown
@@ -17,6 +19,74 @@ function cleanText(value: unknown, maxLength: number) {
   return typeof value === 'string' && value.trim()
     ? value.trim().slice(0, maxLength)
     : null
+}
+
+async function insertLead(
+  adminSupabase: AdminClient,
+  enrichedLead: {
+    provider_id: string
+    customer_name: null
+    customer_phone: null
+    message: string | null
+    source: string
+    page_url: string | null
+    referrer: string | null
+    user_agent: string | null
+    metadata: { tracked_at: string }
+  },
+) {
+  const { data, error } = await adminSupabase
+    .from('leads')
+    .insert(enrichedLead)
+    .select('id')
+    .single()
+
+  if (!error) return { leadId: data.id, degraded: false }
+  if (error.code !== 'PGRST204') return null
+
+  const { data: fallbackLead, error: fallbackError } = await adminSupabase
+    .from('leads')
+    .insert({
+      provider_id: enrichedLead.provider_id,
+      customer_name: null,
+      customer_phone: null,
+      message: enrichedLead.message,
+      source: enrichedLead.source,
+    })
+    .select('id')
+    .single()
+
+  return fallbackError ? null : { leadId: fallbackLead.id, degraded: true }
+}
+
+async function notifyProvider(
+  adminSupabase: AdminClient,
+  providerId: string,
+  leadId: string,
+  message: string | null,
+) {
+  const { data: providerOwner } = await adminSupabase
+    .from('provider_profiles')
+    .select('display_name, user_id')
+    .eq('id', providerId)
+    .maybeSingle()
+
+  if (!providerOwner) return 'skipped' as const
+
+  const { data: ownerProfile } = await adminSupabase
+    .from('profiles')
+    .select('email')
+    .eq('id', providerOwner.user_id)
+    .maybeSingle()
+
+  if (!ownerProfile?.email) return 'skipped' as const
+
+  return sendNewLeadNotification({
+    leadId,
+    providerEmail: ownerProfile.email,
+    providerName: providerOwner.display_name,
+    message,
+  })
 }
 
 export async function POST(request: Request) {
@@ -74,63 +144,17 @@ export async function POST(request: Request) {
     },
   }
 
-  const { data: insertedLead, error } = await adminSupabase
-    .from('leads')
-    .insert(enrichedLead)
-    .select('id')
-    .single()
-
-  let leadId = insertedLead?.id ?? null
-  let degraded = false
-
-  if (error && error.code === 'PGRST204') {
-    const { data: fallbackLead, error: fallbackError } = await adminSupabase
-      .from('leads')
-      .insert({
-        provider_id: providerId,
-        customer_name: null,
-        customer_phone: null,
-        message,
-        source,
-      })
-      .select('id')
-      .single()
-
-    if (!fallbackError) {
-      leadId = fallbackLead?.id ?? null
-      degraded = true
-    } else {
-      return NextResponse.json({ message: 'No se pudo registrar el contacto.' }, { status: 500 })
-    }
-  } else if (error) {
+  const insertedLead = await insertLead(adminSupabase, enrichedLead)
+  if (!insertedLead) {
     return NextResponse.json({ message: 'No se pudo registrar el contacto.' }, { status: 500 })
   }
 
-  let notification: 'sent' | 'skipped' | 'failed' = 'skipped'
-  if (leadId) {
-    const { data: providerOwner } = await adminSupabase
-      .from('provider_profiles')
-      .select('display_name, user_id')
-      .eq('id', providerId)
-      .maybeSingle()
+  const notification: 'sent' | 'skipped' | 'failed' = await notifyProvider(
+    adminSupabase,
+    providerId,
+    insertedLead.leadId,
+    message,
+  )
 
-    if (providerOwner) {
-      const { data: ownerProfile } = await adminSupabase
-        .from('profiles')
-        .select('email')
-        .eq('id', providerOwner.user_id)
-        .maybeSingle()
-
-      if (ownerProfile?.email) {
-        notification = await sendNewLeadNotification({
-          leadId,
-          providerEmail: ownerProfile.email,
-          providerName: providerOwner.display_name,
-          message,
-        })
-      }
-    }
-  }
-
-  return NextResponse.json({ ok: true, degraded, notification })
+  return NextResponse.json({ ok: true, degraded: insertedLead.degraded, notification })
 }

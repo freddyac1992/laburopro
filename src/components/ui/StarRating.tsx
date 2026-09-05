@@ -3,10 +3,10 @@
 import { useState } from 'react'
 
 interface StarRatingProps {
-  value: number
-  onChange?: (value: number) => void
-  size?: 'sm' | 'md' | 'lg'
-  label?: string
+  readonly value: number
+  readonly onChange?: (value: number) => void
+  readonly size?: 'sm' | 'md' | 'lg'
+  readonly label?: string
 }
 
 const SIZE_CLASSES = {
@@ -15,7 +15,7 @@ const SIZE_CLASSES = {
   lg: 'w-9 h-9',
 }
 
-function StarIcon({ filled, className }: { filled: boolean; className: string }) {
+function StarIcon({ filled, className }: { readonly filled: boolean; readonly className: string }) {
   return (
     <svg
       aria-hidden="true"
@@ -47,6 +47,7 @@ export default function StarRating({ value, onChange, size = 'md', label = 'Cali
     <div
       className="inline-flex items-center gap-1"
       role="radiogroup"
+      tabIndex={-1}
       aria-label={label}
       onMouseLeave={() => setHoveredValue(null)}
     >

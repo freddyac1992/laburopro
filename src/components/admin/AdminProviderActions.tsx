@@ -19,10 +19,17 @@ interface Provider {
 }
 
 interface Props {
-  initialProviders: Provider[]
+  readonly initialProviders: Provider[]
 }
 
 type FilterTab = 'all' | 'pending' | 'approved' | 'verified'
+
+function getProviderCardClass(provider: Provider) {
+  if (!provider.is_active) return 'opacity-50 border-gray-100'
+  if (provider.is_verified) return 'border-green-200'
+  if (provider.is_approved) return 'border-teal-100'
+  return 'border-amber-200'
+}
 
 export default function AdminProviderActions({ initialProviders }: Props) {
   const [providers, setProviders] = useState<Provider[]>(initialProviders)
@@ -108,9 +115,7 @@ export default function AdminProviderActions({ initialProviders }: Props) {
           {filtered.map((p) => (
             <div
               key={p.id}
-              className={`bg-white rounded-2xl border p-5 ${
-                !p.is_active ? 'opacity-50 border-gray-100' : p.is_verified ? 'border-green-200' : p.is_approved ? 'border-teal-100' : 'border-amber-200'
-              }`}
+              className={`bg-white rounded-2xl border p-5 ${getProviderCardClass(p)}`}
               id={`admin-provider-${p.id}`}
             >
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">

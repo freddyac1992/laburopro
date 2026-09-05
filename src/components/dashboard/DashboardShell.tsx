@@ -9,9 +9,9 @@ const navItems = [
 ]
 
 interface DashboardShellProps {
-  children: React.ReactNode
-  title?: string
-  newLeadCount?: number
+  readonly children: React.ReactNode
+  readonly title?: string
+  readonly newLeadCount?: number
 }
 
 export default function DashboardShell({ children, title, newLeadCount = 0 }: DashboardShellProps) {

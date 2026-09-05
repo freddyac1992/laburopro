@@ -16,8 +16,8 @@ import { getProviderImageUrl } from '@/lib/provider-images'
 import type { ProviderProfile, Review } from '@/types/database'
 
 interface PageProps {
-  params: Promise<{ slug: string }>
-  searchParams: Promise<{ preview?: string | string[] }>
+  readonly params: Promise<{ slug: string }>
+  readonly searchParams: Promise<{ preview?: string | string[] }>
 }
 
 type ProviderMetadata = ProviderProfile & {
@@ -127,6 +127,12 @@ async function getApprovedReviews(providerId: string) {
   } catch {
     return []
   }
+}
+
+function getReviewSummary(reviewCount: number) {
+  if (reviewCount === 0) return 'Aún no hay reseñas aprobadas'
+  const suffix = reviewCount === 1 ? '' : 's'
+  return `${reviewCount} reseña${suffix} aprobada${suffix}`
 }
 
 export default async function ProviderProfilePage({ params, searchParams }: PageProps) {
@@ -283,9 +289,7 @@ export default async function ProviderProfilePage({ params, searchParams }: Page
               <div>
                 <h2 className="font-semibold text-gray-900">Reseñas</h2>
                 <p className="text-sm text-gray-500">
-                  {reviews.length > 0
-                    ? `${reviews.length} reseña${reviews.length !== 1 ? 's' : ''} aprobada${reviews.length !== 1 ? 's' : ''}`
-                    : 'Aún no hay reseñas aprobadas'}
+                  {getReviewSummary(reviews.length)}
                 </p>
               </div>
               {provider.rating > 0 && (

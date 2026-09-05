@@ -3,8 +3,8 @@
 import { useState } from 'react'
 
 interface ProviderReportFormProps {
-  providerId: string
-  providerName: string
+  readonly providerId: string
+  readonly providerName: string
 }
 
 const REASONS = [
