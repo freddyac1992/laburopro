@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!cat || !city) return {}
 
   const title = `${cat.name} en ${city.name} — ${SITE_NAME}`
-  const description = `Encuentra ${cat.name.toLowerCase()} verificados en ${city.name}, Bolivia. Contacta directamente por WhatsApp en LaburoPro.`
+  const description = `Encuentra ${cat.name.toLowerCase()} con perfiles revisados por LaburoPro en ${city.name}, Bolivia. Contacta directamente por WhatsApp.`
 
   return {
     title,
@@ -76,7 +76,7 @@ export default async function CategoriayCiudadPage({ params, searchParams }: Pag
             </h1>
           </div>
           <p className="text-gray-600">
-            {cat.description} Encuentra proveedores verificados en {city.name}.
+            {cat.description} Encuentra trabajadores con perfiles revisados por LaburoPro en {city.name}.
           </p>
         </div>
         <div className="flex-shrink-0 w-full md:w-56">

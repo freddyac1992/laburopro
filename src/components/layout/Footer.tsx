@@ -15,7 +15,7 @@ export default function Footer() {
               <BrandLogo markClassName="h-9 w-9" textClassName="text-white" inverseMark />
             </Link>
             <p className="text-gray-400 text-sm leading-relaxed max-w-sm">
-              {SITE_TAGLINE}. Conectamos bolivianos con proveedores de servicios verificados en todo el país.
+              {SITE_TAGLINE}. Conectamos bolivianos con trabajadores de todo el país. Perfiles revisados por LaburoPro.
             </p>
             <p className="mt-4 text-gray-500 text-xs">
               🇧🇴 Hecho con orgullo en Bolivia

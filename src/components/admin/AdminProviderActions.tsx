@@ -68,7 +68,7 @@ export default function AdminProviderActions({ initialProviders }: Props) {
     { id: 'all', label: 'Todos', count: providers.length },
     { id: 'pending', label: 'Pendientes', count: providers.filter((p) => !p.is_approved && p.is_active).length },
     { id: 'approved', label: 'Aprobados', count: providers.filter((p) => p.is_approved && !p.is_verified).length },
-    { id: 'verified', label: 'Verificados', count: providers.filter((p) => p.is_verified).length },
+    { id: 'verified', label: 'Identidades confirmadas', count: providers.filter((p) => p.is_verified).length },
   ]
 
   return (
@@ -124,7 +124,7 @@ export default function AdminProviderActions({ initialProviders }: Props) {
                   <div className="flex items-center gap-2 flex-wrap mb-1">
                     <h3 className="font-semibold text-gray-900">{p.display_name}</h3>
                     {p.is_verified && (
-                      <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">✅ Verificado</span>
+                      <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">✅ Identidad confirmada</span>
                     )}
                     {p.is_approved && !p.is_verified && (
                       <span className="text-xs bg-teal-100 text-teal-800 px-2 py-0.5 rounded-full font-medium">Aprobado</span>

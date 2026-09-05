@@ -37,14 +37,14 @@ export default async function ServiciosPage({ searchParams }: ServiciosPageProps
           Todos los servicios
         </h1>
         <p className="text-gray-500 max-w-xl mx-auto">
-          Encuentra el profesional que necesitas. Proveedores verificados en toda Bolivia.
+          Encuentra el trabajador que necesitas. Perfiles revisados por LaburoPro en toda Bolivia.
         </p>
       </div>
 
       <ProviderFilters
         filters={filters}
         clearHref="/servicios"
-        resultCount={providers.length}
+        resultCount={hasFilters ? providers.length : undefined}
         locationLabel={city?.name}
         citySlug={city?.slug}
         showCityFilter

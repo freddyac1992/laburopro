@@ -14,7 +14,7 @@ const manrope = Manrope({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} — Servicios verificados cerca de ti`,
+    default: `${SITE_NAME} — Trabajadores cerca de ti`,
     template: `%s | ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
@@ -26,13 +26,13 @@ export const metadata: Metadata = {
     locale: 'es_BO',
     url: SITE_URL,
     siteName: SITE_NAME,
-    title: `${SITE_NAME} — Servicios verificados cerca de ti`,
+    title: `${SITE_NAME} — Trabajadores cerca de ti`,
     description: SITE_DESCRIPTION,
     images: ['/images/laburopro-hero.png'],
   },
   twitter: {
     card: 'summary_large_image',
-    title: `${SITE_NAME} — Servicios verificados cerca de ti`,
+    title: `${SITE_NAME} — Trabajadores cerca de ti`,
     description: SITE_DESCRIPTION,
     images: ['/images/laburopro-hero.png'],
   },

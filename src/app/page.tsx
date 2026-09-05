@@ -6,9 +6,9 @@ import CategoryCard from '@/components/ui/CategoryCard'
 import { CATEGORIES, SITE_NAME } from '@/lib/constants'
 
 export const metadata: Metadata = {
-  title: `${SITE_NAME} — Servicios verificados cerca de ti`,
+  title: `${SITE_NAME} — Trabajadores cerca de ti`,
   description:
-    'Encuentra plomeros, albañiles, electricistas, fletes, cuidadores, tutores y más en Bolivia. Proveedores verificados en Santa Cruz, La Paz, Cochabamba y todo el país.',
+    'Encuentra plomeros, albañiles, electricistas, fletes, cuidadores, tutores y más en Bolivia. Perfiles revisados por LaburoPro en Santa Cruz, La Paz, Cochabamba y todo el país.',
 }
 
 const HOW_IT_WORKS = [
@@ -41,7 +41,7 @@ const POPULAR_CATEGORIES = CATEGORIES.slice(0, 8)
 export default function HomePage() {
   return (
     <>
-      <section className="relative min-h-[610px] md:min-h-[650px] flex items-end md:items-center overflow-hidden text-white">
+      <section className="relative flex items-center overflow-hidden text-white">
         <Image
           src="/images/laburopro-hero.png"
           alt="Profesional boliviano en un trabajo de remodelación"
@@ -52,33 +52,23 @@ export default function HomePage() {
         />
         <div className="absolute inset-0 bg-[#08252f]/30" aria-hidden="true" />
 
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-12">
           <div className="max-w-4xl">
-            <p className="border-l-4 border-[#e85d3f] pl-3 text-sm font-bold mb-5">Hecho para Bolivia</p>
-            <h1 className="max-w-3xl text-4xl md:text-6xl font-extrabold leading-[1.08] mb-5">
-              Encuentra a alguien para hacer el trabajo.
+            <p className="border-l-4 border-[#e85d3f] pl-3 text-sm font-bold mb-3">LaburoPro · Hecho para Bolivia</p>
+            <h1 className="max-w-2xl text-3xl md:text-5xl font-extrabold leading-tight mb-3">
+              Trabajadores en tu ciudad
             </h1>
-            <p className="max-w-2xl text-base md:text-xl text-white/90 leading-relaxed mb-8">
-              Elige el oficio y tu ciudad. Después habla directamente por WhatsApp.
+            <p className="max-w-2xl text-base text-white/90 leading-relaxed mb-5">
+              Encuentra ayuda y habla directamente por WhatsApp.
             </p>
-            <div className="grid sm:grid-cols-2 gap-3 max-w-2xl mb-7" aria-label="Elige lo que quieres hacer">
-              <a
-                href="#buscar-trabajador"
-                className="min-h-14 inline-flex items-center justify-center rounded-md bg-[#e85d3f] px-5 py-3 text-center font-extrabold text-white hover:bg-[#cf4f34]"
-              >
-                Necesito un trabajador
-              </a>
+            <SearchBar />
+            <div className="mt-3" aria-label="Ofrece tus servicios">
               <Link
                 href="/registro"
-                className="min-h-14 inline-flex items-center justify-center rounded-md border-2 border-white bg-white/10 px-5 py-3 text-center font-extrabold text-white hover:bg-white hover:text-[#102a33]"
+                className="min-h-12 inline-flex items-center justify-center rounded-md border border-white/70 bg-black/20 px-4 py-2 text-center font-bold text-white hover:bg-white hover:text-[#102a33]"
               >
                 Quiero ofrecer mi trabajo
               </Link>
-            </div>
-            <SearchBar />
-            <div className="flex flex-wrap gap-x-6 gap-y-2 mt-5 text-sm text-white/85">
-              <span>Perfiles revisados por nuestro equipo</span>
-              <span>Hablas directamente por WhatsApp</span>
             </div>
           </div>
         </div>

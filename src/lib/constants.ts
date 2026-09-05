@@ -30,8 +30,8 @@ export const CATEGORIES = [
 
 export const SITE_NAME = 'LaburoPro'
 export const SITE_URL = 'https://laburopro.com'
-export const SITE_TAGLINE = 'Servicios verificados cerca de ti'
-export const SITE_DESCRIPTION = 'Encuentra plomeros, albañiles, fletes, cuidadores, tutores, mecánicos y más en Bolivia. Proveedores verificados en Santa Cruz, La Paz, Cochabamba y todo el país.'
+export const SITE_TAGLINE = 'Trabajadores cerca de ti'
+export const SITE_DESCRIPTION = 'Encuentra plomeros, albañiles, fletes, cuidadores, tutores, mecánicos y más en Bolivia. Perfiles revisados por LaburoPro en Santa Cruz, La Paz, Cochabamba y todo el país.'
 
 export const NAV_LINKS = [
   { label: 'Buscar trabajador', href: '/servicios' },

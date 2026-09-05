@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!cat) return {}
 
   const title = `${cat.name} en Bolivia — ${SITE_NAME}`
-  const description = `${cat.description} Encuentra ${cat.name.toLowerCase()} verificados en Santa Cruz, La Paz, Cochabamba y todo Bolivia en LaburoPro.`
+  const description = `${cat.description} Encuentra ${cat.name.toLowerCase()} con perfiles revisados por LaburoPro en Santa Cruz, La Paz, Cochabamba y toda Bolivia.`
 
   return {
     title,
@@ -73,7 +73,7 @@ export default async function CategoriaPage({ params, searchParams }: PageProps)
       {/* SEO text */}
       <div className="bg-teal-50 rounded-2xl p-5 mb-8 text-sm text-gray-700 leading-relaxed">
         <p>
-          Encuentra <strong>{cat.name.toLowerCase()} verificados</strong> en Bolivia a través de LaburoPro.
+          Encuentra <strong>{cat.name.toLowerCase()}</strong> en Bolivia con perfiles revisados por LaburoPro.
           Compara perfiles, revisa experiencia, precios de referencia y contacta directamente por WhatsApp.
           Disponible en Santa Cruz, La Paz, Cochabamba, El Alto y más ciudades del país.
         </p>

@@ -81,7 +81,7 @@ export default function ProviderCard({
 
         {/* Info */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2 pr-9">
+          <div className="flex flex-col items-start gap-2 pr-9">
             <h3 className="font-semibold text-gray-900 text-base leading-tight truncate group-hover:text-teal-700 transition-colors">
               {displayName}
             </h3>

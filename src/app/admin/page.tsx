@@ -111,7 +111,7 @@ export default async function AdminPage() {
     { label: 'Pendientes de aprobación', value: pendingProviders ?? 0, icon: '⏳', color: 'amber' },
     { label: 'Vistas últimos 7 días', value: profileViewsLastSevenDays ?? 0, icon: '👁️', color: 'blue' },
     { label: 'Leads últimos 7 días', value: leadsLastSevenDays ?? 0, icon: '📲', color: 'green' },
-    { label: 'Verificados', value: verifiedProviders ?? 0, icon: '🛡️', color: 'purple' },
+    { label: 'Identidades confirmadas', value: verifiedProviders ?? 0, icon: '🛡️', color: 'purple' },
   ]
 
   const actionQueue = [

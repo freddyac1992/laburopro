@@ -39,8 +39,7 @@ export default function SearchBar() {
       id="search-form"
       aria-labelledby="buscar-trabajador"
     >
-      <h2 id="buscar-trabajador" className="text-lg font-extrabold text-[#102a33] mb-1">Busca un trabajador</h2>
-      <p className="text-sm text-slate-600 mb-4">Elige qué trabajo necesitas y dónde estás.</p>
+      <h2 id="buscar-trabajador" className="text-lg font-extrabold text-[#102a33] mb-3">Necesito un trabajador</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-3 items-end">
         <label className="block text-sm font-bold text-slate-700">
@@ -74,7 +73,7 @@ export default function SearchBar() {
         <button
           type="submit"
           id="search-submit-btn"
-          className="min-h-12 px-7 bg-[#e85d3f] hover:bg-[#cf4f34] text-white font-extrabold rounded-md whitespace-nowrap"
+          className="min-h-12 px-7 bg-teal-700 hover:bg-teal-800 text-white font-extrabold rounded-md whitespace-nowrap"
         >
           Ver trabajadores
         </button>

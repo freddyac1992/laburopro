@@ -74,6 +74,12 @@ await expectBody('/login', {
   contains: ['login-google-only', 'data-auth-method="google"'],
   excludes: ['login-email', 'login-password'],
 })
+await expectBody('/servicios', {
+  excludes: ['data-testid="search-result-summary"', 'Proveedores verificados'],
+})
+await expectBody('/servicios?city=el-alto', {
+  contains: ['data-testid="search-result-summary"', 'Empezar de nuevo'],
+})
 await expectBody('/registro', {
   contains: ['register-google-only', 'data-auth-method="google"'],
   excludes: ['registro-email', 'registro-password'],
@@ -118,7 +124,7 @@ const homeSource = await readFile(new URL('../src/app/page.tsx', import.meta.url
 const searchBarSource = await readFile(new URL('../src/components/ui/SearchBar.tsx', import.meta.url), 'utf8')
 const providerWizardSource = await readFile(new URL('../src/app/dashboard/perfil/page.tsx', import.meta.url), 'utf8')
 const leadUiSource = await readFile(new URL('../src/components/dashboard/LeadPipeline.tsx', import.meta.url), 'utf8')
-assert(homeSource.includes('Necesito un trabajador'), 'Home must give customers a clear starting path')
+assert(searchBarSource.includes('Necesito un trabajador'), 'Home search must give customers a clear starting path')
 assert(homeSource.includes('Quiero ofrecer mi trabajo'), 'Home must give workers a clear starting path')
 assert(searchBarSource.includes('Ver trabajadores'), 'Search must use an explicit result action')
 assert(searchBarSource.includes('<details'), 'Advanced search must not overload the initial form')

@@ -5,7 +5,7 @@ import type { ProviderFilters as ProviderFiltersState } from '@/lib/provider-sea
 interface ProviderFiltersProps {
   readonly filters: ProviderFiltersState
   readonly clearHref: string
-  readonly resultCount: number
+  readonly resultCount?: number
   readonly locationLabel?: string
   readonly citySlug?: string
   readonly showCityFilter?: boolean
@@ -74,7 +74,7 @@ export default function ProviderFilters({
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-t border-slate-100 pt-3 text-sm">
           <p className="font-medium text-green-800">Solo mostramos perfiles revisados por LaburoPro.</p>
-          <div className="flex flex-wrap items-center gap-3">
+          {resultCount !== undefined && <div className="flex flex-wrap items-center gap-3" data-testid="search-result-summary">
             <span className="text-slate-500">
               {resultCount} resultado{resultCount !== 1 ? 's' : ''}
               {locationLabel ? ` en ${locationLabel}` : ''}
@@ -82,7 +82,7 @@ export default function ProviderFilters({
             <Link href={clearHref} className="font-semibold text-[#e85d3f] hover:text-[#cf4f34] hover:underline">
               Empezar de nuevo
             </Link>
-          </div>
+          </div>}
         </div>
       </form>
     </div>
