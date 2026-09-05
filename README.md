@@ -54,6 +54,10 @@ configurado o falla, el contacto se registra igualmente.
 
 ### QA autenticado
 
+La suite autenticada se ejecuta únicamente después de cada push a `main`. Los
+pull requests ejecutan las comprobaciones básicas sin recibir secretos, incluido
+Dependabot.
+
 Las pruebas E2E usan un proyecto Supabase separado para no crear ni modificar
 usuarios de producción. Crea un proyecto de QA, ejecuta allí los mismos archivos
 SQL indicados en el paso 3 y crea un usuario administrador exclusivo de pruebas.

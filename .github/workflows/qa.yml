@@ -71,6 +71,7 @@ jobs:
 
   authenticated-e2e:
     name: Authenticated provider and admin flows
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
