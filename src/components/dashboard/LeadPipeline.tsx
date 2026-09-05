@@ -45,9 +45,9 @@ export default function LeadPipeline({
   initialFilter = 'all',
   referenceTime,
 }: {
-  initialLeads: DashboardLead[]
-  initialFilter?: LeadStatus | 'all'
-  referenceTime: string
+  readonly initialLeads: DashboardLead[]
+  readonly initialFilter?: LeadStatus | 'all'
+  readonly referenceTime: string
 }) {
   const [leads, setLeads] = useState(initialLeads)
   const [filter, setFilter] = useState<LeadStatus | 'all'>(initialFilter)
@@ -175,7 +175,7 @@ export default function LeadPipeline({
                   </div>
 
                   <label className="text-sm font-bold text-gray-700 lg:w-52">
-                    ¿Qué pasó con esta persona?
+                    <span>¿Qué pasó con esta persona?</span>
                     <select
                       value={lead.status}
                       disabled={saving === lead.id}

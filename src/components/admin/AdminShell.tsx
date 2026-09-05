@@ -11,8 +11,8 @@ const navItems = [
 ]
 
 interface AdminShellProps {
-  children: React.ReactNode
-  title?: string
+  readonly children: React.ReactNode
+  readonly title?: string
 }
 
 export default function AdminShell({ children, title }: AdminShellProps) {

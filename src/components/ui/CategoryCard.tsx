@@ -1,11 +1,11 @@
 import Link from 'next/link'
 
 interface CategoryCardProps {
-  name: string
-  slug: string
-  icon: string
-  description?: string | null
-  providerCount?: number
+  readonly name: string
+  readonly slug: string
+  readonly icon: string
+  readonly description?: string | null
+  readonly providerCount?: number
 }
 
 export default function CategoryCard({ name, slug, icon, description, providerCount }: CategoryCardProps) {

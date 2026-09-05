@@ -3,10 +3,10 @@
 import { useState } from 'react'
 
 interface LogoutButtonProps {
-  id?: string
-  className?: string
-  children?: React.ReactNode
-  onClick?: () => void
+  readonly id?: string
+  readonly className?: string
+  readonly children?: React.ReactNode
+  readonly onClick?: () => void
 }
 
 export default function LogoutButton({

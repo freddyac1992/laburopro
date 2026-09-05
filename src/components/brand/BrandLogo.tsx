@@ -1,6 +1,6 @@
 interface BrandMarkProps {
-  className?: string
-  inverse?: boolean
+  readonly className?: string
+  readonly inverse?: boolean
 }
 
 export function BrandMark({ className = 'h-9 w-9', inverse = false }: BrandMarkProps) {
@@ -20,11 +20,11 @@ export function BrandMark({ className = 'h-9 w-9', inverse = false }: BrandMarkP
 }
 
 interface BrandLogoProps {
-  className?: string
-  markClassName?: string
-  textClassName?: string
-  showWordmark?: boolean
-  inverseMark?: boolean
+  readonly className?: string
+  readonly markClassName?: string
+  readonly textClassName?: string
+  readonly showWordmark?: boolean
+  readonly inverseMark?: boolean
 }
 
 export default function BrandLogo({

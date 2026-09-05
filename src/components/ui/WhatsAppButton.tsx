@@ -3,13 +3,13 @@
 import { buildWhatsAppUrl } from '@/lib/utils'
 
 interface WhatsAppButtonProps {
-  phone: string
-  providerName: string
-  providerId?: string
-  message?: string
-  size?: 'sm' | 'md' | 'lg'
-  pulse?: boolean
-  className?: string
+  readonly phone: string
+  readonly providerName: string
+  readonly providerId?: string
+  readonly message?: string
+  readonly size?: 'sm' | 'md' | 'lg'
+  readonly pulse?: boolean
+  readonly className?: string
 }
 
 function getTrackingContext() {

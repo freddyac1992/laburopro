@@ -6,20 +6,20 @@ import { truncate, getInitials } from '@/lib/utils'
 import { getProviderImageUrl } from '@/lib/provider-images'
 
 interface ProviderCardProps {
-  id: string
-  slug: string
-  displayName: string
-  categoryName?: string
-  cityName?: string
-  zone?: string | null
-  description?: string | null
-  priceReference?: string | null
-  rating?: number
-  reviewCount?: number
-  isVerified?: boolean
-  yearsExperience?: number | null
-  profilePhotoPath?: string | null
-  imageVersion?: string
+  readonly id: string
+  readonly slug: string
+  readonly displayName: string
+  readonly categoryName?: string
+  readonly cityName?: string
+  readonly zone?: string | null
+  readonly description?: string | null
+  readonly priceReference?: string | null
+  readonly rating?: number
+  readonly reviewCount?: number
+  readonly isVerified?: boolean
+  readonly yearsExperience?: number | null
+  readonly profilePhotoPath?: string | null
+  readonly imageVersion?: string
 }
 
 export default function ProviderCard({

@@ -19,7 +19,7 @@ function GoogleIcon() {
   )
 }
 
-export default function GoogleAuthPanel({ mode }: { mode: AuthMode }) {
+export default function GoogleAuthPanel({ mode }: { readonly mode: AuthMode }) {
   const searchParams = useSearchParams()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(searchParams.get('error'))

@@ -9,8 +9,8 @@ import { CATEGORIES, CITIES, SITE_NAME, SITE_URL } from '@/lib/constants'
 import { hasActiveProviderFilters, parseProviderFilters, searchProviders } from '@/lib/provider-search'
 
 interface PageProps {
-  params: Promise<{ categoria: string; ciudad: string }>
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+  readonly params: Promise<{ categoria: string; ciudad: string }>
+  readonly searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
 export async function generateStaticParams() {

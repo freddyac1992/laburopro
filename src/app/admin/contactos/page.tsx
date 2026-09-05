@@ -18,6 +18,13 @@ type AdminLead = {
   } | null
 }
 
+const STATUS_STYLES: Record<LeadStatus, string> = {
+  new: 'bg-teal-50 text-teal-800',
+  contacted: 'bg-amber-50 text-amber-700',
+  converted: 'bg-green-50 text-green-700',
+  lost: 'bg-gray-100 text-gray-600',
+}
+
 function formatDate(value: string) {
   return new Intl.DateTimeFormat('es-BO', {
     dateStyle: 'medium',
@@ -110,15 +117,7 @@ export default async function AdminContactosPage() {
                     <span className="px-2.5 py-1 rounded-full bg-green-50 text-green-700 font-semibold">
                       {lead.source ?? 'whatsapp'}
                     </span>
-                    <span className={`px-2.5 py-1 rounded-full font-semibold ${
-                      lead.status === 'converted'
-                        ? 'bg-green-50 text-green-700'
-                        : lead.status === 'contacted'
-                          ? 'bg-amber-50 text-amber-700'
-                          : lead.status === 'lost'
-                            ? 'bg-gray-100 text-gray-600'
-                            : 'bg-teal-50 text-teal-800'
-                    }`}>
+                    <span className={`px-2.5 py-1 rounded-full font-semibold ${STATUS_STYLES[lead.status]}`}>
                       {{ new: 'Nuevo', contacted: 'Atendido', converted: 'Trabajo ganado', lost: 'No concretado' }[lead.status]}
                     </span>
                     {lead.provider?.whatsapp && (

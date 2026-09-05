@@ -44,7 +44,7 @@ export default function SearchBar() {
 
       <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-3 items-end">
         <label className="block text-sm font-bold text-slate-700">
-          ¿Qué trabajo necesitas?
+          <span>¿Qué trabajo necesitas?</span>
           <select
             id="search-category"
             value={category}
@@ -59,7 +59,7 @@ export default function SearchBar() {
         </label>
 
         <label className="block text-sm font-bold text-slate-700">
-          ¿En qué ciudad estás?
+          <span>¿En qué ciudad estás?</span>
           <select
             id="search-city"
             value={city}

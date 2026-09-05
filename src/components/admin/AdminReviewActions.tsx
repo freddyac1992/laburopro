@@ -24,7 +24,12 @@ export type AdminReview = {
 }
 
 interface AdminReviewActionsProps {
-  initialReviews: AdminReview[]
+  readonly initialReviews: AdminReview[]
+}
+
+function getRejectButtonLabel(isSaving: boolean, isApproved: boolean) {
+  if (isSaving) return '...'
+  return isApproved ? 'Eliminar' : 'Rechazar'
 }
 
 async function recalculateProviderRating(providerId: string) {
@@ -225,7 +230,7 @@ export default function AdminReviewActions({ initialReviews }: AdminReviewAction
                     onClick={() => rejectReview(review)}
                     className="text-xs px-3 py-1.5 border border-red-200 text-red-600 rounded-lg hover:bg-red-50 disabled:opacity-60"
                   >
-                    {saving === review.id ? '...' : review.is_approved ? 'Eliminar' : 'Rechazar'}
+                    {getRejectButtonLabel(saving === review.id, review.is_approved)}
                   </button>
                 </div>
               </div>

@@ -24,7 +24,7 @@ export type AdminReport = {
 }
 
 interface AdminReportActionsProps {
-  initialReports: AdminReport[]
+  readonly initialReports: AdminReport[]
 }
 
 const STATUS_LABELS: Record<ProviderReportStatus, string> = {

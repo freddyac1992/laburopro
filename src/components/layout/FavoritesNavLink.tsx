@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useSyncExternalStore } from 'react'
 import { EMPTY_FAVORITES, getFavoriteProviders, subscribeToFavorites } from '@/lib/favorites'
 
-export default function FavoritesNavLink({ mobile = false, onClick }: { mobile?: boolean; onClick?: () => void }) {
+export default function FavoritesNavLink({ mobile = false, onClick }: { readonly mobile?: boolean; readonly onClick?: () => void }) {
   const favorites = useSyncExternalStore(
     subscribeToFavorites,
     getFavoriteProviders,
