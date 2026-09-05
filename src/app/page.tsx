@@ -78,7 +78,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7">
           <div className="grid grid-cols-3 divide-x divide-slate-200 text-center">
             <div className="px-2 sm:px-4">
-              <p className="text-2xl md:text-3xl font-extrabold text-teal-700">14+</p>
+              <p className="text-2xl md:text-3xl font-extrabold text-teal-700">{CATEGORIES.length}</p>
               <p className="text-xs text-slate-500 mt-1">Categorías</p>
             </div>
             <div className="px-2 sm:px-4">

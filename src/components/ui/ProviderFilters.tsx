@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { Search, SlidersHorizontal, ShieldCheck, ChevronDown } from 'lucide-react'
 import { CITIES } from '@/lib/constants'
 import type { ProviderFilters as ProviderFiltersState } from '@/lib/provider-search'
 
@@ -20,7 +21,7 @@ export default function ProviderFilters({
   showCityFilter = false,
 }: ProviderFiltersProps) {
   return (
-    <div className="bg-white border border-slate-200 rounded-lg p-4 sm:p-5 mb-6 shadow-sm">
+    <div className="border-y border-slate-200 py-5 mb-6">
       <form method="get" className="space-y-4">
         <div className={`grid grid-cols-1 gap-3 items-end ${showCityFilter ? 'md:grid-cols-[minmax(15rem,1fr)_minmax(12rem,0.65fr)_auto]' : 'md:grid-cols-[minmax(15rem,1fr)_auto]'}`}>
           <label htmlFor="provider-search-q" className="block text-sm font-bold text-gray-700">
@@ -38,13 +39,14 @@ export default function ProviderFilters({
             </label>
           )}
 
-          <button type="submit" className="min-h-12 px-6 bg-teal-700 text-white font-extrabold rounded-md hover:bg-teal-800 transition-colors">
+          <button type="submit" className="press-feedback min-h-12 inline-flex items-center justify-center gap-2 px-6 bg-teal-700 text-white font-extrabold rounded-md hover:bg-teal-800">
+            <Search size={18} aria-hidden="true" />
             Buscar
           </button>
         </div>
 
-        <details className="border-t border-slate-100 pt-2">
-          <summary className="min-h-11 inline-flex items-center cursor-pointer text-sm font-bold text-teal-800">Más opciones de búsqueda</summary>
+        <details className="group border-t border-slate-200 pt-2">
+          <summary className="min-h-12 flex items-center gap-2 cursor-pointer list-none text-sm font-bold text-teal-800 [&::-webkit-details-marker]:hidden"><SlidersHorizontal size={18} aria-hidden="true" />Más opciones de búsqueda<ChevronDown size={18} aria-hidden="true" className="ml-auto group-open:rotate-180" /></summary>
           <div className="grid sm:grid-cols-2 gap-4 pt-3 pb-2">
             <label htmlFor="provider-search-experience" className="block text-sm font-bold text-gray-700">
               <span>Años de experiencia</span>
@@ -73,7 +75,7 @@ export default function ProviderFilters({
         </details>
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-t border-slate-100 pt-3 text-sm">
-          <p className="font-medium text-green-800">Solo mostramos perfiles revisados por LaburoPro.</p>
+          <p className="flex items-start gap-2 font-medium text-green-800"><ShieldCheck size={18} className="shrink-0 mt-0.5" aria-hidden="true" />Solo mostramos perfiles revisados por LaburoPro.</p>
           {resultCount !== undefined && <div className="flex flex-wrap items-center gap-3" data-testid="search-result-summary">
             <span className="text-slate-500">
               {resultCount} resultado{resultCount !== 1 ? 's' : ''}

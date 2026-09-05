@@ -35,6 +35,7 @@ INSERT INTO public.categories (name, slug, icon, description) VALUES
   ('Fletes y Mudanzas',                'fletes-y-mudanzas',       '🚚', 'Transporte de muebles, mudanzas y fletes locales.'),
   ('Gestores de Trámites',             'gestores-tramites',       '📋', 'Ayuda con trámites administrativos y legales.'),
   ('Mecánicos',                        'mecanicos',               '🔩', 'Reparación y mantenimiento de vehículos.'),
+  ('Técnicos de computadora',          'tecnicos-de-computadora', '💻', 'Reparación y mantenimiento de computadoras y laptops, instalación de programas y soporte técnico.'),
   ('Tutores',                          'tutores',                 '📚', 'Clases particulares y apoyo escolar para todas las edades.'),
   ('Comida Casera y Catering',         'comida-casera-catering',  '🍽️', 'Almuerzos, cenas y catering para eventos.')
 ON CONFLICT (slug) DO NOTHING;

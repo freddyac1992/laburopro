@@ -74,7 +74,7 @@ test.describe('proveedor autenticado', () => {
   test('impide que un proveedor entre al panel administrativo', async ({ page }) => {
     await page.goto('/admin')
     await expect(page).toHaveURL(/\/$/)
-    await expect(page.getByRole('heading', { name: 'Encuentra a alguien para hacer el trabajo.' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Trabajadores en tu ciudad', exact: true })).toBeVisible()
   })
 
 })

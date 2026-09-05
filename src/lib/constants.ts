@@ -24,6 +24,7 @@ export const CATEGORIES = [
   { name: 'Fletes y Mudanzas', slug: 'fletes-y-mudanzas', icon: '🚚', description: 'Transporte de muebles, mudanzas y fletes locales.' },
   { name: 'Gestores de Trámites', slug: 'gestores-tramites', icon: '📋', description: 'Ayuda con trámites administrativos y legales.' },
   { name: 'Mecánicos', slug: 'mecanicos', icon: '🔩', description: 'Reparación y mantenimiento de vehículos.' },
+  { name: 'Técnicos de computadora', slug: 'tecnicos-de-computadora', icon: '💻', description: 'Reparación y mantenimiento de computadoras y laptops, instalación de programas y soporte técnico.' },
   { name: 'Tutores', slug: 'tutores', icon: '📚', description: 'Clases particulares y apoyo escolar para todas las edades.' },
   { name: 'Comida Casera y Catering', slug: 'comida-casera-catering', icon: '🍽️', description: 'Almuerzos, cenas y catering para eventos.' },
 ] as const

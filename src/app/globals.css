@@ -52,33 +52,19 @@ body {
   border-radius: 4px;
 }
 
-/* Badge animations */
-@keyframes pulse-badge {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+.category-card, .provider-card {
+  transition: border-color 160ms ease, background-color 160ms ease;
 }
 
-.verified-badge {
-  animation: pulse-badge 3s ease-in-out infinite;
+@media (hover: hover) and (pointer: fine) {
+  .category-card:hover { background-color: #f0fdfa; }
+  .provider-card:hover { border-color: var(--brand-primary); }
 }
 
-/* Category card hover */
-.category-card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-}
-.category-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
-}
-
-/* Provider card hover */
-.provider-card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.provider-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
-}
+::selection { background: #ccfbf1; color: #102a33; }
+input, textarea { caret-color: var(--brand-primary); }
+.press-feedback { transition: transform 120ms cubic-bezier(0.23, 1, 0.32, 1), background-color 150ms ease; }
+.press-feedback:active { transform: scale(0.98); }
 
 .hero-photo {
   filter: saturate(0.88) contrast(1.04) brightness(0.58);
@@ -184,7 +170,7 @@ button, select, input, textarea, summary {
   box-shadow: 0 0 0 3px rgb(15 118 110 / 0.14);
 }
 .form-input::placeholder {
-  color: #9ca3af;
+  color: #64748b;
 }
 
 /* Section spacing */
