@@ -1,0 +1,110 @@
+name: DAST
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '30 10 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dast-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  passive-scan:
+    name: ZAP passive scan (QA)
+    # Forks cannot access QA secrets. Never use pull_request_target to run PR code.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.QA_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.QA_SUPABASE_ANON_KEY }}
+      NEXT_TELEMETRY_DISABLED: '1'
+
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Verify isolated QA configuration
+        shell: bash
+        run: |
+          if [[ "$NEXT_PUBLIC_SUPABASE_URL" != 'https://ymlbuxsvsxokacqmhyxd.supabase.co' ]]; then
+            echo 'DAST requires the isolated QA Supabase project.'
+            exit 1
+          fi
+          test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY"
+
+      - run: npm ci --ignore-scripts
+      - name: Test report gate
+        run: node --test scripts/dast-report.test.mjs
+      - run: npm run build
+
+      - name: Start temporary production-mode server
+        shell: bash
+        run: |
+          npm run start -- --hostname 127.0.0.1 --port 3200 > /tmp/laburopro-dast.log 2>&1 &
+          echo $! > /tmp/laburopro-dast.pid
+          for i in {1..60}; do
+            if curl -fsS http://127.0.0.1:3200/ > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          exit 1
+
+      - name: Run ZAP baseline (no active attacks)
+        shell: bash
+        run: |
+          mkdir -p dast-reports
+          chmod 750 dast-reports
+          # The container's zap user (UID 1000) writes; the runner group reads.
+          sudo chown 1000:"$(id -g)" dast-reports
+          set +e
+          docker run --rm --network host \
+            -v "$PWD/dast-reports:/zap/wrk:rw" \
+            ghcr.io/zaproxy/zaproxy:stable \
+            zap-baseline.py -t http://127.0.0.1:3200 \
+            -m 2 -T 5 -I \
+            -r report.html -J report.json -w report.md \
+            -z '-config spider.processForm=false -config spider.postForm=false -config spider.maxDepth=5 -config spider.threadCount=2'
+          status=$?
+          set -e
+          # Findings are evaluated separately; runtime failures must never pass.
+          if [[ "$status" -ne 0 && "$status" -ne 1 && "$status" -ne 2 ]]; then
+            echo "ZAP execution failed with exit code $status"
+            exit "$status"
+          fi
+          test -s dast-reports/report.json
+          test -s dast-reports/report.html
+
+      - name: Evaluate findings
+        run: node scripts/dast-report.mjs
+
+      - name: Upload DAST reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: dast-report-${{ github.run_id }}
+          path: dast-reports/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Show server logs on failure
+        if: failure()
+        run: cat /tmp/laburopro-dast.log || true
+
+      - name: Stop temporary server
+        if: always()
+        run: |
+          if [ -f /tmp/laburopro-dast.pid ]; then
+            kill "$(cat /tmp/laburopro-dast.pid)" || true
+          fi
