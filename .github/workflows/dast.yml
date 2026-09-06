@@ -65,7 +65,9 @@ jobs:
         shell: bash
         run: |
           mkdir -p dast-reports
-          chmod 777 dast-reports
+          chmod 750 dast-reports
+          # The container's zap user (UID 1000) writes; the runner group reads.
+          sudo chown 1000:"$(id -g)" dast-reports
           set +e
           docker run --rm --network host \
             -v "$PWD/dast-reports:/zap/wrk:rw" \
@@ -84,7 +86,7 @@ jobs:
           test -s dast-reports/report.json
 
       - name: Evaluate findings
-        run: node scripts/dast-report.mjs dast-reports/report.json
+        run: node scripts/dast-report.mjs
 
       - name: Upload DAST reports
         if: always()

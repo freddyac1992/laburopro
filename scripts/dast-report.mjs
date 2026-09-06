@@ -42,7 +42,7 @@ export function evaluateReport(report) {
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   try {
-    const report = JSON.parse(await readFile(process.argv[2], 'utf8'))
+    const report = JSON.parse(await readFile(new URL('../dast-reports/report.json', import.meta.url), 'utf8'))
     const result = evaluateReport(report)
     console.log(result.summary)
     if (process.env.GITHUB_STEP_SUMMARY) {
