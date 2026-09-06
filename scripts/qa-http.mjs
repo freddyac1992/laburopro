@@ -186,9 +186,20 @@ assert(!brandedSurfaceSource.includes('blue-'), 'Branded application surfaces mu
 const brandLogoSource = await readFile(new URL('../src/components/brand/BrandLogo.tsx', import.meta.url), 'utf8')
 const headerSource = await readFile(new URL('../src/components/layout/Header.tsx', import.meta.url), 'utf8')
 const footerSource = await readFile(new URL('../src/components/layout/Footer.tsx', import.meta.url), 'utf8')
+const mobileBottomNavSource = await readFile(new URL('../src/components/layout/MobileBottomNav.tsx', import.meta.url), 'utf8')
+const categoryPageSource = await readFile(new URL('../src/app/servicios/[categoria]/page.tsx', import.meta.url), 'utf8')
 assert(brandLogoSource.includes('#e85d3f'), 'Brand mark must preserve the coral connection point')
 assert(headerSource.includes('<BrandLogo'), 'Header must use the shared brand logo')
 assert(footerSource.includes('inverseMark'), 'Dark surfaces must use the inverse brand mark')
+for (const label of ['Inicio', 'Buscar', 'Guardados', 'Mi cuenta']) {
+  assert(mobileBottomNavSource.includes(`label: '${label}'`), `Mobile navigation must include ${label}`)
+}
+assert(mobileBottomNavSource.includes("aria-current={item.active ? 'page'"), 'Mobile navigation must expose the active destination')
+assert(mobileBottomNavSource.includes('safe-area-inset-bottom'), 'Mobile navigation must respect phone safe areas')
+assert(
+  categoryPageSource.indexOf('<ProviderFilters') < categoryPageSource.indexOf('Encuentra <strong>'),
+  'Category results and filters must appear before supporting SEO copy'
+)
 
 const protectedApiRoutes = [
   ['../src/app/api/leads/route.ts', "'lead'"],

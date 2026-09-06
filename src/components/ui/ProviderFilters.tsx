@@ -21,7 +21,7 @@ export default function ProviderFilters({
   showCityFilter = false,
 }: ProviderFiltersProps) {
   return (
-    <div className="border-y border-slate-200 py-5 mb-6">
+    <div className="mb-5 border-y border-slate-200 py-4">
       <form method="get" className="space-y-4">
         <div className={`grid grid-cols-1 gap-3 items-end ${showCityFilter ? 'md:grid-cols-[minmax(15rem,1fr)_minmax(12rem,0.65fr)_auto]' : 'md:grid-cols-[minmax(15rem,1fr)_auto]'}`}>
           <label htmlFor="provider-search-q" className="block text-sm font-bold text-gray-700">

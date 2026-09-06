@@ -5,6 +5,7 @@ import ProviderCard from '@/components/ui/ProviderCard'
 import CitySelector from '@/components/ui/CitySelector'
 import EmptyState from '@/components/ui/EmptyState'
 import ProviderFilters from '@/components/ui/ProviderFilters'
+import { CategoryIcon } from '@/components/ui/CategoryCard'
 import { CATEGORIES, CITIES, SITE_NAME, SITE_URL } from '@/lib/constants'
 import { hasActiveProviderFilters, parseProviderFilters, searchProviders } from '@/lib/provider-search'
 
@@ -46,9 +47,9 @@ export default async function CategoriaPage({ params, searchParams }: PageProps)
   const hasFilters = hasActiveProviderFilters(filters)
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 md:py-8">
       {/* Breadcrumb */}
-      <nav className="text-sm text-gray-500 mb-6 flex items-center gap-2">
+      <nav aria-label="Ruta de navegación" className="mb-4 flex items-center gap-2 text-sm text-gray-500">
         <Link href="/" className="hover:text-teal-700">Inicio</Link>
         <span>›</span>
         <Link href="/servicios" className="hover:text-teal-700">Servicios</Link>
@@ -57,26 +58,19 @@ export default async function CategoriaPage({ params, searchParams }: PageProps)
       </nav>
 
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-        <div>
-          <div className="flex items-center gap-3 mb-2">
-            <span className="text-4xl">{cat.icon}</span>
-            <h1 className="text-3xl font-bold text-gray-900">{cat.name}</h1>
+      <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex min-w-0 items-start gap-3">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-teal-50 text-teal-700">
+            <CategoryIcon slug={categoria} size={25} />
           </div>
-          <p className="text-gray-600 max-w-2xl">{cat.description}</p>
+          <div className="min-w-0">
+            <h1 className="text-2xl font-extrabold leading-tight text-gray-900 md:text-3xl">{cat.name}</h1>
+            <p className="mt-1 max-w-2xl text-sm leading-relaxed text-gray-600 md:text-base">{cat.description}</p>
+          </div>
         </div>
         <div className="flex-shrink-0 w-full md:w-56">
           <CitySelector currentCategory={categoria} />
         </div>
-      </div>
-
-      {/* SEO text */}
-      <div className="bg-teal-50 rounded-2xl p-5 mb-8 text-sm text-gray-700 leading-relaxed">
-        <p>
-          Encuentra <strong>{cat.name.toLowerCase()}</strong> en Bolivia con perfiles revisados por LaburoPro.
-          Compara perfiles, revisa experiencia, precios de referencia y contacta directamente por WhatsApp.
-          Disponible en Santa Cruz, La Paz, Cochabamba, El Alto y más ciudades del país.
-        </p>
       </div>
 
       <ProviderFilters
@@ -90,19 +84,19 @@ export default async function CategoriaPage({ params, searchParams }: PageProps)
         <EmptyState
           title={hasFilters ? 'No encontramos proveedores con esos filtros' : `No hay proveedores disponibles en ${cat.name} aún`}
           description={hasFilters ? 'Prueba quitando filtros o usando una búsqueda más general.' : 'Estamos creciendo. Sé el primero en publicar tu servicio en esta categoría.'}
-          icon={cat.icon}
+          icon={<CategoryIcon slug={categoria} size={30} />}
           action={
             hasFilters ? (
               <Link
                 href={`/servicios/${categoria}`}
-                className="inline-block px-6 py-3 bg-teal-700 text-white font-semibold rounded-xl hover:bg-teal-800"
+                className="inline-flex min-h-12 items-center rounded-md bg-teal-700 px-6 py-3 font-semibold text-white hover:bg-teal-800"
               >
                 Limpiar filtros
               </Link>
             ) : (
               <Link
                 href="/registro"
-                className="inline-block px-6 py-3 bg-teal-700 text-white font-semibold rounded-xl hover:bg-teal-800"
+                className="inline-flex min-h-12 items-center rounded-md bg-teal-700 px-6 py-3 font-semibold text-white hover:bg-teal-800"
               >
                 Publicar mi servicio
               </Link>
@@ -111,9 +105,7 @@ export default async function CategoriaPage({ params, searchParams }: PageProps)
         />
       ) : (
         <>
-          <p className="text-gray-500 text-sm mb-5">
-            {providers.length} proveedor{providers.length !== 1 ? 'es' : ''} encontrado{providers.length !== 1 ? 's' : ''}
-          </p>
+          <h2 className="sr-only">Trabajadores disponibles</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {providers.map((p) => {
               const cat = p.category
@@ -143,7 +135,7 @@ export default async function CategoriaPage({ params, searchParams }: PageProps)
       )}
 
       {/* City links for SEO */}
-      <div className="mt-12">
+      <div className="mt-10 border-t border-slate-200 pt-7">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
           {cat.name} por ciudad
         </h2>
@@ -152,13 +144,18 @@ export default async function CategoriaPage({ params, searchParams }: PageProps)
             <Link
               key={city.slug}
               href={`/servicios/${categoria}/${city.slug}`}
-              className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm text-gray-700 hover:border-teal-400 hover:text-teal-700 transition-colors"
+              className="min-h-11 rounded-md border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:border-teal-400 hover:text-teal-700"
             >
               {cat.name} en {city.name}
             </Link>
           ))}
         </div>
       </div>
+
+      <p className="mt-8 max-w-4xl border-t border-slate-200 pt-6 text-sm leading-relaxed text-slate-600">
+        Encuentra <strong>{cat.name.toLowerCase()}</strong> en Bolivia con perfiles revisados por LaburoPro.
+        Compara experiencia, fotos, precios de referencia y reseñas antes de contactar directamente por WhatsApp.
+      </p>
     </div>
   )
 }

@@ -503,7 +503,7 @@ export default function PerfilPage() {
           </section>
         )}
 
-        <div className="sticky bottom-0 z-20 -mx-4 sm:mx-0 border-t border-gray-200 bg-white/95 p-4 shadow-[0_-8px_24px_rgba(16,42,51,0.08)] backdrop-blur">
+        <div className="mobile-nav-sticky-offset sticky bottom-0 z-20 -mx-4 sm:mx-0 border-t border-gray-200 bg-white/95 p-4 shadow-[0_-8px_24px_rgba(16,42,51,0.08)] backdrop-blur">
           <div className="flex gap-3 max-w-3xl mx-auto">
             {currentStep > 1 && <button type="button" onClick={goToPreviousStep} className="min-h-12 px-5 rounded-md border border-gray-300 bg-white font-bold text-gray-800">Volver</button>}
             {currentStep < 4 ? (
