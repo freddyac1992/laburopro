@@ -23,7 +23,11 @@ function firstParam(value: SearchParamValue) {
 }
 
 function normalizeText(value: SearchParamValue, maxLength: number) {
-  return (firstParam(value) ?? '').trim().slice(0, maxLength)
+  return (firstParam(value) ?? '')
+    .replace(/[^\p{L}\p{N}\s'-]/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, maxLength)
 }
 
 function normalizeSort(value: SearchParamValue): ProviderSort {
@@ -78,7 +82,7 @@ export async function searchProviders({
     }
 
     if (filters.q) {
-      const q = filters.q.replaceAll('%', '').replaceAll(',', ' ')
+      const q = filters.q
       query = query.or(
         `display_name.ilike.%${q}%,description.ilike.%${q}%,zone.ilike.%${q}%,price_reference.ilike.%${q}%`
       )

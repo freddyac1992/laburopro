@@ -70,6 +70,35 @@ for (const path of publicPages) {
   await expectStatus(path, 200)
 }
 
+const securityResponse = await expectStatus('/', 200)
+const expectedSecurityHeaders = {
+  'content-security-policy-report-only': [
+    "default-src 'self'",
+    "connect-src 'self'",
+    "object-src 'none'",
+    "frame-ancestors 'none'",
+  ],
+  'x-frame-options': ['DENY'],
+  'x-content-type-options': ['nosniff'],
+  'referrer-policy': ['strict-origin-when-cross-origin'],
+  'permissions-policy': ['camera=()', 'microphone=()', 'geolocation=()'],
+  'cross-origin-opener-policy': ['same-origin'],
+  'cross-origin-resource-policy': ['same-origin'],
+}
+for (const [header, expectedValues] of Object.entries(expectedSecurityHeaders)) {
+  const value = securityResponse.headers.get(header) ?? ''
+  for (const expected of expectedValues) {
+    assert(value.includes(expected), `${header} expected to include ${expected}, received ${value || '<missing>'}`)
+  }
+}
+assert(!securityResponse.headers.has('x-powered-by'), 'Responses must not disclose the Next.js runtime')
+
+const maliciousSearch = '<img src=x onerror=alert(1)>'
+const maliciousSearchResponse = await expectStatus(`/servicios?q=${encodeURIComponent(maliciousSearch)}`, 200)
+const maliciousSearchBody = await maliciousSearchResponse.text()
+assert(!maliciousSearchBody.includes(maliciousSearch), 'Search input must not be reflected as executable markup')
+assert(!maliciousSearchBody.includes('&lt;img'), 'Search input must be normalized before rendering')
+
 await expectBody('/login', {
   contains: ['login-google-only', 'data-auth-method="google"'],
   excludes: ['login-email', 'login-password'],

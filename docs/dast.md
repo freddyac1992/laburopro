@@ -42,6 +42,13 @@ Revisar los medios antes de aprobar cada PR y endurecer el umbral tras resolver
 la linea base. La imagen oficial `stable` se actualiza, por lo que las reglas
 pueden cambiar; el informe permite consultar la version utilizada.
 
+La aplicacion publica una CSP en `Report-Only` durante la etapa inicial. Esta
+politica permite detectar recursos que serian bloqueados sin afectar a usuarios.
+`X-Frame-Options: DENY` mantiene activa la proteccion contra clickjacking mientras
+se valida la CSP. Antes de convertirla en `Content-Security-Policy`, probar Google
+OAuth, consultas y subida de imagenes a Supabase, enlaces de WhatsApp y navegacion
+en movil, y revisar violaciones en la consola del navegador.
+
 Para impedir merges con fallos, configurar este check como obligatorio en la
 regla de proteccion de main una vez ejecutado el primer PR. El workflow solo no
 impide que alguien con permisos haga merge.
