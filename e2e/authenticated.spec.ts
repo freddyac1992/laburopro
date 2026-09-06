@@ -12,6 +12,22 @@ import {
   type QaFixture,
 } from './supabase-fixtures'
 
+test.describe('navegación móvil pública', () => {
+  test('mantiene visibles los cuatro destinos principales', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 })
+    await page.goto('/servicios')
+
+    const navigation = page.locator('#mobile-bottom-nav')
+    await expect(navigation).toBeVisible()
+    await expect(navigation.getByRole('link')).toHaveCount(4)
+    await expect(page.locator('#mobile-nav-buscar')).toHaveAttribute('aria-current', 'page')
+
+    await page.locator('#mobile-nav-guardados').click()
+    await expect(page).toHaveURL(/\/guardados$/)
+    await expect(page.locator('#mobile-nav-guardados')).toHaveAttribute('aria-current', 'page')
+  })
+})
+
 test.describe('proveedor autenticado', () => {
   test.use({ storageState: PROVIDER_AUTH_FILE })
 

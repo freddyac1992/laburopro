@@ -19,6 +19,11 @@ const CATEGORY_ICONS = {
   'comida-casera-catering': CookingPot,
 }
 
+export function CategoryIcon({ slug, size = 28, className = '' }: { readonly slug: string; readonly size?: number; readonly className?: string }) {
+  const Icon = CATEGORY_ICONS[slug as keyof typeof CATEGORY_ICONS] ?? Wrench
+  return <Icon size={size} strokeWidth={1.75} className={className} aria-hidden="true" />
+}
+
 interface CategoryCardProps {
   readonly name: string
   readonly slug: string
@@ -28,7 +33,6 @@ interface CategoryCardProps {
 }
 
 export default function CategoryCard({ name, slug, description, providerCount }: CategoryCardProps) {
-  const Icon = CATEGORY_ICONS[slug as keyof typeof CATEGORY_ICONS] ?? Wrench
   return (
     <Link
       href={`/servicios/${slug}`}
@@ -36,7 +40,7 @@ export default function CategoryCard({ name, slug, description, providerCount }:
       id={`category-card-${slug}`}
     >
       <div className="flex w-full items-center justify-between text-teal-700 mb-4">
-        <Icon size={28} strokeWidth={1.75} aria-hidden="true" />
+        <CategoryIcon slug={slug} />
         <ArrowRight size={16} aria-hidden="true" />
       </div>
       <h3 className="font-bold text-[#102a33] text-base leading-snug mb-1 [overflow-wrap:anywhere]">{name}</h3>
