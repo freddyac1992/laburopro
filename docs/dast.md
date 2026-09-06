@@ -29,8 +29,9 @@ Los E2E autenticados existentes son complementarios, no sustituyen esas pruebas.
 ## Resultado
 
 En el PR, abrir el check `ZAP passive scan (QA)` y su resumen. En la ejecucion
-de Actions, descargar `dast-report-<run-id>` y abrir `report.html`.
-Tambien se conservan JSON y Markdown durante 14 dias.
+de Actions, descargar `dast-report-<run-id>` y abrir `report.html` en cualquier
+navegador. El workflow falla si no puede generar este HTML. Tambien se conservan
+JSON y Markdown durante 14 dias.
 Los informes pueden contener URLs y contenido de QA: no publicar los artefactos
 fuera del equipo ni usar datos personales reales en QA.
 

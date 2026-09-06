@@ -84,6 +84,7 @@ jobs:
             exit "$status"
           fi
           test -s dast-reports/report.json
+          test -s dast-reports/report.html
 
       - name: Evaluate findings
         run: node scripts/dast-report.mjs
