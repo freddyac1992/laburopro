@@ -48,7 +48,7 @@ export default function AdminProviderActions({ initialProviders }: Props) {
       .eq('id', id)
 
     if (updateError) {
-      setError(`No se pudo actualizar el proveedor: ${updateError.message}`)
+      setError('No pudimos guardar el cambio del proveedor. Actualiza la lista e inténtalo otra vez.')
     } else {
       setProviders((prev) =>
         prev.map((p) => (p.id === id ? { ...p, ...updates } : p))

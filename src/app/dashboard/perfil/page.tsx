@@ -13,6 +13,7 @@ import {
   PROVIDER_IMAGES_BUCKET,
 } from '@/lib/provider-images'
 import type { ProviderProfile } from '@/types/database'
+import { requestJson, requestErrorMessage, RequestError, SESSION_MESSAGE } from '@/lib/request-json'
 
 type PhotoKind = 'profile' | 'work'
 
@@ -265,7 +266,7 @@ export default function PerfilPage() {
     try {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) throw new Error('Tu sesión expiró. Vuelve a iniciar sesión.')
+      if (!user) throw new RequestError(SESSION_MESSAGE, 401)
       const userId = user.id
 
       async function syncPhoto(kind: PhotoKind) {
@@ -283,7 +284,7 @@ export default function PerfilPage() {
               upsert: true,
             })
 
-          if (uploadError) throw new Error(`No se pudo subir la foto: ${uploadError.message}`)
+          if (uploadError) throw new RequestError('No pudimos subir la foto. Inténtalo más tarde o elige otra imagen.')
           return path
         }
 
@@ -291,7 +292,7 @@ export default function PerfilPage() {
           const { error: removeError } = await supabase.storage
             .from(PROVIDER_IMAGES_BUCKET)
             .remove([path])
-          if (removeError) throw new Error(`No se pudo eliminar la foto: ${removeError.message}`)
+          if (removeError) throw new RequestError('No pudimos quitar la foto. Inténtalo más tarde.')
           return null
         }
 
@@ -323,16 +324,11 @@ export default function PerfilPage() {
         work_photo_path: workPhotoPath,
       }
 
-      const response = await fetch('/api/provider-profile', {
+      const result = await requestJson<{ id?: string }>('/api/provider-profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
-      })
-      const result = (await response.json()) as { id?: string; message?: string }
-
-      if (!response.ok) {
-        throw new Error(result.message ?? 'Error al guardar')
-      }
+      }, 'No pudimos guardar tu perfil. Inténtalo más tarde sin cerrar el formulario.')
 
       if (result.id) setProfileId(result.id)
       if (userId) window.localStorage.removeItem(`laburopro:profile-draft:v1:${userId}`)
@@ -347,8 +343,7 @@ export default function PerfilPage() {
       setSuccess(true)
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'No pudimos guardar tu perfil.'
-      setError(`${msg} Revisa tu conexión e inténtalo nuevamente.`)
+      setError(requestErrorMessage(err, 'No pudimos completar el guardado. Comprueba tu conexión y que las fotos sean JPG, PNG o WebP de menos de 10 MB.'))
     } finally {
       setSaving(false)
     }

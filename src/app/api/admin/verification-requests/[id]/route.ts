@@ -38,7 +38,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     p_decision: decision,
     p_review_note: decision === 'rejected' || decision === 'revoked' ? reason : null,
   })
-  if (error) return NextResponse.json({ message: error.message }, { status: 409 })
+  if (error) return NextResponse.json({ message: 'No pudimos aplicar la decisión. Actualiza la lista para comprobar si la solicitud ya fue revisada.' }, { status: 409 })
 
   const paths = [data?.[0]?.front_path, data?.[0]?.back_path].filter((path): path is string => Boolean(path))
   const cleanup = paths.length === 0 ? null : await admin.storage.from(BUCKET).remove(paths)

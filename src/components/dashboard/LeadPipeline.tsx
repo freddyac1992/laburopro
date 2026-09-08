@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import type { LeadStatus } from '@/types/database'
+import { requestJson, requestErrorMessage } from '@/lib/request-json'
 
 export type DashboardLead = {
   id: string
@@ -69,14 +70,11 @@ export default function LeadPipeline({
     setError(null)
 
     try {
-      const response = await fetch(`/api/leads/${id}`, {
+      const result = await requestJson<{ lead?: { updated_at: string } }>(`/api/leads/${id}`, {
         method: 'PATCH',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ status }),
-      })
-      const result = await response.json() as { message?: string; lead?: { updated_at: string } }
-
-      if (!response.ok) throw new Error(result.message ?? 'No pudimos guardar el cambio. Inténtalo nuevamente.')
+      }, 'No pudimos guardar el estado de este contacto. Inténtalo más tarde.')
 
       setLeads((current) => current.map((lead) => (
         lead.id === id
@@ -84,7 +82,7 @@ export default function LeadPipeline({
           : lead
       )))
     } catch (updateError) {
-      setError(updateError instanceof Error ? updateError.message : 'No pudimos guardar el cambio. Revisa tu conexión e inténtalo nuevamente.')
+      setError(requestErrorMessage(updateError, 'No pudimos guardar el estado de este contacto. Inténtalo más tarde.'))
     } finally {
       setSaving(null)
     }

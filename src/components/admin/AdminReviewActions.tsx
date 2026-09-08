@@ -88,7 +88,7 @@ export default function AdminReviewActions({ initialReviews }: AdminReviewAction
       .eq('id', review.id)
 
     if (updateError) {
-      setError(`No se pudo aprobar la reseña: ${updateError.message}`)
+      setError('No pudimos aprobar la reseña. Actualiza la lista e inténtalo otra vez.')
       setSaving(null)
       return
     }
@@ -98,8 +98,8 @@ export default function AdminReviewActions({ initialReviews }: AdminReviewAction
       setReviews((prev) =>
         prev.map((item) => (item.id === review.id ? { ...item, is_approved: true } : item))
       )
-    } catch (ratingError) {
-      setError(ratingError instanceof Error ? ratingError.message : 'No se pudo recalcular la calificación.')
+    } catch {
+      setError('La reseña se aprobó, pero la puntuación del proveedor no se actualizó. Vuelve a intentar la aprobación para actualizarla.')
     }
 
     setSaving(null)
@@ -115,13 +115,13 @@ export default function AdminReviewActions({ initialReviews }: AdminReviewAction
       .eq('id', review.id)
 
     if (deleteError) {
-      setError(`No se pudo eliminar la reseña: ${deleteError.message}`)
+      setError('No pudimos eliminar la reseña. Actualiza la lista e inténtalo otra vez.')
     } else {
       if (review.provider_id && review.is_approved) {
         try {
           await recalculateProviderRating(review.provider_id)
-        } catch (ratingError) {
-          setError(ratingError instanceof Error ? ratingError.message : 'No se pudo recalcular la calificación.')
+        } catch {
+          setError('La reseña se eliminó, pero la puntuación del proveedor no se actualizó. Contacta al soporte de LaburoPro para corregirla.')
         }
       }
       setReviews((prev) => prev.filter((item) => item.id !== review.id))

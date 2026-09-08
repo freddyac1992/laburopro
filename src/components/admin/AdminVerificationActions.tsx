@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { BadgeCheck, ExternalLink, FileImage, ShieldOff, XCircle } from 'lucide-react'
 import type { AdminVerificationRequest } from '@/app/admin/verificaciones/page'
 import type { VerificationStatus } from '@/types/database'
+import { requestJson, requestErrorMessage } from '@/lib/request-json'
 
 type Filter = 'pending' | 'approved' | 'rejected' | 'revoked' | 'all'
 
@@ -48,13 +49,11 @@ export default function AdminVerificationActions({ initialRequests }: { readonly
     if (decision === 'revoked' && !window.confirm('¿Retirar esta verificación? La insignia desaparecerá del perfil.')) return
     setSaving(id)
     try {
-      const response = await fetch(`/api/admin/verification-requests/${id}`, {
+      const result = await requestJson<{ documentsDeleted?: boolean }>(`/api/admin/verification-requests/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ decision, reason }),
-      })
-      const result = await response.json() as { message?: string; documentsDeleted?: boolean }
-      if (!response.ok) throw new Error(result.message ?? 'No se pudo guardar la decisión.')
+      }, 'No pudimos guardar la decisión. Inténtalo más tarde.')
       setRequests((current) => current.map((item) => item.id === id ? {
         ...item,
         status: decision,
@@ -66,7 +65,7 @@ export default function AdminVerificationActions({ initialRequests }: { readonly
       } : item))
       if (result.documentsDeleted === false) setError('La decisión se guardó, pero revisa manualmente la limpieza de los archivos privados.')
     } catch (reviewError) {
-      setError(reviewError instanceof Error ? reviewError.message : 'No se pudo guardar la decisión.')
+      setError(requestErrorMessage(reviewError, 'No pudimos guardar la decisión. Inténtalo más tarde.'))
     } finally {
       setSaving(null)
     }

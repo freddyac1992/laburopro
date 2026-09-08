@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { slugify } from '@/lib/utils'
 
 type ServerClient = Awaited<ReturnType<typeof createClient>>
+const SAVE_ERROR = 'No pudimos guardar tu perfil. Inténtalo más tarde sin cerrar el formulario.'
 type ProviderProfilePayload = {
   display_name: string
   category_id: string | null
@@ -111,7 +112,7 @@ async function saveProviderProfile(
     .maybeSingle()
 
   if (existingError) {
-    return NextResponse.json({ message: existingError.message }, { status: 500 })
+    return NextResponse.json({ message: SAVE_ERROR }, { status: 500 })
   }
 
   if (existing) {
@@ -123,7 +124,7 @@ async function saveProviderProfile(
       .single()
 
     return error
-      ? NextResponse.json({ message: error.message }, { status: 500 })
+      ? NextResponse.json({ message: SAVE_ERROR }, { status: 500 })
       : NextResponse.json({ id: data.id })
   }
 
@@ -142,7 +143,7 @@ async function saveProviderProfile(
     .single()
 
   return error
-    ? NextResponse.json({ message: error.message }, { status: 500 })
+    ? NextResponse.json({ message: SAVE_ERROR }, { status: 500 })
     : NextResponse.json({ id: data.id })
 }
 
@@ -177,7 +178,7 @@ export async function POST(request: Request) {
 
   const ownerProfileError = await ensureOwnerProfile(supabase, user)
   if (ownerProfileError) {
-    return NextResponse.json({ message: ownerProfileError }, { status: 500 })
+    return NextResponse.json({ message: SAVE_ERROR }, { status: 500 })
   }
 
   const services = Array.isArray(body.services)

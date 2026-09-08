@@ -12,19 +12,23 @@ export default async function VerificationPage() {
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle()
   if (profile?.role === 'admin') redirect('/admin/verificaciones')
 
-  const { data: provider } = await supabase
+  const { data: provider, error: providerError } = await supabase
     .from('provider_profiles')
     .select('id, is_verified')
     .eq('user_id', user.id)
     .maybeSingle()
 
-  const { data: verification } = provider
+  if (providerError) throw new Error('Provider unavailable')
+
+  const { data: verification, error: verificationError } = provider
     ? await supabase
         .from('verification_requests')
         .select('*')
         .eq('provider_id', provider.id)
         .maybeSingle()
-    : { data: null }
+    : { data: null, error: null }
+
+  if (verificationError) throw new Error('Verification unavailable')
 
   return (
     <DashboardShell title="Confirmar mi identidad">

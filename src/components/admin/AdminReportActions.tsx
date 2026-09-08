@@ -64,7 +64,7 @@ export default function AdminReportActions({ initialReports }: AdminReportAction
       .eq('id', id)
 
     if (updateError) {
-      setError(`No se pudo actualizar el reporte: ${updateError.message}`)
+      setError('No pudimos guardar el estado del reporte. Actualiza la lista e inténtalo otra vez.')
     } else {
       setReports((prev) =>
         prev.map((report) => (report.id === id ? { ...report, status } : report))

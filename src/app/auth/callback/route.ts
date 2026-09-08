@@ -5,7 +5,7 @@ import type { Role } from '@/types/database'
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
-  const oauthError = requestUrl.searchParams.get('error_description') ?? requestUrl.searchParams.get('error')
+  const oauthError = requestUrl.searchParams.get('error') ?? requestUrl.searchParams.get('error_description')
 
   // Only allow internal paths to avoid open redirects
   const nextParam = requestUrl.searchParams.get('next') ?? '/dashboard'
@@ -23,22 +23,23 @@ export async function GET(request: NextRequest) {
     NextResponse.redirect(`${origin}/login?error=${encodeURIComponent(message)}`)
 
   if (oauthError) {
-    return redirectToLogin(oauthError)
+    return redirectToLogin(oauthError === 'access_denied' ? 'access_denied' : 'google_failed')
   }
 
   if (!code) {
-    return redirectToLogin('No se pudo autenticar con Google.')
+    return redirectToLogin('google_failed')
   }
 
   const { supabase, applyAuthCookies } = createRouteClient(request)
   const { error } = await supabase.auth.exchangeCodeForSession(code)
   if (error) {
-    return applyAuthCookies(redirectToLogin(error.message))
+    const code = error.code === 'flow_state_expired' || error.code === 'flow_state_not_found' ? error.code : 'google_failed'
+    return applyAuthCookies(redirectToLogin(code))
   }
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
-    return applyAuthCookies(redirectToLogin('No se pudo autenticar con Google.'))
+    return applyAuthCookies(redirectToLogin('google_failed'))
   }
 
   const { data: profile } = (await supabase
