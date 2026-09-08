@@ -52,6 +52,9 @@ jobs:
       - name: Message recovery tests
         run: npm run qa:messages
 
+      - name: Provider dashboard tests
+        run: npm run qa:dashboard
+
       - name: Build
         run: npm run build
 
