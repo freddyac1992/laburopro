@@ -87,11 +87,8 @@ BEGIN
       NEW.rating := 0;
       NEW.review_count := 0;
     ELSIF public.is_admin() THEN
-      -- Admins moderate publication, but identity and reputation only change
-      -- through their dedicated private server processes.
+      -- Keep existing review moderation working; identity requires the RPC.
       NEW.is_verified := OLD.is_verified;
-      NEW.rating := OLD.rating;
-      NEW.review_count := OLD.review_count;
     ELSE
       NEW.is_approved := OLD.is_approved;
       NEW.is_verified := OLD.is_verified;

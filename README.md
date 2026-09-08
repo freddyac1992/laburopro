@@ -28,6 +28,7 @@ En el **SQL Editor** de tu proyecto Supabase, ejecuta los siguientes archivos en
 ```
 1. supabase/schema.sql   — Crea todas las tablas, RLS y triggers
 2. supabase/seed.sql     — Inserta las ciudades y categorías iniciales
+3. supabase/verification-requests.sql — Agrega el proceso privado de identidad
 ```
 
 En una base existente, ejecuta también las migraciones nuevas que correspondan.
@@ -36,6 +37,9 @@ Para habilitar la confirmación de identidad ejecuta, tanto en producción como 
 ```text
 supabase/verification-requests.sql
 ```
+
+Ejecuta esta migración después de los scripts anteriores de seguridad. Es la fuente
+del flujo de verificación y actualiza la protección de los campos del proveedor.
 
 ### 4. Configurar variables de entorno
 
