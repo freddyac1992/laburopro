@@ -126,6 +126,7 @@ export default async function CategoriaPage({ params, searchParams }: PageProps)
                   isVerified={p.is_verified}
                   yearsExperience={p.years_experience}
                   profilePhotoPath={p.profile_photo_path}
+                  workPhotoPath={p.work_photo_path}
                   imageVersion={p.updated_at}
                 />
               )
