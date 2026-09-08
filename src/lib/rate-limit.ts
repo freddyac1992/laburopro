@@ -37,7 +37,7 @@ export async function getRateLimitResponse(
 
   if (error) {
     return NextResponse.json(
-      { message: 'La protección contra abuso no está disponible temporalmente.' },
+      { message: 'No podemos recibir el envío en este momento. Inténtalo más tarde.' },
       {
         status: 503,
         headers: {

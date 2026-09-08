@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { requestJson, requestErrorMessage } from '@/lib/request-json'
 
 interface ProviderReportFormProps {
   readonly providerId: string
@@ -30,37 +31,35 @@ export default function ProviderReportForm({ providerId, providerName }: Provide
     setStatus('saving')
     setError(null)
 
-    const response = await fetch('/api/provider-reports', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        providerId,
-        reason,
-        details,
-        reporterName,
-        reporterContact,
-      }),
-    })
+    try {
+      await requestJson('/api/provider-reports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          providerId,
+          reason,
+          details,
+          reporterName,
+          reporterContact,
+        }),
+      }, 'No pudimos enviar tu reporte. Inténtalo más tarde.')
 
-    const payload = (await response.json().catch(() => ({}))) as { message?: string }
-
-    if (!response.ok) {
-      setError(payload.message ?? 'No se pudo enviar el reporte.')
+      setStatus('success')
+      setReason('')
+      setDetails('')
+      setReporterName('')
+      setReporterContact('')
+    } catch (submissionError) {
+      setError(requestErrorMessage(submissionError, 'No pudimos enviar tu reporte. Inténtalo más tarde.'))
       setStatus('idle')
-      return
     }
-
-    setStatus('success')
-    setReason('')
-    setDetails('')
-    setReporterName('')
-    setReporterContact('')
   }
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-5">
       <button
         type="button"
+        aria-expanded={isOpen}
         onClick={() => setIsOpen((value) => !value)}
         className="w-full text-left flex items-center justify-between gap-3"
       >
@@ -74,18 +73,18 @@ export default function ProviderReportForm({ providerId, providerName }: Provide
       {isOpen && (
         <div className="mt-4 border-t border-gray-100 pt-4">
           {status === 'success' && (
-            <div className="bg-green-50 border border-green-200 text-green-700 rounded-xl p-3 text-sm mb-4">
+            <div role="status" className="bg-green-50 border border-green-200 text-green-700 rounded-xl p-3 text-sm mb-4">
               Gracias. Revisaremos el reporte de {providerName}.
             </div>
           )}
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-3 text-sm mb-4">
+            <div role="alert" className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-3 text-sm mb-4">
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} aria-busy={status === 'saving'} className="space-y-4">
             <div>
               <label htmlFor="report-reason" className="block text-sm font-medium text-gray-700 mb-1.5">
                 Motivo
@@ -108,7 +107,7 @@ export default function ProviderReportForm({ providerId, providerName }: Provide
 
             <div>
               <label htmlFor="report-details" className="block text-sm font-medium text-gray-700 mb-1.5">
-                Detalles
+                ¿Qué ocurrió? (al menos 10 caracteres)
               </label>
               <textarea
                 id="report-details"
@@ -126,7 +125,7 @@ export default function ProviderReportForm({ providerId, providerName }: Provide
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label htmlFor="reporter-name" className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Tu nombre
+                  Tu nombre (opcional)
                 </label>
                 <input
                   id="reporter-name"
@@ -140,7 +139,7 @@ export default function ProviderReportForm({ providerId, providerName }: Provide
 
               <div>
                 <label htmlFor="reporter-contact" className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Contacto
+                  Teléfono o correo (opcional)
                 </label>
                 <input
                   id="reporter-contact"

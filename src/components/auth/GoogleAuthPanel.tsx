@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { BrandMark } from '@/components/brand/BrandLogo'
+import { authErrorMessage } from '@/lib/auth-messages'
 
 type AuthMode = 'login' | 'register'
 
@@ -22,7 +23,7 @@ function GoogleIcon() {
 export default function GoogleAuthPanel({ mode }: { readonly mode: AuthMode }) {
   const searchParams = useSearchParams()
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(searchParams.get('error'))
+  const [error, setError] = useState<string | null>(authErrorMessage(searchParams.get('error')))
   const isRegister = mode === 'register'
 
   useEffect(() => {
@@ -45,9 +46,8 @@ export default function GoogleAuthPanel({ mode }: { readonly mode: AuthMode }) {
       })
 
       if (oauthError) throw oauthError
-    } catch (caughtError: unknown) {
-      const message = caughtError instanceof Error ? caughtError.message : null
-      setError(message || 'No se pudo continuar con Google.')
+    } catch {
+      setError('No pudimos conectar con Google. Revisa tu conexión a internet y vuelve a intentarlo.')
       setLoading(false)
     }
   }

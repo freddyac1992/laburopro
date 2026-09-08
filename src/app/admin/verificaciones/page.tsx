@@ -25,11 +25,13 @@ export default async function AdminVerificacionesPage() {
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle()
   if (profile?.role !== 'admin') redirect('/')
 
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('verification_requests')
     .select('id, legal_name, document_type, document_front_path, document_back_path, status, review_note, submitted_at, reviewed_at, provider:provider_profiles(display_name, slug, is_verified), profile:profiles!verification_requests_user_id_fkey(email)')
     .order('submitted_at', { ascending: false })
     .limit(100)
+
+  if (error) throw new Error('Verification list unavailable')
 
   return (
     <AdminShell title="Verificación de identidades">

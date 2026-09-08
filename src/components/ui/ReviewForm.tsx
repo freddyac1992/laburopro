@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import StarRating from './StarRating'
+import { requestJson, requestErrorMessage } from '@/lib/request-json'
 
 interface ReviewFormProps {
   readonly providerId: string
@@ -20,29 +21,26 @@ export default function ReviewForm({ providerId, providerName }: ReviewFormProps
     setStatus('saving')
     setError(null)
 
-    const response = await fetch('/api/reviews', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        providerId,
-        rating,
-        reviewerName,
-        comment,
-      }),
-    })
+    try {
+      await requestJson('/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          providerId,
+          rating,
+          reviewerName,
+          comment,
+        }),
+      }, 'No pudimos enviar tu reseña. Inténtalo más tarde.')
 
-    const payload = (await response.json().catch(() => ({}))) as { message?: string }
-
-    if (!response.ok) {
-      setError(payload.message ?? 'No se pudo enviar la reseña.')
+      setStatus('success')
+      setReviewerName('')
+      setComment('')
+      setRating(5)
+    } catch (submissionError) {
+      setError(requestErrorMessage(submissionError, 'No pudimos enviar tu reseña. Inténtalo más tarde.'))
       setStatus('idle')
-      return
     }
-
-    setStatus('success')
-    setReviewerName('')
-    setComment('')
-    setRating(5)
   }
 
   return (
@@ -53,18 +51,18 @@ export default function ReviewForm({ providerId, providerName }: ReviewFormProps
       </p>
 
       {status === 'success' && (
-        <div className="bg-green-50 border border-green-200 text-green-700 rounded-xl p-3 text-sm mb-4">
+        <div role="status" className="bg-green-50 border border-green-200 text-green-700 rounded-xl p-3 text-sm mb-4">
           Gracias. Recibimos tu reseña y quedará visible cuando sea aprobada.
         </div>
       )}
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-3 text-sm mb-4">
+        <div role="alert" className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-3 text-sm mb-4">
           {error}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} aria-busy={status === 'saving'} className="space-y-4">
         <fieldset>
           <legend className="block text-sm font-medium text-gray-700 mb-1.5">
             Calificación
@@ -79,7 +77,7 @@ export default function ReviewForm({ providerId, providerName }: ReviewFormProps
 
         <div>
           <label htmlFor="reviewer-name" className="block text-sm font-medium text-gray-700 mb-1.5">
-            Tu nombre
+            Tu nombre (opcional)
           </label>
           <input
             id="reviewer-name"
@@ -93,7 +91,7 @@ export default function ReviewForm({ providerId, providerName }: ReviewFormProps
 
         <div>
           <label htmlFor="review-comment" className="block text-sm font-medium text-gray-700 mb-1.5">
-            Comentario
+            Cuéntanos tu experiencia (al menos 10 caracteres)
           </label>
           <textarea
             id="review-comment"

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { BadgeCheck, Camera, Clock3, FileCheck2, LockKeyhole, ShieldCheck, XCircle } from 'lucide-react'
 import { compressProviderImage } from '@/lib/provider-images'
+import { requestJson, requestErrorMessage } from '@/lib/request-json'
 import type { VerificationDocumentType, VerificationRequest, VerificationStatus } from '@/types/database'
 
 type Props = {
@@ -88,13 +89,11 @@ export default function VerificationRequestForm({ hasProfile, isVerified, initia
       data.set('front', frontImage, 'front.webp')
       if (backImage) data.set('back', backImage, 'back.webp')
 
-      const response = await fetch('/api/verification-request', { method: 'POST', body: data })
-      const result = await response.json() as { message?: string; status?: VerificationStatus }
-      if (!response.ok) throw new Error(result.message ?? 'No pudimos enviar la solicitud.')
+      await requestJson('/api/verification-request', { method: 'POST', body: data }, 'No pudimos enviar tus documentos. Inténtalo más tarde.')
       setStatus('pending')
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (submissionError) {
-      setError(submissionError instanceof Error ? submissionError.message : 'No pudimos enviar la solicitud.')
+      setError(requestErrorMessage(submissionError, 'No pudimos preparar las fotos. Elige imágenes JPG, PNG o WebP de menos de 10 MB y vuelve a intentarlo.'))
     } finally {
       setSaving(false)
     }

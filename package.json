@@ -9,6 +9,7 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "qa:http": "node scripts/qa-http.mjs",
+    "qa:messages": "node --experimental-strip-types --test tests/messages.test.mjs",
     "qa:e2e": "playwright test"
   },
   "dependencies": {
