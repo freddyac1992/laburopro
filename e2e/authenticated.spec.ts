@@ -64,6 +64,10 @@ test.describe('proveedor autenticado', () => {
     await expect(page.getByRole('heading', { name: 'Actualizar mi información' })).toBeVisible()
     await expect(page.locator('#perfil-nombre')).toHaveValue(PROVIDER_NAME)
 
+    await page.goto('/dashboard/verificacion')
+    await expect(page.getByRole('heading', { name: 'Confirmar mi identidad' })).toBeVisible()
+    await expect(page.getByText('Tus documentos son privados')).toBeVisible()
+
     const fixture = JSON.parse(await readFile(FIXTURE_FILE, 'utf8')) as QaFixture
     const providerId = await approveProviderForQa(fixture.providerUserId)
     const adminClient = createQaAdminClient()
@@ -146,6 +150,7 @@ test.describe('administrador autenticado', () => {
       ['/admin/contactos', 'Leads y contactos'],
       ['/admin/resenas', 'Moderación de reseñas'],
       ['/admin/reportes', 'Reportes de proveedores'],
+      ['/admin/verificaciones', 'Verificación de identidades'],
     ] as const
 
     for (const [path, heading] of modules) {

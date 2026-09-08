@@ -60,22 +60,25 @@ CREATE TRIGGER protect_profile_role
   BEFORE UPDATE ON public.profiles
   FOR EACH ROW EXECUTE FUNCTION public.protect_profile_role();
 
--- 3. Only admins can set moderation/reputation columns.
---    For non-admins these silently keep their previous values
---    (or safe defaults on INSERT), so the profile form keeps working.
+-- 3. Only admins can moderate publication. Identity and reputation are
+--    reserved for private server processes using service_role.
 CREATE OR REPLACE FUNCTION public.protect_provider_flags()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER SET search_path = public
 AS $$
 BEGIN
-  IF NOT public.is_admin() THEN
+  IF COALESCE(auth.role(), '') <> 'service_role' THEN
     IF TG_OP = 'INSERT' THEN
       NEW.is_approved   := false;
       NEW.is_verified   := false;
       NEW.is_active     := true;
       NEW.rating        := 0;
       NEW.review_count  := 0;
+    ELSIF public.is_admin() THEN
+      NEW.is_verified   := OLD.is_verified;
+      NEW.rating        := OLD.rating;
+      NEW.review_count  := OLD.review_count;
     ELSE
       NEW.is_approved   := OLD.is_approved;
       NEW.is_verified   := OLD.is_verified;

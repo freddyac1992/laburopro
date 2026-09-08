@@ -119,10 +119,11 @@ function ProfileStatus({ provider, leadCount }: Readonly<{ provider: ProviderDas
         <StatusRow label="Personas interesadas" value={String(leadCount)} valueClass="text-teal-700" />
         {!provider.is_approved && <div className="mt-3 bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">Estamos revisando tu perfil. Te mostraremos públicamente cuando esté listo.</div>}
         {provider.is_approved && (
-          <div className="mt-3">
+          <div className="mt-3 flex flex-wrap gap-4">
             <Link href={`/proveedores/${provider.slug}`} className="text-sm text-teal-700 hover:underline font-medium" target="_blank" id="dashboard-view-profile-link">
               Ver mi perfil como lo ven los clientes
             </Link>
+            {!provider.is_verified && <Link href="/dashboard/verificacion" className="text-sm font-bold text-[#e85d3f] hover:underline">Confirmar mi identidad</Link>}
           </div>
         )}
       </div>

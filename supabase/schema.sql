@@ -421,13 +421,17 @@ LANGUAGE plpgsql
 SECURITY DEFINER SET search_path = public
 AS $$
 BEGIN
-  IF NOT public.is_admin() THEN
+  IF COALESCE(auth.role(), '') <> 'service_role' THEN
     IF TG_OP = 'INSERT' THEN
       NEW.is_approved   := false;
       NEW.is_verified   := false;
       NEW.is_active     := true;
       NEW.rating        := 0;
       NEW.review_count  := 0;
+    ELSIF public.is_admin() THEN
+      NEW.is_verified   := OLD.is_verified;
+      NEW.rating        := OLD.rating;
+      NEW.review_count  := OLD.review_count;
     ELSE
       NEW.is_approved   := OLD.is_approved;
       NEW.is_verified   := OLD.is_verified;
@@ -482,3 +486,103 @@ CREATE POLICY "Providers can delete own fixed images" ON storage.objects
     AND (storage.foldername(name))[1] = auth.uid()::text
     AND storage.filename(name) IN ('profile.webp', 'work.webp')
   );
+
+-- ============================================================
+-- PRIVATE IDENTITY VERIFICATION
+-- ============================================================
+CREATE TABLE IF NOT EXISTS public.verification_requests (
+  id                  uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  provider_id         uuid NOT NULL UNIQUE REFERENCES public.provider_profiles(id) ON DELETE CASCADE,
+  user_id             uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  legal_name          text NOT NULL CHECK (char_length(legal_name) BETWEEN 2 AND 120),
+  document_type       text NOT NULL CHECK (document_type IN ('ci', 'passport')),
+  document_front_path text,
+  document_back_path  text,
+  status              text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected', 'revoked')),
+  review_note         text,
+  submitted_at        timestamptz NOT NULL DEFAULT now(),
+  consented_at        timestamptz NOT NULL DEFAULT now(),
+  reviewed_at         timestamptz,
+  reviewed_by         uuid REFERENCES public.profiles(id),
+  created_at          timestamptz NOT NULL DEFAULT now(),
+  updated_at          timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT verification_pending_has_document CHECK (status <> 'pending' OR document_front_path IS NOT NULL),
+  CONSTRAINT verification_decision_has_reason CHECK (status NOT IN ('rejected', 'revoked') OR review_note IS NOT NULL)
+);
+
+CREATE INDEX IF NOT EXISTS idx_verification_requests_status
+  ON public.verification_requests(status, submitted_at DESC);
+
+ALTER TABLE public.verification_requests ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON public.verification_requests FROM anon, authenticated;
+GRANT SELECT ON public.verification_requests TO authenticated;
+
+CREATE POLICY "Providers can view own verification request" ON public.verification_requests
+  FOR SELECT TO authenticated USING (auth.uid() = user_id);
+CREATE POLICY "Admins can view verification requests" ON public.verification_requests
+  FOR SELECT TO authenticated USING (public.is_admin());
+
+CREATE TRIGGER set_verification_requests_updated_at
+  BEFORE UPDATE ON public.verification_requests
+  FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
+
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES ('verification-documents', 'verification-documents', false, 1048576, ARRAY['image/webp'])
+ON CONFLICT (id) DO UPDATE SET
+  public = false,
+  file_size_limit = EXCLUDED.file_size_limit,
+  allowed_mime_types = EXCLUDED.allowed_mime_types;
+
+DROP FUNCTION IF EXISTS public.review_verification_request(uuid, uuid, text, text);
+CREATE OR REPLACE FUNCTION public.review_verification_request(
+  p_request_id uuid,
+  p_reviewer_id uuid,
+  p_decision text,
+  p_review_note text DEFAULT NULL
+)
+RETURNS TABLE (front_path text, back_path text)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+DECLARE
+  v_request public.verification_requests%ROWTYPE;
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM public.profiles WHERE id = p_reviewer_id AND role = 'admin') THEN
+    RAISE EXCEPTION 'Only administrators can review identity requests';
+  END IF;
+  IF p_decision NOT IN ('approved', 'rejected', 'revoked') THEN
+    RAISE EXCEPTION 'Invalid verification decision';
+  END IF;
+  IF p_decision IN ('rejected', 'revoked') AND NULLIF(trim(p_review_note), '') IS NULL THEN
+    RAISE EXCEPTION 'A review note is required';
+  END IF;
+
+  SELECT * INTO v_request FROM public.verification_requests
+  WHERE id = p_request_id
+    AND (
+      (p_decision = 'revoked' AND status = 'approved')
+      OR (p_decision <> 'revoked' AND status = 'pending')
+    )
+  FOR UPDATE;
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Verification request is not in a valid state for this decision';
+  END IF;
+
+  UPDATE public.provider_profiles
+  SET is_verified = (p_decision = 'approved')
+  WHERE id = v_request.provider_id;
+
+  UPDATE public.verification_requests
+  SET status = p_decision,
+      review_note = CASE WHEN p_decision IN ('rejected', 'revoked') THEN trim(p_review_note) ELSE NULL END,
+      reviewed_at = now(), reviewed_by = p_reviewer_id,
+      document_front_path = NULL, document_back_path = NULL
+  WHERE id = p_request_id;
+
+  RETURN QUERY SELECT v_request.document_front_path, v_request.document_back_path;
+END;
+$$;
+
+REVOKE ALL ON FUNCTION public.review_verification_request(uuid, uuid, text, text) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.review_verification_request(uuid, uuid, text, text) TO service_role;

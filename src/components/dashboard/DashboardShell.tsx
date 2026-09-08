@@ -5,6 +5,7 @@ import BrandLogo from '@/components/brand/BrandLogo'
 const navItems = [
   { label: 'Inicio', href: '/dashboard' },
   { label: 'Mi información', href: '/dashboard/perfil' },
+  { label: 'Confirmar identidad', href: '/dashboard/verificacion' },
   { label: 'Personas interesadas', href: '/dashboard/contactos' },
 ]
 

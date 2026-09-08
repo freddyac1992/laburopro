@@ -238,6 +238,26 @@ assert(adminClientSource.includes("import 'server-only'"), 'Admin Supabase clien
 assert(adminClientSource.includes('SUPABASE_SECRET_KEY'), 'Admin Supabase client must prefer a modern secret key')
 assert(adminClientSource.includes('SUPABASE_SERVICE_ROLE_KEY'), 'Admin Supabase client must support the legacy service role key')
 assert(!adminClientSource.includes('NEXT_PUBLIC_SUPABASE_SERVICE'), 'Service role key must never be public')
+
+const verificationSql = await readFile(new URL('../supabase/verification-requests.sql', import.meta.url), 'utf8')
+const verificationRequestSource = await readFile(new URL('../src/app/api/verification-request/route.ts', import.meta.url), 'utf8')
+const verificationReviewSource = await readFile(new URL('../src/app/api/admin/verification-requests/[id]/route.ts', import.meta.url), 'utf8')
+const verificationDocumentSource = await readFile(new URL('../src/app/api/admin/verification-requests/[id]/document/route.ts', import.meta.url), 'utf8')
+const adminProviderActionsSource = await readFile(new URL('../src/components/admin/AdminProviderActions.tsx', import.meta.url), 'utf8')
+const privacySource = await readFile(new URL('../src/app/privacidad/page.tsx', import.meta.url), 'utf8')
+assert(verificationSql.includes("'verification-documents', 'verification-documents', false"), 'Identity documents must use a private bucket')
+assert(verificationSql.includes('TO service_role'), 'Verification decisions must be restricted to service_role')
+assert(verificationSql.includes("COALESCE(auth.role(), '') <> 'service_role'"), 'Moderation trigger must explicitly recognize the private server role')
+assert(verificationSql.includes("p_decision NOT IN ('approved', 'rejected', 'revoked')"), 'Verification decisions must support audited revocation')
+assert(verificationSql.includes("p_decision = 'revoked' AND status = 'approved'"), 'Only approved identities may be revoked')
+assert(verificationRequestSource.includes("value.type !== 'image/webp'"), 'Identity uploads must enforce a compressed image format')
+assert(verificationRequestSource.includes('MAX_FILE_SIZE = 1024 * 1024'), 'Identity uploads must enforce a strict size limit')
+assert(verificationReviewSource.includes('review_verification_request'), 'Verification decisions must use the atomic database function')
+assert(verificationReviewSource.includes('documentsDeleted'), 'Reviewed identity files must be deleted')
+assert(verificationDocumentSource.includes('createSignedUrl(path, 120)'), 'Admin document links must be short-lived')
+assert(verificationDocumentSource.includes(".eq('status', 'pending')"), 'Documents must only be available while pending')
+assert(!adminProviderActionsSource.includes('admin-verify-'), 'Provider list must not bypass the verification request process')
+assert(privacySource.includes('Los documentos de identidad se guardan en un espacio privado'), 'Privacy policy must disclose identity document handling')
 assert(rateLimitSql.includes('TO service_role'), 'Rate limit RPC must only be granted to service_role')
 assert(!rateLimitSql.includes('TO anon, authenticated'), 'Rate limit RPC must not be public')
 for (const policy of ['leads', 'profile views', 'reviews', 'provider reports']) {
@@ -273,11 +293,13 @@ assert(providerDashboardSource.includes(".eq('status', 'new').lt('created_at', s
 await expectRedirect('/dashboard', '/login')
 await expectRedirect('/dashboard/perfil', '/login')
 await expectRedirect('/dashboard/contactos', '/login')
+await expectRedirect('/dashboard/verificacion', '/login')
 await expectRedirect('/admin', '/login')
 await expectRedirect('/admin/proveedores', '/login')
 await expectRedirect('/admin/contactos', '/login')
 await expectRedirect('/admin/resenas', '/login')
 await expectRedirect('/admin/reportes', '/login')
+await expectRedirect('/admin/verificaciones', '/login')
 await expectRedirect('/auth/callback', '/login?error=')
 await expectStatus('/api/auth/logout', 405)
 await expectRedirect('/api/auth/logout', '/login', { method: 'POST' }, 303)
@@ -289,6 +311,13 @@ await expectStatus('/api/provider-profile', 401, {
     whatsapp: '59170000000',
   }),
 })
+
+await expectStatus('/api/verification-request', 401, { method: 'POST' })
+await expectStatus('/api/admin/verification-requests/00000000-0000-4000-8000-000000000000', 401, {
+  method: 'PATCH',
+  body: JSON.stringify({ decision: 'approved' }),
+})
+await expectStatus('/api/admin/verification-requests/00000000-0000-4000-8000-000000000000/document?side=front', 401)
 
 await expectStatus('/api/leads/00000000-0000-4000-8000-000000000000', 401, {
   method: 'PATCH',

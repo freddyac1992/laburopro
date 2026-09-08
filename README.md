@@ -30,6 +30,13 @@ En el **SQL Editor** de tu proyecto Supabase, ejecuta los siguientes archivos en
 2. supabase/seed.sql     — Inserta las ciudades y categorías iniciales
 ```
 
+En una base existente, ejecuta también las migraciones nuevas que correspondan.
+Para habilitar la confirmación de identidad ejecuta, tanto en producción como en QA:
+
+```text
+supabase/verification-requests.sql
+```
+
 ### 4. Configurar variables de entorno
 
 ```bash
@@ -51,6 +58,11 @@ Las variables de Resend son opcionales. Al configurarlas, cada nuevo contacto de
 WhatsApp genera una notificación por correo para el proveedor. El subdominio del
 remitente debe estar verificado en Resend; si el servicio de correo no está
 configurado o falla, el contacto se registra igualmente.
+
+La confirmación de identidad requiere `SUPABASE_SECRET_KEY` o la clave heredada
+`SUPABASE_SERVICE_ROLE_KEY`. Esta clave se usa únicamente en el servidor para
+guardar documentos en un bucket privado, crear enlaces temporales para los
+administradores y eliminar las imágenes después de la revisión.
 
 ### QA autenticado
 
