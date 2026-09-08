@@ -2,12 +2,14 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
+import { BriefcaseBusiness, CalendarClock, CircleDollarSign, MapPin, ShieldCheck, ShieldAlert } from 'lucide-react'
 import WhatsAppButton from '@/components/ui/WhatsAppButton'
 import VerificationBadge from '@/components/ui/VerificationBadge'
 import ReviewForm from '@/components/ui/ReviewForm'
 import ProviderReportForm from '@/components/ui/ProviderReportForm'
 import FavoriteButton from '@/components/ui/FavoriteButton'
 import StarRating from '@/components/ui/StarRating'
+import { CategoryIcon } from '@/components/ui/CategoryCard'
 import ProfileViewTracker from '@/components/analytics/ProfileViewTracker'
 import { SITE_NAME, SITE_URL } from '@/lib/constants'
 import { createClient } from '@/lib/supabase/server'
@@ -162,11 +164,12 @@ export default async function ProviderProfilePage({ params, searchParams }: Page
     isVerified: provider.is_verified,
     yearsExperience: provider.years_experience,
     profilePhotoPath: provider.profile_photo_path,
+    workPhotoPath: provider.work_photo_path,
     imageVersion: provider.updated_at,
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 md:py-10 lg:px-8">
       {!isAdminPreview && <ProfileViewTracker providerId={provider.id} />}
 
       {isAdminPreview && (!provider.is_approved || !provider.is_active) && (
@@ -190,14 +193,14 @@ export default async function ProviderProfilePage({ params, searchParams }: Page
         <span className="text-gray-900 font-medium">{provider.display_name}</span>
       </nav>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-8">
         {/* Main profile */}
         <div className="md:col-span-2 space-y-6">
           {/* Profile header */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-6">
-            <div className="flex items-start gap-5">
+          <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+            <div className="flex items-start gap-4 p-5 sm:gap-5 sm:p-6">
               {/* Avatar */}
-              <div className="relative w-20 h-20 rounded-2xl overflow-hidden bg-teal-700 flex items-center justify-center text-white font-bold text-2xl flex-shrink-0">
+              <div className="relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-teal-700 text-2xl font-bold text-white">
                 {profilePhotoUrl ? (
                   <Image
                     src={profilePhotoUrl}
@@ -208,53 +211,86 @@ export default async function ProviderProfilePage({ params, searchParams }: Page
                   />
                 ) : initials}
               </div>
-              <div className="flex-1">
+              <div className="min-w-0 flex-1">
                 <div className="flex items-start justify-between gap-3 mb-1">
                   <div className="flex items-start flex-wrap gap-2 min-w-0">
-                    <h1 className="text-2xl font-bold text-gray-900">{provider.display_name}</h1>
-                    {provider.is_verified && <VerificationBadge size="md" />}
+                    <div>
+                      <p className="mb-1 text-xs font-extrabold uppercase text-teal-700">Perfil de trabajo</p>
+                      <h1 className="text-2xl font-extrabold leading-tight text-[#102a33] sm:text-3xl">{provider.display_name}</h1>
+                    </div>
                   </div>
                   {!isAdminPreview && (
                     <FavoriteButton provider={favoriteProvider} className="w-10 h-10 rounded-full flex-shrink-0" />
                   )}
                 </div>
                 {category && (
-                  <p className="text-teal-700 font-semibold text-base">
-                    {category.icon} {category.name}
+                  <p className="mt-2 flex items-center gap-2 text-base font-bold text-teal-700">
+                    <CategoryIcon slug={category.slug} size={19} /> {category.name}
                   </p>
                 )}
-                <div className="flex items-center gap-1 text-gray-500 text-sm mt-1">
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
+                <div className="mt-1.5 flex items-center gap-1.5 text-sm text-gray-600">
+                  <MapPin className="h-4 w-4 shrink-0" aria-hidden="true" />
                   {provider.zone ? `${provider.zone}, ` : ''}{city?.name ?? 'Bolivia'}
                 </div>
 
                 {/* Rating */}
-                {provider.rating > 0 && (
-                  <div className="flex items-center gap-2 mt-2">
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  {provider.is_verified && <VerificationBadge size="sm" />}
+                  {provider.rating > 0 ? (
+                    <div className="flex items-center gap-2">
                     <StarRating value={provider.rating} size="sm" label="Calificación promedio" />
-                    <span className="text-sm text-gray-600">
-                      {provider.rating.toFixed(1)} ({provider.review_count} reseña{provider.review_count !== 1 ? 's' : ''})
+                    <span className="text-sm font-bold text-[#102a33]">
+                      {provider.rating.toFixed(1)} · {provider.review_count} opinión{provider.review_count !== 1 ? 'es' : ''}
                     </span>
                   </div>
-                )}
+                  ) : <span className="text-sm text-slate-500">Aún sin reseñas</span>}
+                </div>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 border-t border-slate-100 bg-[#f6f8f7] text-sm sm:grid-cols-3">
+              <div className="flex min-h-16 items-center gap-2 border-r border-slate-200 px-4 py-3 font-semibold text-slate-700">
+                <ShieldCheck className="h-5 w-5 shrink-0 text-teal-700" aria-hidden="true" />
+                Perfil revisado
+              </div>
+              {provider.years_experience ? (
+                <div className="flex min-h-16 items-center gap-2 px-4 py-3 font-semibold text-slate-700 sm:border-r sm:border-slate-200">
+                  <BriefcaseBusiness className="h-5 w-5 shrink-0 text-teal-700" aria-hidden="true" />
+                  {provider.years_experience} año{provider.years_experience !== 1 ? 's' : ''} trabajando
+                </div>
+              ) : (
+                <div className="flex min-h-16 items-center gap-2 px-4 py-3 font-semibold text-slate-700 sm:border-r sm:border-slate-200">
+                  <MapPin className="h-5 w-5 shrink-0 text-teal-700" aria-hidden="true" />
+                  {city?.name ?? 'Bolivia'}
+                </div>
+              )}
+              <div className="col-span-2 flex min-h-16 items-center gap-2 border-t border-slate-200 px-4 py-3 font-semibold text-slate-700 sm:col-span-1 sm:border-t-0">
+                <CircleDollarSign className="h-5 w-5 shrink-0 text-[#e85d3f]" aria-hidden="true" />
+                {provider.price_reference ?? 'Consulta el precio'}
               </div>
             </div>
           </div>
 
+          {!isAdminPreview && provider.whatsapp && (
+            <div className="rounded-lg border border-teal-200 bg-teal-50 p-4 md:hidden">
+              <p className="mb-3 text-sm font-bold text-teal-950">¿Te interesa su trabajo? Escríbele directamente.</p>
+              <WhatsAppButton phone={provider.whatsapp} providerName={provider.display_name} providerId={provider.id} size="md" className="w-full" />
+            </div>
+          )}
+
           {/* Description */}
           {provider.description && (
-            <div className="bg-white rounded-2xl border border-gray-100 p-6">
-              <h2 className="font-semibold text-gray-900 mb-3">Sobre mí</h2>
+            <div className="rounded-lg border border-slate-200 bg-white p-5 sm:p-6">
+              <h2 className="mb-3 text-lg font-extrabold text-[#102a33]">Sobre su trabajo</h2>
               <p className="text-gray-700 leading-relaxed">{provider.description}</p>
             </div>
           )}
 
           {workPhotoUrl && (
-            <div className="bg-white rounded-2xl border border-gray-100 p-6">
-              <h2 className="font-semibold text-gray-900 mb-3">Trabajo realizado</h2>
+            <div className="rounded-lg border border-slate-200 bg-white p-5 sm:p-6">
+              <div className="mb-4">
+                <h2 className="text-lg font-extrabold text-[#102a33]">Una muestra de su trabajo</h2>
+                <p className="mt-1 text-sm text-slate-500">Foto publicada por el proveedor.</p>
+              </div>
               <div className="relative w-full aspect-[4/3] overflow-hidden rounded-lg bg-gray-100">
                 <Image
                   src={workPhotoUrl}
@@ -269,13 +305,13 @@ export default async function ProviderProfilePage({ params, searchParams }: Page
 
           {/* Services */}
           {provider.services && provider.services.length > 0 && (
-            <div className="bg-white rounded-2xl border border-gray-100 p-6">
-              <h2 className="font-semibold text-gray-900 mb-3">Servicios ofrecidos</h2>
+            <div className="rounded-lg border border-slate-200 bg-white p-5 sm:p-6">
+              <h2 className="mb-3 text-lg font-extrabold text-[#102a33]">Trabajos que realiza</h2>
               <div className="flex flex-wrap gap-2">
                 {provider.services.map((service: string) => (
                   <span
                     key={service}
-                    className="px-3 py-1.5 bg-teal-50 text-teal-800 rounded-full text-sm font-medium border border-teal-100"
+                    className="rounded-md border border-teal-100 bg-teal-50 px-3 py-1.5 text-sm font-semibold text-teal-800"
                   >
                     {service}
                   </span>
@@ -284,7 +320,7 @@ export default async function ProviderProfilePage({ params, searchParams }: Page
             </div>
           )}
 
-          <div className="bg-white rounded-2xl border border-gray-100 p-6">
+          <div className="rounded-lg border border-slate-200 bg-white p-5 sm:p-6">
             <div className="flex items-center justify-between gap-4 mb-4">
               <div>
                 <h2 className="font-semibold text-gray-900">Reseñas</h2>
@@ -330,9 +366,9 @@ export default async function ProviderProfilePage({ params, searchParams }: Page
           <ProviderReportForm providerId={provider.id} providerName={provider.display_name} />
 
           {/* Safety disclaimer */}
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5">
+          <div className="rounded-lg border border-amber-200 bg-amber-50 p-5">
             <div className="flex gap-3">
-              <span className="text-2xl">⚠️</span>
+              <ShieldAlert className="h-6 w-6 shrink-0 text-amber-700" aria-hidden="true" />
               <div>
                 <h3 className="font-semibold text-amber-900 text-sm mb-1">Aviso de seguridad</h3>
                 <p className="text-amber-800 text-xs leading-relaxed">
@@ -348,8 +384,9 @@ export default async function ProviderProfilePage({ params, searchParams }: Page
         {/* Sidebar */}
         <div className="space-y-4">
           {/* Contact card */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-6 sticky top-24">
-            <h2 className="font-semibold text-gray-900 mb-4 text-center">Contactar al proveedor</h2>
+          <div className="sticky top-24 rounded-lg border border-slate-200 bg-white p-5">
+            <h2 className="text-lg font-extrabold text-[#102a33]">Habla directamente</h2>
+            <p className="mb-4 mt-1 text-sm leading-relaxed text-slate-600">Consulta disponibilidad y acuerda el trabajo por WhatsApp.</p>
 
             {provider.whatsapp ? (
               <WhatsAppButton
@@ -367,16 +404,16 @@ export default async function ProviderProfilePage({ params, searchParams }: Page
             )}
 
             {/* Quick info */}
-            <div className="mt-5 space-y-3 text-sm">
+            <div className="mt-5 space-y-1 text-sm">
               {provider.price_reference && (
                 <div className="flex items-center justify-between py-2 border-b border-gray-50">
-                  <span className="text-gray-500">Precio referencial</span>
+                  <span className="flex items-center gap-2 text-gray-500"><CircleDollarSign className="h-4 w-4" aria-hidden="true" />Precio referencial</span>
                   <span className="font-semibold text-gray-900">{provider.price_reference}</span>
                 </div>
               )}
               {provider.years_experience && (
                 <div className="flex items-center justify-between py-2 border-b border-gray-50">
-                  <span className="text-gray-500">Experiencia</span>
+                  <span className="flex items-center gap-2 text-gray-500"><BriefcaseBusiness className="h-4 w-4" aria-hidden="true" />Experiencia</span>
                   <span className="font-medium text-gray-900">
                     {provider.years_experience} año{provider.years_experience !== 1 ? 's' : ''}
                   </span>
@@ -384,13 +421,13 @@ export default async function ProviderProfilePage({ params, searchParams }: Page
               )}
               {provider.availability && (
                 <div className="flex items-center justify-between py-2 border-b border-gray-50">
-                  <span className="text-gray-500">Disponibilidad</span>
+                  <span className="flex items-center gap-2 text-gray-500"><CalendarClock className="h-4 w-4" aria-hidden="true" />Disponibilidad</span>
                   <span className="font-medium text-gray-900">{provider.availability}</span>
                 </div>
               )}
               {city && (
                 <div className="flex items-center justify-between py-2">
-                  <span className="text-gray-500">Ciudad</span>
+                  <span className="flex items-center gap-2 text-gray-500"><MapPin className="h-4 w-4" aria-hidden="true" />Ciudad</span>
                   <span className="font-medium text-gray-900">{city.name}</span>
                 </div>
               )}
@@ -398,10 +435,8 @@ export default async function ProviderProfilePage({ params, searchParams }: Page
 
             {/* Verification info */}
             {provider.is_verified && (
-              <div className="mt-4 flex items-center gap-2 text-green-700 bg-green-50 rounded-xl p-3 text-xs">
-                <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
-                </svg>
+              <div className="mt-4 flex items-center gap-2 rounded-md bg-green-50 p-3 text-xs text-green-700">
+                <ShieldCheck className="h-4 w-4 shrink-0" aria-hidden="true" />
                 <span>Identidad confirmada por LaburoPro</span>
               </div>
             )}

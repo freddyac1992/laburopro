@@ -67,6 +67,17 @@ test.describe('proveedor autenticado', () => {
     const fixture = JSON.parse(await readFile(FIXTURE_FILE, 'utf8')) as QaFixture
     const providerId = await approveProviderForQa(fixture.providerUserId)
     const adminClient = createQaAdminClient()
+    const { data: publicProvider } = await adminClient
+      .from('provider_profiles')
+      .select('slug')
+      .eq('id', providerId)
+      .single()
+
+    expect(publicProvider?.slug).toBeTruthy()
+    await page.goto(`/proveedores/${publicProvider!.slug}`)
+    await expect(page.getByRole('heading', { name: PROVIDER_NAME })).toBeVisible()
+    await expect(page.getByText('Perfil revisado')).toBeVisible()
+    await expect(page.getByRole('link', { name: `Contactar a ${PROVIDER_NAME} por WhatsApp` }).last()).toBeVisible()
 
     const leadResponse = await page.request.post('/api/leads', {
       data: {

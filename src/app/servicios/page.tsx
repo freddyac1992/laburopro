@@ -73,6 +73,7 @@ export default async function ServiciosPage({ searchParams }: ServiciosPageProps
                     isVerified={provider.is_verified}
                     yearsExperience={provider.years_experience}
                     profilePhotoPath={provider.profile_photo_path}
+                    workPhotoPath={provider.work_photo_path}
                     imageVersion={provider.updated_at}
                   />
                 ))}

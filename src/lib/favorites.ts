@@ -12,6 +12,7 @@ export type FavoriteProvider = {
   isVerified?: boolean
   yearsExperience?: number | null
   profilePhotoPath?: string | null
+  workPhotoPath?: string | null
   imageVersion?: string
 }
 
