@@ -30,7 +30,7 @@ const EMPTY_METRICS: DashboardMetrics = {
 async function loadMetrics(
   supabase: Awaited<ReturnType<typeof createClient>>,
   providerId: string | undefined,
-): Promise<DashboardMetrics> {
+): Promise<DashboardMetrics | null> {
   if (!providerId) return EMPTY_METRICS
 
   const analytics = await Promise.all([
@@ -45,6 +45,7 @@ async function loadMetrics(
     supabase.from('leads').select('id', { count: 'exact', head: true }).eq('provider_id', providerId).eq('status', 'new'),
     supabase.from('leads').select('id', { count: 'exact', head: true }).eq('provider_id', providerId).eq('status', 'new').lt('created_at', since(1)),
   ])
+  if (analytics.some((result) => result.error)) return null
   const count = (index: number) => analytics[index]?.count ?? 0
 
   return {
@@ -66,19 +67,22 @@ export default async function DashboardPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('full_name, role')
     .eq('id', user.id)
     .maybeSingle()
 
+  if (profileError) throw new Error('No pudimos cargar tu cuenta.')
   if (profile?.role === 'admin') redirect('/admin')
 
-  const { data: providerProfile } = (await supabase
+  const { data: providerProfile, error: providerError } = (await supabase
     .from('provider_profiles')
     .select('id, display_name, slug, zone, description, services, years_experience, price_reference, whatsapp, availability, profile_photo_path, work_photo_path, is_approved, is_verified, is_active, rating, review_count, category:categories(name), city:cities(name)')
     .eq('user_id', user.id)
-    .maybeSingle()) as { data: ProviderDashboardProfile | null }
+    .maybeSingle()) as { data: ProviderDashboardProfile | null; error: unknown }
+
+  if (providerError) throw new Error('No pudimos cargar tu perfil de trabajo.')
 
   const metrics = await loadMetrics(supabase, providerProfile?.id)
 
