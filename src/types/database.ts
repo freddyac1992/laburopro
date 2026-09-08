@@ -109,6 +109,27 @@ export type ProviderReport = {
   updated_at: string
 }
 
+export type VerificationStatus = 'pending' | 'approved' | 'rejected' | 'revoked'
+export type VerificationDocumentType = 'ci' | 'passport'
+
+export type VerificationRequest = {
+  id: string
+  provider_id: string
+  user_id: string
+  legal_name: string
+  document_type: VerificationDocumentType
+  document_front_path: string | null
+  document_back_path: string | null
+  status: VerificationStatus
+  review_note: string | null
+  submitted_at: string
+  consented_at: string
+  reviewed_at: string | null
+  reviewed_by: string | null
+  created_at: string
+  updated_at: string
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -214,6 +235,13 @@ export interface Database {
           },
         ]
       }
+      verification_requests: {
+        Row: VerificationRequest
+        Insert: Omit<VerificationRequest, 'id' | 'created_at' | 'updated_at' | 'submitted_at' | 'consented_at' | 'reviewed_at' | 'reviewed_by' | 'review_note'> &
+          Partial<Pick<VerificationRequest, 'id' | 'status' | 'review_note' | 'submitted_at' | 'consented_at' | 'reviewed_at' | 'reviewed_by'>>
+        Update: Partial<Omit<VerificationRequest, 'id' | 'provider_id' | 'user_id' | 'created_at'>>
+        Relationships: []
+      }
     }
     Views: Record<string, never>
     Functions: {
@@ -223,6 +251,15 @@ export interface Database {
           p_identifier_hash: string
         }
         Returns: boolean
+      }
+      review_verification_request: {
+        Args: {
+          p_request_id: string
+          p_reviewer_id: string
+          p_decision: 'approved' | 'rejected' | 'revoked'
+          p_review_note?: string | null
+        }
+        Returns: { front_path: string | null; back_path: string | null }[]
       }
     }
     Enums: Record<string, never>

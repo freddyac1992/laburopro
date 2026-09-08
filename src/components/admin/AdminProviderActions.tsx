@@ -39,7 +39,7 @@ export default function AdminProviderActions({ initialProviders }: Props) {
 
   const supabase = createClient()
 
-  async function updateProvider(id: string, updates: Partial<{ is_approved: boolean; is_verified: boolean; is_active: boolean }>) {
+  async function updateProvider(id: string, updates: Partial<{ is_approved: boolean; is_active: boolean }>) {
     setSaving(id)
     setError(null)
     const { error: updateError } = await supabase
@@ -166,28 +166,6 @@ export default function AdminProviderActions({ initialProviders }: Props) {
                       className="text-xs px-3 py-1.5 bg-teal-700 text-white rounded-lg hover:bg-teal-800 disabled:opacity-60"
                     >
                       {saving === p.id ? '…' : 'Aprobar'}
-                    </button>
-                  )}
-
-                  {p.is_approved && !p.is_verified && (
-                    <button
-                      id={`admin-verify-${p.id}`}
-                      disabled={saving === p.id}
-                      onClick={() => updateProvider(p.id, { is_verified: true })}
-                      className="text-xs px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-60"
-                    >
-                      {saving === p.id ? '…' : 'Verificar'}
-                    </button>
-                  )}
-
-                  {p.is_verified && (
-                    <button
-                      id={`admin-unverify-${p.id}`}
-                      disabled={saving === p.id}
-                      onClick={() => updateProvider(p.id, { is_verified: false })}
-                      className="text-xs px-3 py-1.5 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 disabled:opacity-60"
-                    >
-                      Quitar verificación
                     </button>
                   )}
 
