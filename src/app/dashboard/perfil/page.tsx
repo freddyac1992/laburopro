@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
+import { BriefcaseBusiness, Camera, Check, Eye, MapPin, MessageCircle, UserRound } from 'lucide-react'
 import DashboardShell from '@/components/dashboard/DashboardShell'
 import { createClient } from '@/lib/supabase/client'
 import { CATEGORIES, CITIES } from '@/lib/constants'
@@ -20,11 +22,14 @@ const photoConfig = {
 } as const
 
 const WIZARD_STEPS = [
-  { number: 1, label: 'Sobre ti' },
-  { number: 2, label: 'Tu trabajo' },
-  { number: 3, label: 'Tu WhatsApp' },
-  { number: 4, label: 'Tus fotos' },
+  { number: 1, label: 'Sobre ti', icon: UserRound },
+  { number: 2, label: 'Tu trabajo', icon: BriefcaseBusiness },
+  { number: 3, label: 'Tu WhatsApp', icon: MessageCircle },
+  { number: 4, label: 'Tus fotos', icon: Camera },
+  { number: 5, label: 'Revisar', icon: Eye },
 ] as const
+
+const LAST_STEP = WIZARD_STEPS.length
 
 function localWhatsAppNumber(value: string | null | undefined) {
   const digits = value?.replace(/\D/g, '') ?? ''
@@ -161,7 +166,10 @@ export default function PerfilPage() {
   }, [form, loading, profileId, userId])
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+    const value = e.target.name === 'whatsapp'
+      ? e.target.value.replace(/\D/g, '').slice(0, 8)
+      : e.target.value
+    setForm((prev) => ({ ...prev, [e.target.name]: value }))
     setError(null)
     setSuccess(false)
   }
@@ -203,30 +211,35 @@ export default function PerfilPage() {
     setSuccess(false)
   }
 
-  function validateStep(step: number) {
+  function validateStep(step: number): { message: string; fieldId: string } | null {
     if (step === 1) {
-      if (!form.display_name.trim()) return 'Escribe tu nombre o el nombre de tu negocio.'
-      if (!form.category_id) return 'Elige el trabajo que realizas.'
-      if (!form.city_id) return 'Elige la ciudad donde trabajas.'
+      if (!form.display_name.trim()) return { message: 'Escribe tu nombre o el nombre de tu negocio.', fieldId: 'perfil-nombre' }
+      if (!form.category_id) return { message: 'Elige el trabajo que realizas.', fieldId: 'perfil-categoria' }
+      if (!form.city_id) return { message: 'Elige la ciudad donde trabajas.', fieldId: 'perfil-ciudad' }
     }
     if (step === 3 && !form.whatsapp.trim()) {
-      return 'Escribe el número donde quieres recibir mensajes por WhatsApp.'
+      return { message: 'Escribe el número donde quieres recibir mensajes por WhatsApp.', fieldId: 'perfil-whatsapp' }
     }
     if (step === 3 && localWhatsAppNumber(form.whatsapp).length !== 8) {
-      return 'Tu número de WhatsApp debe tener 8 números. Ejemplo: 71234567.'
+      return { message: 'Tu número de WhatsApp debe tener 8 números. Ejemplo: 71234567.', fieldId: 'perfil-whatsapp' }
     }
     return null
+  }
+
+  function showValidationError(validationError: { message: string; fieldId: string }) {
+    setError(validationError.message)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    window.setTimeout(() => document.getElementById(validationError.fieldId)?.focus(), 250)
   }
 
   function goToNextStep() {
     const validationError = validateStep(currentStep)
     if (validationError) {
-      setError(validationError)
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+      showValidationError(validationError)
       return
     }
     setError(null)
-    setCurrentStep((step) => Math.min(4, step + 1))
+    setCurrentStep((step) => Math.min(LAST_STEP, step + 1))
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
@@ -242,7 +255,11 @@ export default function PerfilPage() {
     setSuccess(false)
 
     const requiredError = validateStep(1) ?? validateStep(3)
-    if (requiredError) return setError(requiredError)
+    if (requiredError) {
+      setCurrentStep(requiredError.fieldId === 'perfil-whatsapp' ? 3 : 1)
+      showValidationError(requiredError)
+      return
+    }
 
     setSaving(true)
     try {
@@ -357,20 +374,36 @@ export default function PerfilPage() {
   let submitLabel = 'Enviar mi perfil para revisión'
   if (profileId) submitLabel = 'Guardar mis cambios'
   if (saving) submitLabel = 'Guardando, espera un momento...'
+  const selectedCategory = categoryOptions.find((item) => item.id === form.category_id)?.name
+  const selectedCity = cityOptions.find((item) => item.id === form.city_id)?.name
+  const services = form.services.split(',').map((service) => service.trim()).filter(Boolean)
 
   return (
     <DashboardShell title={profileId ? 'Actualizar mi información' : 'Crear mi perfil de trabajo'}>
       <form onSubmit={handleSubmit} className="space-y-5" id="perfil-form">
+        {!profileId && (
+          <div className="flex gap-3 border-l-4 border-[#e85d3f] bg-[#fff7f4] px-4 py-3 text-sm text-[#673023]">
+            <Check className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
+            <div>
+              <p className="font-extrabold text-[#102a33]">Tu perfil puede estar listo en unos 5 minutos</p>
+              <p className="mt-1 leading-relaxed">Completa un paso a la vez. Tus datos se guardan en este dispositivo hasta que envíes el perfil.</p>
+            </div>
+          </div>
+        )}
         <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-5">
           <div className="flex items-center justify-between gap-3 mb-3">
-            <p className="font-bold text-gray-900">Paso {currentStep} de 4: {WIZARD_STEPS[currentStep - 1].label}</p>
-            {!profileId && <span className="text-xs text-gray-500">Tu avance se guarda en este teléfono</span>}
+            <p className="font-bold text-gray-900">Paso {currentStep} de {LAST_STEP}: {WIZARD_STEPS[currentStep - 1].label}</p>
+            <span className="text-sm font-extrabold text-teal-800">{currentStep * 20}%</span>
           </div>
-          <div className="grid grid-cols-4 gap-2" aria-label={`Paso ${currentStep} de 4`}>
+          <div className="grid grid-cols-5 gap-2" aria-label={`Paso ${currentStep} de ${LAST_STEP}`}>
             {WIZARD_STEPS.map((step) => (
               <div key={step.number} className="min-w-0">
                 <div className={`h-2 rounded-full ${step.number <= currentStep ? 'bg-teal-700' : 'bg-gray-200'}`} />
-                <span className={`hidden sm:block mt-2 text-xs ${step.number === currentStep ? 'font-bold text-teal-800' : 'text-gray-500'}`}>{step.label}</span>
+                <span className={`mt-2 flex items-center justify-center gap-1 text-xs sm:justify-start ${step.number === currentStep ? 'font-bold text-teal-800' : 'text-gray-500'}`}>
+                  <step.icon className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  <span className="hidden sm:inline">{step.label}</span>
+                  <span className="sr-only sm:hidden">{step.label}</span>
+                </span>
               </div>
             ))}
           </div>
@@ -435,20 +468,25 @@ export default function PerfilPage() {
               <input id="perfil-servicios" name="services" type="text" value={form.services} onChange={handleChange} placeholder="Ejemplo: enchufes, duchas, cableado" className="form-input mt-2" />
               <span className="wizard-help block mt-2">Separa cada trabajo con una coma.</span>
             </label>
-            <div className="grid sm:grid-cols-2 gap-5">
-              <label className="wizard-label" htmlFor="perfil-experiencia">
-                Años trabajando <span className="wizard-optional">(opcional)</span>
-                <input id="perfil-experiencia" name="years_experience" type="number" inputMode="numeric" min="0" max="50" value={form.years_experience} onChange={handleChange} placeholder="Ejemplo: 5" className="form-input mt-2" />
-              </label>
-              <label className="wizard-label" htmlFor="perfil-precio">
-                Precio aproximado <span className="wizard-optional">(opcional)</span>
-                <input id="perfil-precio" name="price_reference" type="text" value={form.price_reference} onChange={handleChange} placeholder="Ejemplo: Desde Bs 80" className="form-input mt-2" />
-              </label>
-            </div>
-            <label className="wizard-label" htmlFor="perfil-disponibilidad">
-              ¿Cuándo puedes atender? <span className="wizard-optional">(opcional)</span>
-              <input id="perfil-disponibilidad" name="availability" type="text" value={form.availability} onChange={handleChange} placeholder="Ejemplo: De lunes a sábado" className="form-input mt-2" />
-            </label>
+            <details className="rounded-md border border-gray-200 px-4 py-3">
+              <summary className="min-h-11 cursor-pointer py-2 font-bold text-teal-800">Agregar experiencia, precio y horarios (opcional)</summary>
+              <div className="mt-4 space-y-5 border-t border-gray-100 pt-5">
+                <div className="grid sm:grid-cols-2 gap-5">
+                  <label className="wizard-label" htmlFor="perfil-experiencia">
+                    Años trabajando
+                    <input id="perfil-experiencia" name="years_experience" type="number" inputMode="numeric" min="0" max="50" value={form.years_experience} onChange={handleChange} placeholder="Ejemplo: 5" className="form-input mt-2" />
+                  </label>
+                  <label className="wizard-label" htmlFor="perfil-precio">
+                    Precio aproximado
+                    <input id="perfil-precio" name="price_reference" type="text" value={form.price_reference} onChange={handleChange} placeholder="Ejemplo: Desde Bs 80" className="form-input mt-2" />
+                  </label>
+                </div>
+                <label className="wizard-label" htmlFor="perfil-disponibilidad">
+                  ¿Cuándo puedes atender?
+                  <input id="perfil-disponibilidad" name="availability" type="text" value={form.availability} onChange={handleChange} placeholder="Ejemplo: De lunes a sábado" className="form-input mt-2" />
+                </label>
+              </div>
+            </details>
           </section>
         )}
 
@@ -495,10 +533,51 @@ export default function PerfilPage() {
                 )
               })}
             </div>
-            <div className="rounded-lg bg-gray-50 p-4 text-sm text-gray-700">
-              <p className="font-bold mb-1">Antes de guardar</p>
-              <p>{form.display_name || 'Tu nombre'} · {categoryOptions.find((item) => item.id === form.category_id)?.name || 'sin oficio'} · {cityOptions.find((item) => item.id === form.city_id)?.name || 'sin ciudad'}</p>
-              <p className="mt-1">WhatsApp: {form.whatsapp || 'sin número'}</p>
+          </section>
+        )}
+
+        {currentStep === 5 && (
+          <section className="wizard-panel" aria-labelledby="step-five-title">
+            <div>
+              <h2 id="step-five-title" className="wizard-title">Así verán tu información</h2>
+              <p className="wizard-help">Revisa que tu nombre, trabajo, ciudad y WhatsApp estén correctos antes de enviar.</p>
+            </div>
+            <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
+              {photoPreviews.work && (
+                <div className="relative aspect-[16/7] bg-gray-100">
+                  <Image src={photoPreviews.work} alt="Vista previa de tu trabajo" fill sizes="(max-width: 768px) 100vw, 720px" className="object-cover" unoptimized />
+                </div>
+              )}
+              <div className="p-5 sm:p-6">
+                <div className="flex items-start gap-4">
+                  <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full border-2 border-white bg-teal-50 shadow-sm">
+                    {photoPreviews.profile ? (
+                      <Image src={photoPreviews.profile} alt="Vista previa de tu foto" fill sizes="64px" className="object-cover" unoptimized />
+                    ) : (
+                      <UserRound className="absolute inset-0 m-auto h-7 w-7 text-teal-700" aria-hidden="true" />
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xl font-extrabold text-[#102a33]">{form.display_name}</p>
+                    <p className="mt-1 font-semibold text-teal-800">{selectedCategory}</p>
+                    <p className="mt-1 flex items-center gap-1 text-sm text-gray-600"><MapPin className="h-4 w-4" aria-hidden="true" />{selectedCity}{form.zone ? ` · ${form.zone}` : ''}</p>
+                  </div>
+                </div>
+                {form.description && <p className="mt-5 max-w-2xl leading-relaxed text-gray-700">{form.description}</p>}
+                {services.length > 0 && (
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {services.map((service) => <span key={service} className="rounded-md bg-teal-50 px-3 py-1.5 text-sm font-semibold text-teal-800">{service}</span>)}
+                  </div>
+                )}
+                <div className="mt-5 flex items-center gap-2 border-t border-gray-100 pt-4 font-bold text-[#102a33]">
+                  <MessageCircle className="h-5 w-5 text-[#128c7e]" aria-hidden="true" />
+                  WhatsApp: +591 {form.whatsapp}
+                </div>
+              </div>
+            </div>
+            <div className="border-l-4 border-teal-700 bg-teal-50 px-4 py-3 text-sm leading-relaxed text-teal-950">
+              <p className="font-extrabold">¿Qué pasa después?</p>
+              <p className="mt-1">Guardaremos tu información y LaburoPro la revisará antes de publicarla. Podrás volver a editarla cuando quieras.</p>
             </div>
           </section>
         )}
@@ -506,7 +585,7 @@ export default function PerfilPage() {
         <div className="mobile-nav-sticky-offset sticky bottom-0 z-20 -mx-4 sm:mx-0 border-t border-gray-200 bg-white/95 p-4 shadow-[0_-8px_24px_rgba(16,42,51,0.08)] backdrop-blur">
           <div className="flex gap-3 max-w-3xl mx-auto">
             {currentStep > 1 && <button type="button" onClick={goToPreviousStep} className="min-h-12 px-5 rounded-md border border-gray-300 bg-white font-bold text-gray-800">Volver</button>}
-            {currentStep < 4 ? (
+            {currentStep < LAST_STEP ? (
               <button type="button" onClick={goToNextStep} className="min-h-12 flex-1 rounded-md bg-teal-700 px-5 font-extrabold text-white hover:bg-teal-800">Continuar</button>
             ) : (
               <button type="submit" disabled={saving} id="perfil-submit-btn" className="min-h-12 flex-1 rounded-md bg-[#e85d3f] px-5 font-extrabold text-white hover:bg-[#cf4f34] disabled:opacity-60">
@@ -514,6 +593,11 @@ export default function PerfilPage() {
               </button>
             )}
           </div>
+          {success && (
+            <div className="mx-auto mt-3 flex max-w-3xl justify-end">
+              <Link href="/dashboard" className="min-h-11 inline-flex items-center font-bold text-teal-800">Volver a mis trabajos</Link>
+            </div>
+          )}
         </div>
       </form>
     </DashboardShell>

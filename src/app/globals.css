@@ -74,6 +74,13 @@ input, textarea { caret-color: var(--brand-primary); }
 
 .hero-photo {
   filter: saturate(0.88) contrast(1.04) brightness(0.58);
+  object-position: 68% 28%;
+}
+
+@media (min-width: 768px) {
+  .hero-photo {
+    object-position: 50% 16%;
+  }
 }
 
 .hero-search {

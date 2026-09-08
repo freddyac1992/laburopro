@@ -46,12 +46,17 @@ test.describe('proveedor autenticado', () => {
 
     await page.locator('#perfil-descripcion').fill('Perfil creado automáticamente para verificar el flujo completo.')
     await page.locator('#perfil-servicios').fill('Instalaciones, reparaciones')
+    await page.getByText('Agregar experiencia, precio y horarios (opcional)').click()
     await page.locator('#perfil-experiencia').fill('5')
     await page.locator('#perfil-disponibilidad').fill('De lunes a sábado')
     await page.getByRole('button', { name: 'Continuar' }).click()
 
     await page.locator('#perfil-whatsapp').fill('71234567')
     await page.getByRole('button', { name: 'Continuar' }).click()
+    await expect(page.getByRole('heading', { name: 'Muestra quién eres y cómo trabajas' })).toBeVisible()
+    await page.getByRole('button', { name: 'Continuar' }).click()
+    await expect(page.getByRole('heading', { name: 'Así verán tu información' })).toBeVisible()
+    await expect(page.getByText(PROVIDER_NAME, { exact: true }).last()).toBeVisible()
     await page.locator('#perfil-submit-btn').click()
     await expect(page.getByRole('status')).toContainText('Tu perfil fue guardado correctamente')
 

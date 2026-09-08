@@ -48,7 +48,7 @@ export default function HomePage() {
           fill
           priority
           sizes="100vw"
-          className="hero-photo object-cover object-[68%_center] md:object-center"
+          className="hero-photo object-cover"
         />
         <div className="absolute inset-0 bg-[#08252f]/30" aria-hidden="true" />
 
